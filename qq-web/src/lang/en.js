@@ -8,32 +8,26 @@ export default {
     criminal: 'Criminal', // 服刑人员
     criminalLevel: 'Criminal Level', // 服刑人员级别
     relatives: 'Relatives', // 亲属
-    meetRegister: 'Meet Register', // 会见登记
-    addMeetRegister: 'Add Meet Register', // 添加会见登记
-    sfYz: 'Verification',// 身份验证
-    meetSign: 'Meet Sign', // 会见签到
-    meetNotice: 'Meet Notice', // 会见通知
-    meetMonitor: 'Meet Monitor', // 会见监控
-    meetMonitorGraph: 'Meet Monitor Graph', // 会见监控-图形化
+    yjMessage: 'Yj Message', // 干警信息
+    realtMonitor: 'Realt Monitor',// 实时监控
+    callRecord: 'Call Record', // 通话录音
+    chargeMessage: 'Charge Message', //话费充值
+    telCost: 'Tel Cost', // 话务统计
+    diaryMessage: 'Diary Message', // 日志管理
+    qqRemind: 'Qq Remind', // 亲情提醒
+    czCount: 'Cz Count', //充值统计
+   
     meetSp: 'Meet Sp', // 会见审批
-    yjMessage: 'Yj Message', // 警察信息
-    logRecord: 'Log Record', //日志记录
-    meetRecord: 'Meet Record', // 会见记录
-    meetReport: 'Meet Report', // 会见报表
-    operationLog: 'Operation Log', // 操作日志
-    registerLog: 'Register Log', // 登记记录
+    
     spLog: 'Sp Log', // 审批记录
-    entranceGuard: 'Entrance Guard', // 门禁记录
     systemSet: 'System Set', // 系统设置
     sysUser: 'Sys User', // 系统用户
     sysRoles: 'Sys Roles', // 系统权限配置
     jqSet: 'Jq Set', // 监区设置
-    holidaySet: 'Holiday Set', // 特殊会见日
     spSet: 'Sp Set', //审批设置
     lineSet: 'Line Set', // 线路设置
     gxManage: 'Gx Manage', // 亲属关系
     deptManage: 'Dept Manage', // 部门管理
-    noticeSet: 'Notice Set', //会见通知设置
     sysParam: 'sys Param', // 系统参数
     permission: 'Permission',
     pagePermission: 'Page Permission',
