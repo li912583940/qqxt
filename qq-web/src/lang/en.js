@@ -16,9 +16,7 @@ export default {
     diaryMessage: 'Diary Message', // 日志管理
     qqRemind: 'Qq Remind', // 亲情提醒
     czCount: 'Cz Count', //充值统计
-   
     meetSp: 'Meet Sp', // 会见审批
-    
     spLog: 'Sp Log', // 审批记录
     systemSet: 'System Set', // 系统设置
     sysUser: 'Sys User', // 系统用户
@@ -90,6 +88,7 @@ export default {
     jqName: 'Prison Name',
     add: 'Add',
     confJq: 'Conf Jq',
+    frCard: 'Criminal Card' //罪犯卡号
   },
   /* 服刑 */
   criminal: {

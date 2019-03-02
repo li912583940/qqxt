@@ -13,20 +13,14 @@
         <el-option v-for="item in jbNos" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入IC卡号" v-model="listQuery.frCard" clearable>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入IC卡号" v-model="listQuery.frCard" clearable>
       </el-input>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.state" placeholder="选择服刑状态">
         <el-option v-for="item in states" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.hjJb" placeholder="选择会见级别">
-        <el-option v-for="item in hjJbs" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.stateZdzf" placeholder="选择重点罪犯">
-        <el-option v-for="item in stateZdzfs" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入电话卡号" v-model="listQuery.qqZh" clearable>
+      </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
       <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
       <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
@@ -43,7 +37,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1471px">
+      style="width: 1211px">
       <el-table-column width="100" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
@@ -59,49 +53,42 @@
           <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="160" align="center" label="IC卡号">
+      <el-table-column width="160" align="center" :label="$t('currency.frCard')">
         <template slot-scope="scope">
           <span>{{scope.row.frCard}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="90" align="center" label="级别">
+      <el-table-column width="90" align="center" label="余额">
         <template slot-scope="scope">
-          <span>{{scope.row.jbName}}</span>
+          <span>{{scope.row.qqYe}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="当月会见次数">
+      <el-table-column width="110" align="center" label="拨打次数">
         <template slot-scope="scope">
-          <span>{{scope.row.hjUse}}</span>
+          <span>{{scope.row.qqUse}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="当月剩余次数">
+      <el-table-column width="110" align="center" label="剩余次数">
         <template slot-scope="scope">
-          <span>{{scope.row.hjLeft}}</span>
+          <span>{{scope.row.qqLeft}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="160" align="center" label="入监时间">
+      <el-table-column width="160" align="center" label="电话卡号/密码">
         <template slot-scope="scope">
-          <span>{{scope.row.infoRjsj}}</span>
+          <span>{{scope.row.qqZh}} / {{scope.row.qqMm}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100" align="center" label="重点罪犯">
+      <el-table-column v-if="buttonRole.queryQsPermission==1 || buttonRole.editPermission==1 || buttonRole.deletePermission==1 || buttonRole.statePermission==1 || buttonRole.speciallyPermission==1" align="center" :label="$t('criminal.actions')" width="220" fixed="right">
         <template slot-scope="scope">
-          <span v-if="scope.row.stateZdzf==1" style="color: red;">是</span>
-          <span v-if="scope.row.stateZdzf==0">否</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="100" align="center" label="会见级别">
-        <template slot-scope="scope">
-          <span v-if="scope.row.hjJb==1">正常</span>
-          <span v-if="scope.row.hjJb==-1" style="color: red;">禁止</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="buttonRole.queryQsPermission==1 || buttonRole.editPermission==1 || buttonRole.deletePermission==1" align="center" :label="$t('criminal.actions')" width="280" fixed="right">
-        <template slot-scope="scope">
-        	<el-button v-if="buttonRole.queryQsPermission==1" type="primary" size="mini" @click="handleQsManage(scope.row)">亲属</el-button>
-          <el-button v-if="buttonRole.editPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">{{$t('criminal.edit')}}</el-button>
-          <el-button v-if="buttonRole.deletePermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">{{$t('criminal.delete')}}
-          </el-button>
+        	<div>
+	          <el-button v-if="buttonRole.editPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">{{$t('criminal.edit')}}</el-button>
+	          <el-button v-if="buttonRole.deletePermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">{{$t('criminal.delete')}}</el-button>
+          </div>
+          <div style="margin-top: 2px;">
+          	<el-button v-if="buttonRole.queryQsPermission==1" type="primary" size="mini" @click="handleQsManage(scope.row)">亲属</el-button>
+	          <el-button v-if="buttonRole.statePermission==1" type="primary" size="mini" @click="openState(scope.row)">状态</el-button>
+	        	<el-button v-if="buttonRole.speciallyPermission==1" type="primary" size="mini" @click="openSpecially(scope.row)">特批</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -131,44 +118,11 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="犯人级别" prop="jbNo">
+        <el-form-item label="级别" prop="jbNo">
           <el-select class="filter-item" v-model="dataForm.jbNo" placeholder="请选择">
             <el-option v-for="item in  jbNos" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="会见级别" prop="hjJb">
-          <el-select class="filter-item" v-model="dataForm.hjJb" placeholder="请选择" @change="hjJbChange">
-            <el-option v-for="item in hjJbs" :key="item.id" :label="item.name" :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="禁止时间" prop="hjStopTime">
-          <el-date-picker v-if="dataForm.hjJb==-1" v-model="dataForm.hjStopTime" type="datetime" placeholder="请选取禁止时间" >
-          </el-date-picker>
-          <el-date-picker v-else v-model="dataForm.hjStopTime" type="datetime" placeholder="请选取禁止时间" :disabled="true">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="禁止说明" prop="hjStopSm">
-          <el-input  v-if="dataForm.hjJb==-1" v-model="dataForm.hjStopSm"></el-input>
-          <el-input  v-else v-model="dataForm.hjStopSm" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="入监时间" prop="infoRjsj">
-          <el-date-picker v-model="dataForm.infoRjsj" type="datetime" placeholder="请选取入监时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="罪名" prop="infoZm">
-          <el-input v-model="dataForm.infoZm"></el-input>
-        </el-form-item>
-        <el-form-item label="刑期" prop="infoXq">
-          <el-input v-model="dataForm.infoXq"></el-input>
-        </el-form-item>
-        <el-form-item label="出生日期" prop="infoCsrq">
-          <el-date-picker v-model="dataForm.infoCsrq" type="datetime" placeholder="请选取出生日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="住址" prop="infoHome">
-          <el-input v-model="dataForm.infoHome"></el-input>
         </el-form-item>
         <el-form-item label="重点监控" >
         	<el-radio-group v-model="dataForm.monitorFlag">
@@ -176,24 +130,11 @@
 				    <el-radio :label="'1'">是</el-radio>
 				  </el-radio-group>
         </el-form-item>
-        <el-form-item label="重点罪犯" >
-        	<el-radio-group v-model="dataForm.stateZdzf">
-				    <el-radio :label="0">否</el-radio>
-				    <el-radio :label="1">是</el-radio>
+        <el-form-item label="亲情级别" >
+        	<el-radio-group v-model="dataForm.qqJb">
+				    <el-radio :label="0">禁止</el-radio>
+				    <el-radio :label="1">正常</el-radio>
 				  </el-radio-group>
-        </el-form-item>
-        <el-form-item label="服刑状态" >
-        	<el-radio-group v-model="dataForm.state">
-				    <el-radio :label="0">服刑中</el-radio>
-				    <el-radio :label="1">已出狱</el-radio>
-				  </el-radio-group>
-        </el-form-item>
-        <el-form-item label="出狱时间" prop="outTime">
-          <el-date-picker v-model="dataForm.outTime" type="datetime" placeholder="请选取出狱时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="备注" prop="zdzfType">
-          <el-input v-model="dataForm.zdzfType"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -210,37 +151,29 @@
 	    </div>
       <el-table :key='qsTableKey' :data="qsList" v-loading="qsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
 	      style="width: 1281px;margin-left: 10px;">
-	      <el-table-column width="160" align="center" label="亲属姓名">
+	      <el-table-column width="110" align="center" label="亲属姓名">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.qsName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="100" align="center" label="证件类别">
-	        <template slot-scope="scope">
-	          <span v-if="scope.row.qsZjlb==1">身份证</span>
-	          <span v-if="scope.row.qsZjlb==2">警官证</span>
-	          <span v-if="scope.row.qsZjlb==3">工作证</span>
-	          <span v-if="scope.row.qsZjlb==4">其他</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="180" align="center" label="证件号码">
+	      <el-table-column width="180" align="center" label="亲属身份证">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.qsSfz}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="140" align="center" label="关系">
+	      <el-table-column width="160" align="center" label="IC卡号">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.qsCard}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="90" align="center" label="关系">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.gx}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="140" align="center" label="性别">
+	      <el-table-column width="90" align="center" label="性别">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.xb}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="140" align="center" label="电话号码">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.tele}}</span>
 	        </template>
 	      </el-table-column>
 	      <el-table-column width="300" align="center" label="地址">
@@ -248,9 +181,14 @@
 	          <span>{{scope.row.dz}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="200" align="center" label="备注">
+	      <el-table-column width="140" align="center" label="电话号码">
 	        <template slot-scope="scope">
-	          <span>{{scope.row.bz}}</span>
+	          <span>{{scope.row.tele}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="140" align="center" label="缩位号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.sw}}</span>
 	        </template>
 	      </el-table-column>
 	      <el-table-column v-if="buttonRole.editQsPermission==1 || buttonRole.deleteQsPermission==1" align="center" :label="$t('criminal.actions')" width="200"  fixed="right">
@@ -273,14 +211,8 @@
 		<!-- 亲属新增或编辑 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogQsFormVisible">
       <el-form :rules="rulesQs" :model="dataQsForm" ref="dataQsForm" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
-        <el-form-item label="证件类别" prop="qsZjlb">
-          <el-select class="filter-item" v-model="dataQsForm.qsZjlb" placeholder="请选择">
-            <el-option v-for="item in qsZjlbs" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item label="证件号码" prop="qsSfz">
           <el-input v-model="dataQsForm.qsSfz"></el-input>
-          <!--<el-button  size="mini" type="primary" @click="handleDistinguish()">识别</el-button>-->
         </el-form-item>
         <el-form-item label="亲属姓名" prop="qsName">
           <el-input v-model="dataQsForm.qsName"></el-input>
@@ -305,11 +237,10 @@
         <el-form-item label="电话号码" prop="tele">
           <el-input v-model="dataQsForm.tele"></el-input>
         </el-form-item>
-        <el-form-item label="审批状态">
-          <el-input v-model="dataQsForm.spState" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="备注" prop="bz">
-          <el-input v-model="dataQsForm.bz"></el-input>
+        <el-form-item label="缩位号码" prop="sw">
+          <el-select class="filter-item" v-model="dataQsForm.sw" placeholder="请选择">
+            <el-option v-for="item in sws" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -323,7 +254,7 @@
 
 <script>
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJqList, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList  } from '@/api/criminal'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJqList, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList } from '@/api/criminal'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -351,8 +282,7 @@ export default {
         jbNo: undefined,
         frCard: undefined,
         state: undefined,
-        isHjStop: undefined,
-        stateZdzf: undefined
+        qqZh: undefined,
       },
       
       // 新增或编辑弹窗
@@ -363,18 +293,8 @@ export default {
         frCard: undefined,
         jq: undefined,
         jbNo: undefined,
-        hjJb: 1,
-        hjStopTime: undefined,
-        hjStopSm: undefined,
-        infoRjsj: undefined,
-        infoZm: undefined,
-        infoXq: undefined,
-        infoCsrq: undefined,
-        infoHome: undefined,
         monitorFlag: '0',
-        stateZdzf: 1,
-        state: 0,
-        outTime: undefined,
+        qqJb: 1,
       },
       jqs: [ // 监区下拉选框
       
@@ -392,26 +312,7 @@ export default {
       		name: '已出狱'
       	}
       ],
-      hjJbs: [
-        {
-        	id: 1,
-        	name: '正常'
-        },
-      	{
-      		id: -1,
-      		name: '禁止'
-      	}
-      ],
-      stateZdzfs: [
-        {
-        	id: 1,
-        	name: '是'
-        },
-      	{
-      		id: 0,
-      		name: '否'
-      	}
-      ],
+ 
       excelPath: process.env.BASE_API+"/jlFr/importExcel", //罪犯excel导入地址
       
       dialogFormVisible: false,
@@ -445,7 +346,6 @@ export default {
       dataQsForm: { 
         webId: undefined,
         frNo: undefined,
-        qsZjlb: 1,
         qsSfz: undefined,
         qsName: undefined,
         gx: undefined,
@@ -453,30 +353,12 @@ export default {
         dz: undefined,
         xb: '男',
         tele: undefined,
-        spState: undefined,
-        bz: undefined
+        sw: undefined,
       },
       gxs: [ // 关系
       	
       ],
-      qsZjlbs: [
-        {
-        	id: 1,
-        	name: '身份证'
-        },
-      	{
-      		id: 2,
-      		name: '警官证'
-      	},
-      	{
-      		id: 3,
-      		name: '工作证'
-      	},
-      	{
-      		id: 4,
-      		name: '其他'
-      	}
-      ],
+      sws: [], // 缩位号码
       rulesQs:{
         qsName: [{ required: true, message: '亲属姓名不能为空', trigger: 'blur' }],
         gx: [{ required: true, message: '亲属关系必选', trigger: 'blur' }],
@@ -491,6 +373,8 @@ export default {
       	deletePermission: 0,
       	exportPermission: 0,
       	importPermission: 0,
+      	statePermission: 0,
+      	speciallyPermission: 0,
       	//亲属相关的
       	queryQsPermission: 0,
       	addQsPermission: 0,
@@ -520,30 +404,6 @@ export default {
   	},
     getList() { // 犯人列表
       this.listLoading = true
-//    if(this.listQuery.frName==undefined || this.listQuery.frName==''){
-//    	this.listQuery.frName = undefined
-//    }
-//    if(this.listQuery.frNo==undefined || this.listQuery.frNo==''){
-//    	this.listQuery.frNo = undefined
-//    }
-//    if(this.listQuery.jq==undefined || this.listQuery.jq=='' ){
-//    	this.listQuery.jq = undefined
-//    }
-// 		if(this.listQuery.jbNo==undefined || this.listQuery.jbNo==''){
-// 			this.listQuery.jbNo = undefined
-// 		}
-// 		if(this.listQuery.frCard==undefined || this.listQuery.frCard==''){
-// 			this.listQuery.frCard = undefined
-// 		}
-// 		if(this.listQuery.state==undefined || this.listQuery.state==''){
-// 			this.listQuery.state = undefined
-// 		}
-// 		if(this.listQuery.isHjStop==undefined || this.listQuery.isHjStop=='' ){
-// 			this.listQuery.isHjStop = undefined
-// 		}
-// 		if(this.listQuery.stateZdzf==undefined || this.listQuery.stateZdzf=='' ){
-// 			this.listQuery.stateZdzf = undefined
-// 		}
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -586,7 +446,9 @@ export default {
     		this.buttonRole.deletePermission= 1
     		this.buttonRole.exportPermission= 1
     		this.buttonRole.importPermission= 1
-    		
+    		this.buttonRole.statePermission= 1
+      	this.buttonRole.speciallyPermission= 1
+      	
     		this.buttonRole.queryQsPermission= 1
     		this.buttonRole.addQsPermission= 1
     		this.buttonRole.editQsPermission= 1
@@ -596,7 +458,7 @@ export default {
     		let criminal = buttonRoles.criminal
     		if(criminal.length>0){
     			for(let value of criminal){
-    					if(value=='addPermission'){
+    				if(value=='addPermission'){
     					this.buttonRole.addPermission= 1
     				}else if(value=='editPermission'){
     					this.buttonRole.editPermission= 1
@@ -606,6 +468,10 @@ export default {
     					this.buttonRole.exportPermission= 1
     				}else if(value=='importPermission'){
     					this.buttonRole.importPermission= 1
+    				}else if(value=='statePermission'){
+    					this.buttonRole.statePermission= 1
+    				}else if(value=='speciallyPermission'){
+    					this.buttonRole.speciallyPermission= 1
     				}
     				else if(value=='queryQsPermission'){
     					this.buttonRole.queryQsPermission= 1
@@ -664,48 +530,17 @@ export default {
 	    this.dataForm.frCard= undefined
 	    this.dataForm.jq= this.jqs.length === 0?undefined:this.jqs[0].id
 	    this.dataForm.jbNo= this.jbNos.length === 0?undefined:this.jbNos[0].id
-	    this.dataForm.hjJb= 1
-	    this.dataForm.hjStopTime = undefined
-      this.dataForm.hjStopSm = undefined
-	    this.dataForm.infoRjsj= undefined
-	    this.dataForm.infoZm= undefined
-	    this.dataForm.infoXq= undefined
-	    this.dataForm.infoCsrq= undefined
-	    this.dataForm.infoHome= undefined
 	    this.dataForm.monitorFlag= '0'
-	    this.dataForm.stateZdzf= 1
-	    this.dataForm.state= 0
-	    this.dataForm.outTime=undefined
-	  },
-	  hjJbChange(val) { // 会见级别 正常 清空禁止时间 禁止说明
-	  	if(val==1){
-	  		this.dataForm.hjStopTime=undefined
-	  		this.dataForm.hjStopSm=undefined
-	  	}
+	    this.dataForm.qqJb= 1
 	  },
     handleCreate() {
       this.dialogStatus = 'create'
       this.resetForm('dataForm')
       this.dialogFormVisible = true
-//    this.$nextTick(() => {
-//      this.$refs['dataForm'].clearValidate()
-//    })
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-        	if(this.dataForm.infoRjsj){
-        		this.dataForm.infoRjsj = this.dateFormats(this.dataForm.infoRjsj);
-        	}
-        	if(this.dataForm.infoCsrq){
-        		this.dataForm.infoCsrq = this.dateFormats(this.dataForm.infoCsrq);
-        	}
-        	if(this.dataForm.outTime){
-        		this.dataForm.outTime = this.dateFormats(this.dataForm.outTime);
-        	}
-        	if(this.dataForm.hjStopTime){
-        		this.dataForm.hjStopTime = this.dateFormats(this.dataForm.hjStopTime);
-        	}
           RequestAdd(this.dataForm).then((res) => {
 	      		this.dialogFormVisible = false
 	          this.getList()
@@ -726,18 +561,8 @@ export default {
         this.dataForm.frCard = res.data.frCard
         this.dataForm.jq = res.data.jq
         this.dataForm.jbNo = res.data.jbNo
-        this.dataForm.hjJb = res.data.hjJb
-        this.dataForm.hjStopTime =  res.data.hjStopTime
-        this.dataForm.hjStopSm = res.data.hjStopSm
-        this.dataForm.infoRjsj = res.data.infoRjsj
-        this.dataForm.infoZm = res.data.infoZm
-        this.dataForm.infoXq = res.data.infoXq
-        this.dataForm.infoCsrq = res.data.infoCsrq
-        this.dataForm.infoHome = res.data.infoHome
         this.dataForm.monitorFlag = res.data.monitorFlag
-        this.dataForm.stateZdzf = res.data.stateZdzf
-        this.dataForm.state = res.data.state
-        this.dataForm.outTime = res.data.outTime
+        this.dataForm.qqJb = res.data.qqJb
     	})
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -748,18 +573,6 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-        	if(this.dataForm.infoRjsj){
-        		this.dataForm.infoRjsj = this.dateFormats(this.dataForm.infoRjsj);
-        	}
-        	if(this.dataForm.infoCsrq){
-        		this.dataForm.infoCsrq = this.dateFormats(this.dataForm.infoCsrq);
-        	}
-        	if(this.dataForm.outTime){
-        		this.dataForm.outTime = this.dateFormats(this.dataForm.outTime);
-        	}
-        	if(this.dataForm.hjStopTime){
-        		this.dataForm.hjStopTime = this.dateFormats(this.dataForm.hjStopTime);
-        	}
           RequestEdit(this.dataForm).then(res => {
 	      		this.dialogFormVisible = false
 	          this.getList()
@@ -786,31 +599,6 @@ export default {
 			})
 		},
     handleDownload() {
-//			if(!this.listQuery.frName){
-//    	this.listQuery.frName = undefined
-//    }
-//    if(!this.listQuery.frNo){
-//    	this.listQuery.frNo = undefined
-//    }
-//    if(!this.listQuery.jq){
-//    	this.listQuery.jq = undefined
-//    }
-//    if(!this.listQuery.jbNo){
-// 			this.listQuery.jbNo = undefined
-// 		}
-// 		if(!this.listQuery.frCard){
-// 			this.listQuery.frCard = undefined
-// 		}
-// 		if(!this.listQuery.state){
-// 			this.listQuery.state = undefined
-// 		}
-// 		if(!this.listQuery.isHjStop){
-// 			this.listQuery.isHjStop = undefined
-// 		}
-// 		if(!this.listQuery.stateZdzf){
-// 			this.listQuery.stateZdzf = undefined
-// 		}
-   		
    		Message({
         message: '已准备导出罪犯信息文件，请稍等几秒。',
 	      type: 'success',
@@ -863,6 +651,22 @@ export default {
 	    	})
     	}
     },
+    getSwList(id) {
+    	this.sws = []
+    	let param ={
+    		frNo: this.qsListQuery.frNo,
+    		id: id
+    	}
+    	findSwList(param).then(res =>{
+    		let list = res.swList
+    		for(let x of list){
+    			let value = {}
+    			value.id = x
+    			value.name = x
+    			this.sws.push(value)
+    		}
+    	})
+    },
     handleQsManage(row) { //打开亲属弹框
     	this.qsListQuery.frNo = row.frNo
     	this.qs_frname = row.frName
@@ -890,6 +694,7 @@ export default {
       this.dialogStatus = 'create'
       this.resetQsForm('dataQsForm')
       this.dialogQsFormVisible = true
+      this.getSwList(undefined)
     },
     createQsData() {
       this.$refs['dataQsForm'].validate((valid) => {
@@ -911,7 +716,6 @@ export default {
     	findQsOne(param).then((res) =>{
     		this.dataQsForm.webId = res.data.webId
         this.dataQsForm.frNo = this.qsListQuery.frNo
-        this.dataQsForm.qsZjlb = res.data.qsZjlb
         this.dataQsForm.qsSfz = res.data.qsSfz
         this.dataQsForm.qsName = res.data.qsName
         this.dataQsForm.gx = res.data.gx
@@ -919,14 +723,16 @@ export default {
         this.dataQsForm.dz = res.data.dz
         this.dataQsForm.xb = res.data.xb
         this.dataQsForm.tele = res.data.tele
-        this.dataQsForm.spState = res.data.spState
-        this.dataQsForm.bz = res.data.bz
+        this.dataQsForm.sw = res.data.sw
     	})
       this.dialogStatus = 'update'
       this.dialogQsFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataQsForm'].clearValidate()
       })
+      
+      this.getSwList(row.webId)
+      
     },
     updateQsData() {
       this.$refs['dataQsForm'].validate((valid) => {

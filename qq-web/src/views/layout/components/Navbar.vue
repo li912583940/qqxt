@@ -70,18 +70,6 @@
         <el-button type="primary" @click="updateData">确 定</el-button>
       </div>
     </el-dialog>
-    
-    <object width="0px" height="0px" id="IDCard2" name="IDCard2"  codebase="../../../ocx/SynCardOcx1.CAB#version=1,0,0,1" classid="clsid:4B3CB088-9A00-4D24-87AA-F65C58531039">
-		</object>
-		<audio id="audio1" :src="wavUrl"></audio>
-		<!-- 拍照-->
-		<!--<object id="camera" classid="clsid:792FD9B8-5917-45D2-889D-C49FD174D4E0"
-		  codebase="../../../ocx/capProj1.ocx#version=1,0,0,0"
-		  width=160
-		  height=176
-		  hspace=0
-		  vspace=0>
-		</object>-->
   </div>
 </template>
 
@@ -95,10 +83,8 @@ import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
 
-import { findNotTzList } from '@/api/meetNotice'
 import { EditPassword, ResetUserPassword } from '@/api/login'
 import { Message, MessageBox } from 'element-ui'
-import { findSpNotice } from '@/api/meetSp'
 
 
 export default {
@@ -122,7 +108,6 @@ export default {
   data() {
     return {
       imagephoto: '/static/image/user.jpg',
-    	wavUrl: '/static/video/hjnotice.wav',
     	
     	dialogFormVisible: false,
     	dataForm: { 
@@ -132,35 +117,15 @@ export default {
         userPwdNew: undefined,
       },
       
-      isHjNotice:0,
-      isSpNotice:0,
-      
     	rules: {
         password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
       },
     }
   },
   mounted() {
-  	if(this.setButtonRole()==1){
-  		if(this.timer){
-	  		this.clearInterval(this.timer)
-	  	}else{
-	  		this.timer = setInterval(() =>{
-	  			if(this.isHjNotice==1){
-	  				this.getHjNotice()
-	  			}
-	  			if(this.isSpNotice==1){
-	  				this.getSpNotice()
-	  			}
-	  		}, 60000) //60秒一次
-	  	}
-  	}
-
   },
   destroyed() {
-  	if(this.timer){
-  		clearInterval(this.timer)
-  	}
+
   },
   methods: {
     toggleSideBar() {
@@ -171,67 +136,7 @@ export default {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
     },
-    getHjNotice(){//--会见通知
-    	findNotTzList({}).then(res => {
-    		let list = res.list
-    		if(list.length>0){
-    			// 语音提示
-          this.audioPaly()
-    	
-    			let obj = list[0]
-    			this.$notify({
-	          title: '会见通知',
-	          message: obj.jqName+' '+obj.frName+" 有亲属登记会见，请在《会见通知》菜单查看",
-	          position: 'bottom-right',
-	          type: 'warning'
-	        });
-    		}
-    		
-    	})
-    },
-    setButtonRole() { //右下角弹窗提示 --会见通知 --会见审批
-    	let bool = 0
-    	let roles = sessionStorage.getItem("roles")
-    	if(roles.includes('admin')){
-    		bool=1
-    		this.isHjNotice=1
-    		this.isSpNotice=1
-    	}else{
-    		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
-    		if(buttonRoles.meetNotice){
-    			this.isHjNotice=1
-    			bool=1
-    		}
-    		if(buttonRoles.meetSp){
-    			this.isSpNotice=1
-    			bool=1
-    		}
-    	}
-    	return bool
-    },
-    
-    getSpNotice() {// --会见审批
-    	findSpNotice({}).then(res => {
-				let count = res.data
-				if(count>0){
-					// 语音提示
-          this.audioPaly()
-          
-					this.$notify({
-	          title: '审批通知',
-	          message: "您有新的审批需要处理，请前往《会见审批》菜单查看",
-	          position: 'bottom-right',
-	          type: 'warning'
-	        });
-				}
-			})
-    },
-    
-    audioPaly() {
-    	var audio1 = document.getElementById("audio1")
-			audio1.currentTime = 0;
-			//audio1.play()
-    },
+
     //重置表单
 		resetForm() {
 			this.dataForm.webId= undefined

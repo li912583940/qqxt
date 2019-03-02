@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -444,4 +445,33 @@ public class JlQsServiceImpl extends BaseSqlImpl<JlQsVO> implements JlQsService{
 			}
 		}
 	}
+	
+	@Override
+	public String findSwList(String frNo, Integer id) {
+		Result result = new Result();
+		JlQsVO jlQs = new JlQsVO();
+		jlQs.setFrNo(frNo);
+		List<JlQsVO> jlQsList = this.findList(jlQs);
+		List<Integer> delList = new ArrayList<Integer>();
+		for(JlQsVO t : jlQsList){
+			if(t.getSw() != null){
+				delList.add(t.getSw());
+			}
+		}
+		TreeSet<Integer> swList = new TreeSet<Integer>();
+		for(int i=2;i<=9;i++){
+			if(!delList.contains(i)){
+				swList.add(i);
+			}
+		}
+		if(id != null){
+			JlQsVO t = this.findOne(id);
+			if(t.getSw() != null){
+				swList.add(t.getSw());
+			}
+		}
+		result.putData("swList", swList);
+		return result.toResult();
+	}
+	
 }

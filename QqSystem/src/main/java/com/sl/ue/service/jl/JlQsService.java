@@ -43,4 +43,13 @@ public interface JlQsService extends BaseService<JlQsVO>{
 	 * @作者 LXT @2018年9月30日
 	 */
 	public void wordDownload(JlQsVO model, HttpServletRequest request, HttpServletResponse response);
+	
+	/**
+	 * 说明 [查询缩位号码]
+	 * @param frNo
+	 * @return
+	 * L_晓天  @2019年3月2日
+	 */
+	public String findSwList(String frNo, Integer id);
+	
 }

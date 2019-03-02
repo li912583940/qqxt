@@ -16,10 +16,7 @@ export default {
     diaryMessage: '日志管理',
     qqRemind: '亲情提醒',
     czCount: '充值统计',
-  
     meetSp: '会见审批',
-    
- 
     spLog: '审批记录',
     systemSet: '系统设置',
     sysUser: '系统用户',
@@ -90,7 +87,8 @@ export default {
     jqNo: '监区编号',
     jqName: '监区名称',
     add: '添加',
-    confJq: '配置监区'
+    confJq: '配置监区',
+    frCard: '罪犯卡号',
   },
   /* 服刑 */
   criminal: {

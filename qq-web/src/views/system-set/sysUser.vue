@@ -12,7 +12,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 100%">
+      style="width: 981px">
       <el-table-column width="80" align="center"  :label="$t('criminal.id')">
         <template slot-scope="scope">
           <span>{{scope.row.webId}}</span>

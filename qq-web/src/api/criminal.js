@@ -56,3 +56,6 @@ export const findJqList = params => { return request.get('/jlJq/findList', { par
 
 // 获取犯人级别集合
 export const findJbList = params => { return request.get('/jlJb/findList', { params: params } ).then(res => res) }
+
+// 获取缩位号码
+export const findSwList = params => { return request.get('/jlQs/findSwList', { params: params } ).then(res => res) }
