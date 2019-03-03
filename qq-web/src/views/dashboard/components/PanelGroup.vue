@@ -39,8 +39,8 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">会见批次</div>
-          <count-to :start-val="0" :end-val="hjCount" :duration="3600" class="card-panel-num"/>
+          <div class="card-panel-text">电话批次</div>
+          <count-to :start-val="0" :end-val="qqCount" :duration="3600" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -52,7 +52,7 @@ import CountTo from 'vue-count-to'
 import {findCount as findUserCount } from '@/api/sysUser'
 import {findCount as findFrCount } from '@/api/criminal'
 import {findCount as findQsCount } from '@/api/relatives'
-import {findCount as findHjCount } from '@/api/meetRecord'
+import {findCount as findQqCount } from '@/api/callRecord'
 
 export default {
 	data() {
@@ -60,7 +60,7 @@ export default {
       userCount: 0,
       frCount: 0,
       qsCount: 0,
-      hjCount: 0
+      qqCount: 0
     }
   },
   components: {
@@ -73,7 +73,7 @@ export default {
     this.findUserData()
     this.findFrData()
     this.findQsData()
-    this.findHjData()
+    this.findQqData()
   },
   methods: {
   	findUserData(){
@@ -91,9 +91,9 @@ export default {
   			this.qsCount = res.count
   		})
   	},
-  	findHjData(){
-  		findHjCount({}).then(res => {
-  			this.hjCount = res.count
+  	findQqData(){
+  		findQqCount({}).then(res => {
+  			this.qqCount = res.count
   		})
   	}
  

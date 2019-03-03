@@ -28,24 +28,28 @@
       </el-input>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入亲属姓名" v-model="listQuery.qsName">
       </el-input>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.recRatingState" placeholder="选择评级状态">
-        <el-option v-for="item in recRatingStates" :key="item.id" :label="item.name" :value="item.id">
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入电话号码" v-model="listQuery.tele">
+      </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入本机号码" v-model="listQuery.localTele">
+      </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入警察警号" v-model="listQuery.yjNo">
+      </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入警察姓名：" v-model="listQuery.yjName">
+      </el-input>
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jfType" placeholder="选择计费方式">
+        <el-option v-for="item in jfTypes" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.zw" placeholder="请选择座位">
-        <el-option v-for="item in zws" :key="item.id" :label="item.name" :value="item.id">
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jfFlag" placeholder="选择是否计费">
+        <el-option v-for="item in jfFlags" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.hjType" placeholder="请选择会见类型">
-        <el-option v-for="item in hjTypes" :key="item.id" :label="item.name" :value="item.id">
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.kfFlag" placeholder="选择扣费标志">
+        <el-option v-for="item in kfFlags" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.recordOverTime" placeholder="请选择复听超时">
-        <el-option v-for="item in recordOverTimes" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.recAssessmentState" placeholder="请选择复听状态">
-        <el-option v-for="item in recAssessmentStates" :key="item.id" :label="item.name" :value="item.id">
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.type" placeholder="选择通话类型">
+        <el-option v-for="item in types" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
@@ -69,21 +73,15 @@
           <span>{{scope.row.callTimeLen}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="90" align="center" label="座位名称">
+      <el-table-column width="110" align="center" label="电话号码">
         <template slot-scope="scope">
-          <span>{{scope.row.zw}}</span>
+          <span>{{scope.row.tele}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="会见类型">
+      <el-table-column width="110" align="center" label="通话类型">
         <template slot-scope="scope">
-          <span v-if="scope.row.hjType==1">亲属会见</span>
-          <span v-else-if="scope.row.hjType==2">监护人会见</span>
-          <span v-else-if="scope.row.hjType==3">律师会见</span>
-          <span v-else-if="scope.row.hjType==4">使领馆探视</span>
-          <span v-else-if="scope.row.hjType==5">提审会见</span>
-          <span v-else-if="scope.row.hjType==6">公务会见</span>
-          <span v-else-if="scope.row.hjType==9">特批会见</span>
-          <span v-else-if="scope.row.hjType==99">其他会见</span>
+          <span v-if="scope.row.type==0">亲情电话</span>
+          <span v-else-if="scope.row.type==1">特批电话</span>
         </template>
       </el-table-column>
       <el-table-column width="90" align="center" :label="$t('currency.jqName')">
@@ -91,29 +89,30 @@
           <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100" align="center" :label="$t('currency.frNo')">
+      <el-table-column width="110" align="center" :label="$t('currency.frName')">
         <template slot-scope="scope">
-          <span>{{scope.row.frNo}}</span>
+          <span v-if="scope.row.monitorFlag !=1">{{scope.row.frName}}</span>
+          <span v-if="scope.row.monitorFlag ==1" style="color: red;">{{scope.row.frName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120" align="center" :label="$t('currency.frName')">
+      <el-table-column width="110" align="center" label="亲属姓名">
         <template slot-scope="scope">
-          <span>{{scope.row.frName}}</span>
+          <span>{{scope.row.qsName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="90" align="center" label="亲属个数">
+      <el-table-column width="90" align="center" label="关系">
         <template slot-scope="scope">
-          <span>{{scope.row.qsIndex}}</span>
+          <span>{{scope.row.gx}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="亲属信息">
+      <el-table-column width="110" align="center" label="警察信息">
         <template slot-scope="scope">
-          <span>{{scope.row.qsInfo}}</span>
+          <span>{{scope.row.yjName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="160" align="center" label="警察信息">
+      <el-table-column width="110" align="center" label="本机号码">
         <template slot-scope="scope">
-          <span>{{scope.row.yjNo}}/{{scope.row.yjName}}</span>
+          <span>{{scope.row.localTele}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.playAudioVideoPermission==1 || buttonRole.downAudioVideoPermission==1" width="130" align="center" label="音视频操作" fixed="right">
@@ -487,7 +486,7 @@
 
 <script>
 import { findPojo, findOne, findJqList, GetZwList, GetZs, AddRecordFlag, GetZsAllPojo, GetRatingState, UpdateRatingState, 
-	GetRatingStateAllPojo, GetAllAssessmentPojo, GetOtherInfo, exportExcel } from '@/api/meetRecord'
+	GetRatingStateAllPojo, GetAllAssessmentPojo, GetOtherInfo, exportExcel } from '@/api/callRecord'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -495,7 +494,7 @@ import { parseTime } from '@/utils'
 import { Message, MessageBox } from 'element-ui'
 
 export default {
-  name: 'meetRecord',
+  name: 'callRecord',
   directives: {
     waves
   },
@@ -514,86 +513,68 @@ export default {
         frNo: undefined,
         frName: undefined,
         qsName: undefined,
-        recRatingState: undefined,
-        zw: undefined,
-        hjType: undefined,
-        recordOverTime: undefined,
-        recAssessmentState: undefined,
+        tele: undefined,
+        localTele: undefined,
+        yjNo: undefined,
+        yjName: undefined,
+        
       },
       jqs: [ // 监区下拉选框
       
       ],
-      recRatingStates: [
-      	{
+      jfTypes: [ // 计费方式
+        {
       		id: 0,
-      		name: '未评'
+      		name: '普通'
       	},
       	{
       		id: 1,
-      		name: '异常'
+      		name: '一卡通'
       	},
       	{
       		id: 2,
-      		name: '正常'
+      		name: '翼支付'
       	}
       ],
-      zws: [ //座位
-      
-      ],
-      hjTypes:[
+      jfFlags: [ // 是否计费
         {
+      		id: 0,
+      		name: '免费'
+      	},
+      	{
       		id: 1,
-      		name: '亲属会见'
+      		name: '计费'
+      	}
+      ],
+      kfFlags: [ // 扣费标志
+        {
+      		id: 0,
+      		name: '免费'
+      	},
+      	{
+      		id: 1,
+      		name: '扣费成功'
       	},
       	{
       		id: 2,
-      		name: '监护人会见'
+      		name: '扣费失败'
       	},
       	{
-      		id: 3,
-      		name: '律师会见'
-      	},
-      	{
-      		id: 4,
-      		name: '使领馆探视'
-      	},
-      	{
-      		id: 5,
-      		name: '提审会见'
-      	},
-      	{
-      		id: 6,
-      		name: '公务会见'
-      	},
-      	{
-      		id: 9,
-      		name: '特批会见'
-      	},
-      	{
-      		id: 99,
-      		name: '其他会见'
-      	},
+      		id: -1,
+      		name: '自动扣费中'
+      	}
       ],
-      recordOverTimes: [
+      types: [
         {
       		id: 0,
-      		name: '未超时'
+      		name: '亲情电话'
       	},
       	{
       		id: 1,
-      		name: '已超时'
-      	},
+      		name: '特批电话'
+      	}
       ],
-      recAssessmentStates:[
-        {
-      		id: 0,
-      		name: '未听'
-      	},
-      	{
-      		id: 1,
-      		name: '已听'
-      	},
-      ],
+     
       
       downloadLoading: false,
 	    pickerOptionsStart: {
@@ -1212,9 +1193,9 @@ export default {
       	this.buttonRole.seeOtherPermission= 1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
-    		let meetRecord = buttonRoles.meetRecord
-    		if(meetRecord != undefined && meetRecord.length>0){
-    			for(let value of meetRecord){
+    		let callRecord = buttonRoles.callRecord
+    		if(callRecord != undefined && callRecord.length>0){
+    			for(let value of callRecord){
     				if(value=='exportPermission'){
     					this.buttonRole.exportPermission= 1
     				}else if(value=='playAudioVideoPermission'){

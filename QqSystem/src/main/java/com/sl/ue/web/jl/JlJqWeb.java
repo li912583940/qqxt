@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sl.ue.entity.jl.vo.JlJqVO;
-import com.sl.ue.entity.sys.vo.SysHjServerVO;
+import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.service.jl.JlJqService;
-import com.sl.ue.service.sys.SysHjServerService;
+import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.util.http.Result;
 
 @RestController
@@ -21,7 +21,7 @@ public class JlJqWeb extends Result{
     @Autowired
     private JlJqService jlJqSQL;
     @Autowired
-    private SysHjServerService sysHjServerSQL;
+    private SysQqServerService sysQqServerSQL;
 
     @RequestMapping("/findList")
     public String findList(JlJqVO model,Integer pageSize, Integer pageNum){
@@ -67,8 +67,8 @@ public class JlJqWeb extends Result{
     		}
     	}
     	
-    	SysHjServerVO sysHjServer = new SysHjServerVO();
-    	List<SysHjServerVO> list = sysHjServerSQL.findList(sysHjServer);
+    	SysQqServerVO sysQqServer = new SysQqServerVO();
+    	List<SysQqServerVO> list = sysQqServerSQL.findList(sysQqServer);
     	if(list.size()>0){
     		model.setJy(list.get(0).getServerName());
     	}else{

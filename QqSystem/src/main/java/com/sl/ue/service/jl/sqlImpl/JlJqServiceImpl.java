@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.sl.ue.entity.jl.vo.JlHjJqWeekVO;
 import com.sl.ue.entity.jl.vo.JlJqVO;
-import com.sl.ue.entity.sys.vo.SysHjServerVO;
+import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.service.base.impl.BaseSqlImpl;
 import com.sl.ue.service.jl.JlHjJqWeekService;
 import com.sl.ue.service.jl.JlJqService;
-import com.sl.ue.service.sys.SysHjServerService;
+import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.util.StringUtil;
 import com.sl.ue.util.http.Result;
 
@@ -24,7 +24,7 @@ public class JlJqServiceImpl extends BaseSqlImpl<JlJqVO> implements JlJqService{
 	@Autowired
 	private JlHjJqWeekService jlHjJqWeekSQL;
 	@Autowired
-    private SysHjServerService sysHjServerSQL;
+    private SysQqServerService sysQqServerSQL;
 	
 	public Map<String, Object> findPojoJoin(JlJqVO model, Integer pageSize, Integer pageNum){
 		if(StringUtils.isNotBlank(model.getJqName())){
@@ -87,8 +87,8 @@ public class JlJqServiceImpl extends BaseSqlImpl<JlJqVO> implements JlJqService{
 		jlHjJqWeekSQL.delete(jlHjJqWeek);
 		
 		String jy = "Server1";
-		SysHjServerVO sysHjServer = new SysHjServerVO();
-    	List<SysHjServerVO> list = sysHjServerSQL.findList(sysHjServer);
+		SysQqServerVO sysQqServer = new SysQqServerVO();
+    	List<SysQqServerVO> list = sysQqServerSQL.findList(sysQqServer);
     	if(list.size()>0){
     		jy = list.get(0).getServerName();
     	}

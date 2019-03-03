@@ -24,3 +24,9 @@ export function exportExcel(param) {
     responseType:'blob'
   }).then(res => res)
 }
+
+//获取亲属关系集合
+export const findGxList = params => { return request.get('/jlQsGx/findList', { params: params } ).then(res => res) }
+
+// 获取缩位号码
+export const findSwList = params => { return request.get('/jlQs/findSwList', { params: params } ).then(res => res) }

@@ -70,6 +70,12 @@
         <el-button type="primary" @click="updateData">确 定</el-button>
       </div>
     </el-dialog>
+    
+    <div v-for="(item, index) in sysQqServerList">
+			<object :id="item.serverName" :name="item.serverName" codebase="../../ocx/TeleQqOcx.ocx#version=1,0,0,1" classid="clsid:561E476B-6C4F-4FCC-A8CE-A85C7F781620" 
+		 		width="0" height="0">
+			</object>
+	  </div>
   </div>
 </template>
 
@@ -85,7 +91,7 @@ import ThemePicker from '@/components/ThemePicker'
 
 import { EditPassword, ResetUserPassword } from '@/api/login'
 import { Message, MessageBox } from 'element-ui'
-
+import { GetQqServerList} from '@/api/realtMonitor'
 
 export default {
   components: {
@@ -108,7 +114,9 @@ export default {
   data() {
     return {
       imagephoto: '/static/image/user.jpg',
-    	
+    	// 注册控件
+      sysQqServerList: null,
+      
     	dialogFormVisible: false,
     	dataForm: { 
         webId: undefined,
@@ -120,9 +128,11 @@ export default {
     	rules: {
         password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
       },
+      
     }
   },
   mounted() {
+  	this.getHjServerList()
   },
   destroyed() {
 
@@ -188,7 +198,12 @@ export default {
 	    	}
 				
 			})
-    }
+    },
+    getHjServerList() { // 获取服务器用于注册控件
+			GetQqServerList({}).then(res => {
+				this.sysQqServerList = res.list
+			})
+		},
   }
 }
 </script>

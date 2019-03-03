@@ -2,19 +2,14 @@
   <div class="app-container">
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间"  border fit highlight-current-row
       style="width: 100%">
-      <el-table-column width="100" align="center" label="服务器名称">
-        <template slot-scope="scope">
-          <span>{{scope.row.jy}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="100" align="center" label="通道">
+      <el-table-column width="110" align="center" label="线路逻辑编号">
         <template slot-scope="scope">
           <span>{{scope.row.lineNo}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="座位号">
+      <el-table-column width="90" align="center" :label="$t('currency.jqName')">
         <template slot-scope="scope">
-          <span>{{scope.row.zw}}</span>
+          <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
       <el-table-column width="100" align="center" label="状态">
@@ -24,29 +19,44 @@
           <span v-if="scope.row.monitorState =='应答'">应答</span>
         </template>
       </el-table-column>
-      <el-table-column width="90" align="center" :label="$t('currency.jqName')">
+      <el-table-column width="110" align="center" label="电话号码">
         <template slot-scope="scope">
-          <span>{{scope.row.monitorJq}}</span>
+        	<span v-if="scope.row.monitorFlag == 1" style="color: red;">{{scope.row.monitorTele}}</span>
+        	<span v-if="scope.row.monitorFlag != 1">{{scope.row.monitorTele}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120" align="center" :label="$t('currency.frName')">
+      <el-table-column width="110" align="center" label="类型">
         <template slot-scope="scope">
-          <span>{{scope.row.monitorFr}}</span>
+        	<span v-if="scope.row.monitorFlag == 1" style="color: red;">{{scope.row.monitorType}}</span>
+        	<span v-if="scope.row.monitorFlag != 1">{{scope.row.monitorType}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="300" align="center" label="亲属信息">
+      <el-table-column width="110" align="center" :label="$t('currency.frName')">
         <template slot-scope="scope">
-          <span>{{scope.row.monitorQs}}</span>
+          <span v-if="scope.row.monitorFlag == 1" style="color: red;">{{scope.row.monitorFr}}</span>
+        	<span v-if="scope.row.monitorFlag != 1">{{scope.row.monitorFr}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="110" align="center" label="亲属姓名">
+        <template slot-scope="scope">
+          <span v-if="scope.row.monitorFlag == 1" style="color: red;">{{scope.row.monitorQs}}</span>
+        	<span v-if="scope.row.monitorFlag != 1">{{scope.row.monitorQs}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="100" align="center" label="关系">
+        <template slot-scope="scope">
+          <span v-if="scope.row.monitorFlag == 1" style="color: red;">{{scope.row.monitorGx}}</span>
+        	<span v-if="scope.row.monitorFlag != 1">{{scope.row.monitorGx}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="100" align="center" label="线路号码">
+        <template slot-scope="scope">
+          <span>{{scope.row.localTele}}</span>
         </template>
       </el-table-column>
       <el-table-column width="100" align="center" label="剩余时间">
         <template slot-scope="scope">
           <span>{{scope.row.monitorTime}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120" align="center" label="监听警察">
-        <template slot-scope="scope">
-          <span>{{scope.row.yjName}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.jiantingPermission==1 || buttonRole.qieduanPermission==1 || buttonRole.chahuaPermission==1" align="center" :label="$t('criminal.actions')" width="300" fixed="right">
@@ -57,10 +67,9 @@
           <el-button v-if="buttonRole.chahuaPermission==1" type="primary" size="mini" icon="el-icon-phone-outline" @click="chahua(scope.row)">插话</el-button>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.chahuaPermission==1 || buttonRole.zhushiPermission==1 || buttonRole.updateTimePermission==1" align="center" label="功能" width="210" fixed="right">
+      <el-table-column v-if=" buttonRole.zhushiPermission==1" align="center" label="功能" width="120" fixed="right">
         <template slot-scope="scope">
           <el-button v-if="buttonRole.zhushiPermission==1" size="mini" type="info" icon="el-icon-document" @click="zhushi(scope.row)">注释</el-button>
-          <el-button v-if="buttonRole.updateTimePermission==1" size="mini" type="info" icon="el-icon-time" @click="xiugaiTime(scope.row)">修改时间</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -71,21 +80,6 @@
       </el-pagination>
     </div>
 
-		<el-dialog title="修改时间" :visible.sync="dialogSJVisible">
-      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
-        <el-form-item label="姓名" >
-          <el-input v-model="dataForm.frName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="时间" prop="timeUp" >
-          <el-input v-model="dataForm.timeUp" placeholder="10：延长10分钟，-10：减少10分钟"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogSJVisible = false">取 消</el-button>
-        <el-button type="primary" @click="updateSJ">确 定</el-button>
-      </div>
-    </el-dialog>
-	
 	  <el-dialog title="插话" :visible.sync="dialogCHVisible">
       <el-form :rules="rulesCH" :model="dataFormCH" ref="dataFormCH" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
         <el-form-item label="姓名" >
@@ -118,17 +112,12 @@
       </div>
     </el-dialog>
     
-	  <div v-for="(item, index) in sysHjServerList">
-			<object :id="item.serverName" :name="item.serverName" codebase="../../ocx/TeleQqOcx.ocx#version=1,0,0,1" classid="clsid:561E476B-6C4F-4FCC-A8CE-A85C7F781620" 
-		 		width="0" height="0">
-			</object>
-	  </div>
   </div>
 </template>
 
 <script>
 	
-import { findPojo, UpdateSJ, UpdateYJ, GetHjServerList, GetMonitorVocList, AddMonitorFlag, GetZs, QieduanHj } from '@/api/meetMonitor'
+import { findPojo, GetMonitorVocList, AddMonitorFlag, GetZs} from '@/api/realtMonitor'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -153,23 +142,7 @@ export default {
       
       jtState: 1, //监听状态
       
-      /** 修改时间 开始 */ 
-      dialogSJVisible: false,
-      
-      dataForm: {
-      	webId: undefined,
-      	frName: undefined,
-      	timeUp: undefined
-      },
-      rules: {
-        timeUp: [{ required: true, message: '时间不能为空', trigger: 'blur' }]
-      },
-      /** 修改时间 结束 */ 
-      
       /** 插话 开始 */
-      // 注册控件
-      sysHjServerList: null,
-      
       // 插话
       monitorVocList: [],
       dialogCHVisible: false,
@@ -201,7 +174,6 @@ export default {
       	jiantingPermission: 0,   //监听
       	qieduanPermission: 0,    //切断
       	chahuaPermission: 0,     //插话
-      	updateTimePermission: 0, //修改时间
       	zhushiPermission: 0      //注释
       },
       
@@ -216,7 +188,6 @@ export default {
   mounted() {
   	this.setButtonRole()
   	
-  	this.getHjServerList()
   	this.getMonitorVocList()
   	
   	if(this.timer){
@@ -254,21 +225,18 @@ export default {
     		this.buttonRole.jiantingPermission= 1
     		this.buttonRole.qieduanPermission= 1
     		this.buttonRole.chahuaPermission= 1
-    		this.buttonRole.updateTimePermission= 1
     		this.buttonRole.zhushiPermission= 1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
-    		let meetMonitor = buttonRoles.meetMonitor
-    		if(meetMonitor.length>0){
-    			for(let value of meetMonitor){
+    		let realtMonitor = buttonRoles.realtMonitor
+    		if(realtMonitor.length>0){
+    			for(let value of realtMonitor){
     				if(value=='jiantingPermission'){
     					this.buttonRole.jiantingPermission= 1
     				}else if(value=='qieduanPermission'){
     					this.buttonRole.qieduanPermission= 1
     				}else if(value=='chahuaPermission'){
     					this.buttonRole.chahuaPermission= 1
-    				}else if(value=='updateTimePermission'){
-    					this.buttonRole.updateTimePermission= 1
     				}else if(value=='zhushiPermission'){
     					this.buttonRole.zhushiPermission= 1
     				}
@@ -279,10 +247,6 @@ export default {
     /** 监听 开始 */
     jianting(row){
     	if(row.monitorState=='通话'){
-    		UpdateYJ({webId:row.webId, state:1}).then(res =>{
-    			this.getList()
-    		})
-    		
     		document.getElementById(row.jy).ListenTele(row.lineNo);
     		this.jtState = 2
     	}else{
@@ -297,9 +261,6 @@ export default {
    
     /** 停止监听 开始 */
     jiantingStop(row){
-    	UpdateYJ({webId:row.webId, state:0}).then(res =>{
-				this.getList()
-			})
     	document.getElementById(row.jy).ListenStop(row.lineNo);
     	this.jtState = 1
     	Message({
@@ -312,70 +273,27 @@ export default {
     
     /** 切断 开始 */
     qieduan(row){
-    	this.$confirm('是否确定切断通话？注意：切断后，需要前往会见登记处重新登记会见！', '提示', {
+    	this.$confirm('是否要继续切断通话？切断后，该通话将不可恢复，请确认！', '提示', {
 				type: 'warning'
 			}).then(() => {
-				let param = {
-					hjid:row.hjid
-				}
-				QieduanHj(param).then(res => {
-					UpdateYJ({webId:row.webId, state:0}).then(res =>{
-	    			this.getList()
-	    		})
-					
-					this.jtState = 1
-					this.getList()
-					
-					Message({
-		        message: '已成功切断当前通话',
-			      type: 'success',
-			      duration: 5 * 1000
-		      });
-				}).catch(error =>{
-					Message({
-		        message: '系统原因，切断当前通话失败',
-			      type: 'error',
-			      duration: 5 * 1000
-		      });
-				})
+				document.getElementById(row.jy).StopTele(row.lineNo);
+		    Message({
+	        message: '已成功切断当前通话',
+		      type: 'success',
+		      duration: 5 * 1000
+		    });
+			}).catch(error =>{
+				Message({
+	        message: '系统原因，切断当前通话失败',
+		      type: 'error',
+		      duration: 5 * 1000
+	      });
 			})
     },
     /** 切断 结束 */
   
   
-    /** 修改时间 开始 */
-    
-		resetForm() {//重置表单
-			this.dataForm.webId = undefined
-			this.dataForm.frName = undefined
-			this.dataForm.timeUp = undefined
-	    },
-		xiugaiTime(row){ //修改时间
-			
-			this.resetForm()
-			this.dialogSJVisible =true
-			this.dataForm.webId = row.webId
-			this.dataForm.frName = row.monitorFr
-		},
-		updateSJ(){ //修改时间
-			UpdateSJ(this.dataForm).then(res => {
-			    Message({
-		          message: res.errMsg,
-		          type: 'success',
-		          duration: 5 * 1000
-		        });
-			})
-			this.dialogSJVisible =false
-		},
-		/** 修改时间 结束 */
-		
-		
 		/** 用于插话  开始 */
-		getHjServerList() { // 获取服务器用于注册控件
-			GetHjServerList({}).then(res => {
-				this.sysHjServerList = res.list
-			})
-		},
 		getMonitorVocList(){ // 获取插话内容
 			GetMonitorVocList({}).then(res => {
 				this.monitorVocList = res.list
@@ -445,14 +363,6 @@ export default {
 		},
 		/** 注释 结束 */
 	
-    dateFormat(row, column) {
-			//时间格式化  
-	    let date = row[column.property];  
-	    if (date == undefined) {  
-	      return "";  
-	    }  
-	    return moment(date).format("YYYY-MM-DD HH:mm:ss");  
-		},
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

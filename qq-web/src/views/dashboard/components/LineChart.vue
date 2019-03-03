@@ -7,7 +7,7 @@ import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import { debounce } from '@/utils'
 
-import {GetWeekCount } from '@/api/meetRecord'
+import {GetWeekCount } from '@/api/callRecord'
 
 export default {
   props: {

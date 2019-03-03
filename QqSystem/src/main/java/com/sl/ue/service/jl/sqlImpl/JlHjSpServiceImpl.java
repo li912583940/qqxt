@@ -10,14 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.sl.ue.entity.jl.vo.JlHjDjVO;
 import com.sl.ue.entity.jl.vo.JlHjSpDetailsVO;
 import com.sl.ue.entity.jl.vo.JlHjSpVO;
 import com.sl.ue.entity.jl.vo.JlQsSpVO;
 import com.sl.ue.entity.jl.vo.JlQsVO;
 import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.base.impl.BaseSqlImpl;
-import com.sl.ue.service.jl.JlHjDjService;
 import com.sl.ue.service.jl.JlHjSpDetailsService;
 import com.sl.ue.service.jl.JlHjSpService;
 import com.sl.ue.service.jl.JlQsService;
@@ -28,8 +26,6 @@ import com.sl.ue.util.http.token.TokenUser;
 @Service("jlHjSpSQL")
 public class JlHjSpServiceImpl extends BaseSqlImpl<JlHjSpVO> implements JlHjSpService{
 
-	@Autowired
-	private JlHjDjService jlHjDjSQL;
 	@Autowired
 	private JlHjSpDetailsService jlHjSpDetailsSQL;
 	@Autowired
@@ -124,9 +120,7 @@ public class JlHjSpServiceImpl extends BaseSqlImpl<JlHjSpVO> implements JlHjSpSe
 			//查看当前审批共有几级
 			if(jlHjSp.getMaxNum()==speedProgress){ //当最后一级时
 				if(jlHjSp.getType()==1){ // 修改会见登记状态state=0
-					JlHjDjVO jlHjDj = jlHjDjSQL.findOne(jlHjSp.getHjid());
-					jlHjDj.setState(0);
-					jlHjDjSQL.edit(jlHjDj);
+				
 					result.msg("审批通过，请通知罪犯及亲属参加会见");
 				}else if(jlHjSp.getType()==2){ // 将亲属信息入库到正式表
 					JlQsSpVO jlQsSp = jlQsSpSQL.findOne(jlHjSp.getQsId());
@@ -152,10 +146,7 @@ public class JlHjSpServiceImpl extends BaseSqlImpl<JlHjSpVO> implements JlHjSpSe
 		}else{ // 审批不通过
 			if(jlHjSp.getMaxNum()>=speedProgress){ 
 				if(jlHjSp.getType()==1){
-					JlHjDjVO jlHjDj = jlHjDjSQL.findOne(jlHjSp.getHjid());
-					jlHjDj.setState(2);
-					jlHjDj.setCancelInfo("当前罪犯会见登记，审批不通过");
-					jlHjDjSQL.edit(jlHjDj);
+				
 				}else if(jlHjSp.getType()==2){
 					JlQsSpVO jlQsSp = jlQsSpSQL.findOne(jlHjSp.getQsId());
 					jlQsSp.setState(2);
