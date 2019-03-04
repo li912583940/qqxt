@@ -154,15 +154,6 @@ export default {
   },
   methods: {
     getList() {
-//  	if(!this.listQuery.yjNo){
-//    	this.listQuery.yjNo = undefined
-//    }
-//    if(!this.listQuery.yjName){
-//    	this.listQuery.yjName = undefined
-//    }
-//    if(!this.listQuery.deptName){
-//    	this.listQuery.deptName = undefined
-//    }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -229,9 +220,6 @@ export default {
       this.dialogStatus = 'create'
       this.resetForm('dataForm')
       this.dialogFormVisible = true
-//    this.$nextTick(() => {
-//      this.$refs['dataForm'].clearValidate()
-//    })
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -275,31 +263,21 @@ export default {
       })
     },
     //删除
-	handleDelete(row) {
-		this.$confirm('确认删除该记录吗?', '提示', {
-			type: 'warning'
-		}).then(() => {
-			this.listLoading = true;
-			let param = {
-    			id: row.webId
-    		}
-			RequestDelete(param).then(() => {
-    		this.getList()
-    	}).catch(error => {
-	        this.dialogFormVisible = false
-	      })
-		})
-	},
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
-    
+	  handleDelete(row) {
+			this.$confirm('确认删除该记录吗?', '提示', {
+				type: 'warning'
+			}).then(() => {
+				this.listLoading = true;
+				let param = {
+	    			id: row.webId
+	    		}
+				RequestDelete(param).then(() => {
+	    		this.getList()
+	    	}).catch(error => {
+		        this.dialogFormVisible = false
+		      })
+			})
+	  },
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

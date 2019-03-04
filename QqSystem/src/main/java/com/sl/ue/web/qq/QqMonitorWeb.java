@@ -11,7 +11,7 @@ import com.sl.ue.util.http.Result;
 
 @RestController
 @RequestMapping("/qqMonitor")
-public class QqMonitorWeb  extends Result {
+public class QqMonitorWeb extends Result {
 
 	@Autowired
 	private SysQqLineService sysQqLineSQL;

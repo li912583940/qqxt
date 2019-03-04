@@ -26,20 +26,37 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.sl.ue.entity.jl.vo.JlFrVO;
+import com.sl.ue.entity.jl.vo.JlJqVO;
+import com.sl.ue.entity.jl.vo.JlQqCzVO;
+import com.sl.ue.entity.sys.vo.SysLogVO;
+import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.base.impl.BaseSqlImpl;
 import com.sl.ue.service.jl.JlFrService;
+import com.sl.ue.service.jl.JlJqService;
+import com.sl.ue.service.jl.JlQqCzService;
+import com.sl.ue.service.sys.SysLogService;
 import com.sl.ue.util.Config;
 import com.sl.ue.util.DateUtil;
 import com.sl.ue.util.business.FrThreadXLS;
 import com.sl.ue.util.business.FrThreadXLSX;
+import com.sl.ue.util.http.Result;
+import com.sl.ue.util.http.token.TokenManager;
+import com.sl.ue.util.http.token.TokenUser;
 
 @Service("jlFrSQL")
 public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
+	@Autowired
+	private SysLogService sysLogSQL;
+	@Autowired
+	private JlQqCzService jlQqCzSQL;
+	@Autowired
+	private JlJqService jlJqSQL;
 	
 	@Override
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum) {
@@ -61,15 +78,6 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		model.setLeftJoinTable(table.toString());
     	model.setLeftJoinWhere(Where.toString());
 		Map<String, Object> map = this.findPojo(model, pageSize, pageNum);
-//		if(map.containsKey("list")) { //查询亲属个数
-//			List<JlFrVO> list = (List<JlFrVO>) map.get("list");
-//			for(JlFrVO jlFr : list) {
-//				JlQsVO jlQs = new JlQsVO();
-//				jlQs.setFrNo(jlFr.getFrNo());
-//				Integer qsNum= jlQsSQL.count(jlQs);
-//				jlFr.setQsNum(qsNum);
-//			}
-//		}
 		return map;
 	}
 	
@@ -295,5 +303,72 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		}else{
 			return false;
 		}
+	}
+	
+	public Map<String, Object> findPojoCharge(JlFrVO model, Integer pageSize, Integer pageNum){
+		StringBuffer leftJoinField = new StringBuffer(); // sql关联字段
+		leftJoinField.append(",b.JQ_Name");
+		
+		StringBuffer leftJoinTable = new StringBuffer(); // sql关联表
+		leftJoinTable.append(" left join JL_JQ b ON a.JQ=b.JQ_No");
+		
+		StringBuffer leftJoinWhere = new StringBuffer(); // sql条件
+    	if(StringUtils.isNotBlank(model.getFrName())){
+    		String str = model.getFrName();
+    		leftJoinWhere.append(" AND (a.FR_Name LIKE '%"+str+"%' OR dbo.f_get_fryp(a.FR_Name,'"+str+"') =1 )");
+    		model.setFrName(null);
+    	}
+    	model.setLeftJoinField(leftJoinField.toString());
+		model.setLeftJoinTable(leftJoinTable.toString());
+    	model.setLeftJoinWhere(leftJoinWhere.toString());
+		Map<String, Object> map = this.findPojo(model, pageSize, pageNum);
+		return map;
+	}
+	
+	public String requestRecharge(Integer webId, Integer czje){
+		Result result = new Result();
+		if(czje==null || czje==0){
+			result.error(Result.error_102, "充值必须大于0");
+			return result.toResult();
+		}
+		JlFrVO  jlFr = this.findOne(webId);
+		if(jlFr==null){
+			result.error(Result.error_103, "数据错误，查询记录为空");
+			return result.toResult();
+		}
+		JlJqVO jlJq = new JlJqVO(); 
+		jlJq.setJqNo(jlFr.getJq());
+		List<JlJqVO> jlJqList = jlJqSQL.findList(jlJq);
+		jlJq = jlJqList.get(0);
+		
+		SysUserVO sysUser = TokenUser.getUser();
+		Date nowDate = new Date();
+		JlQqCzVO jlQqCz = new JlQqCzVO();
+		jlQqCz.setFrNo(jlFr.getFrNo());
+		jlQqCz.setFrName(jlFr.getFrName());
+		jlQqCz.setJy(jlFr.getJy());
+		jlQqCz.setJqNo(jlFr.getJq());
+		jlQqCz.setJqName(jlJq.getJqName());
+		jlQqCz.setCzsj(nowDate);
+		jlQqCz.setCzje(czje*1000);
+		jlQqCz.setCzrNo(sysUser.getUserNo());
+		jlQqCz.setCzrName(sysUser.getUserName());
+		jlQqCz.setCzzt(1);
+		jlQqCzSQL.add(jlQqCz);
+		
+		jlFr.setQqYe(jlFr.getQqYe()+(czje*1000));
+		this.edit(jlFr);
+		
+		SysLogVO sysLog = new SysLogVO();
+		sysLog.setType("正常");
+		String now = DateUtil.getDefault(nowDate);
+		sysLog.setLogTime(now);
+		sysLog.setUserNo(sysUser.getUserNo());
+		sysLog.setUserName(sysUser.getUserName());
+		sysLog.setModel("话费充值");
+		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+now+"充值"+czje+"元");
+		sysLog.setOp("话费充值");
+		sysLogSQL.add(sysLog);
+		return result.toResult();
 	}
 }

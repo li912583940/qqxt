@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-    	<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入服刑人员编号" v-model="listQuery.frNo" clearable>
+    	<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入罪犯编号" v-model="listQuery.frNo" clearable>
       </el-input>
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入服刑人员姓名" v-model="listQuery.frName" clearable>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入罪犯姓名" v-model="listQuery.frName" clearable>
       </el-input>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jq" placeholder="选择监区">
         <el-option v-for="item in jqs" :key="item.id" :label="item.name" :value="item.id">
@@ -60,7 +60,7 @@
       </el-table-column>
       <el-table-column width="90" align="center" label="余额">
         <template slot-scope="scope">
-          <span>{{scope.row.qqYe}}</span>
+          <span>{{scope.row.qqYe | qqYeFormat}}</span>
         </template>
       </el-table-column>
       <el-table-column width="110" align="center" label="拨打次数">
@@ -254,7 +254,8 @@
 
 <script>
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJqList, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList } from '@/api/criminal'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList } from '@/api/criminal'
+import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -385,7 +386,12 @@ export default {
     }
   },
   filters: {
-    
+    qqYeFormat(data){
+			if(data == undefined){
+				return '0';
+			}
+			return data/1000;
+		},
   },
   created() {
     //this.getList()

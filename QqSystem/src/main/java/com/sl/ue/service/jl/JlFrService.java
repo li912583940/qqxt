@@ -10,6 +10,25 @@ import com.sl.ue.service.base.BaseService;
 
 public interface JlFrService extends BaseService<JlFrVO>{
 
+	/**
+	 * 说明 [话费充值查询]
+	 * @param model
+	 * @param pageSize
+	 * @param pageNum
+	 * @return
+	 * L_晓天  @2019年3月4日
+	 */
+	public Map<String, Object> findPojoCharge(JlFrVO model, Integer pageSize, Integer pageNum);
+	
+	/**
+	 * 说明 [充值金额]
+	 * @param webId 犯人表主键
+	 * @param czje 充值金额 元
+	 * @return
+	 * L_晓天  @2019年3月5日
+	 */
+	public String requestRecharge(Integer webId, Integer czje);
+	
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum);
 	
 	/**

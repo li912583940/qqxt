@@ -1,3 +1,6 @@
+<!--
+	描述：通话录音
+-->
 <template>
   <div class="app-container">
     <div class="filter-container">
@@ -18,7 +21,7 @@
 	      type="date"
 	      placeholder="选择结束日期">
 	    </el-date-picker>
-	    <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jq" placeholder="选择监区">
+	    <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jqNo" placeholder="选择监区">
         <el-option v-for="item in jqs" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
@@ -227,7 +230,7 @@ export default {
         pageSize: 10,
         callTimeStart: undefined,
         callTimeEnd: undefined,
-        jq: undefined,
+        jqNo: undefined,
         frNo: undefined,
         frName: undefined,
         qsName: undefined,

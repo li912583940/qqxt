@@ -125,7 +125,7 @@ import { Message, MessageBox } from 'element-ui'
 
 
 export default {
-  name: 'criminal',
+  name: 'realtMonitor',
   directives: {
     waves
   },
