@@ -73,7 +73,6 @@ public class SysQqLineServiceImpl extends BaseSqlImpl<SysQqLineVO> implements Sy
 	public String getZs(String monitorCallid){
 		Result result = new Result();
 		if(StringUtils.isBlank(monitorCallid)){
-			result.error(Result.error_102);
 			return result.toResult();
 		}
 		SysUserVO sysUser = TokenUser.getUser();

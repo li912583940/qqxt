@@ -7,13 +7,30 @@ public class JlQqRecVO extends JlQqRec{
     /** 序列化 */
     private static final long serialVersionUID = 1L;
 
+    private String callRecfileUrl;
 
-
+    private Integer jfFlag; // 是否计费 
     /*---------------------------  处理关联表  -----------------------------*/
+    
+    public String getCallRecfileUrl() {
+		return callRecfileUrl;
+	}
 
-    private String leftJoinField; // 关联表字段
+	public void setCallRecfileUrl(String callRecfileUrl) {
+		this.callRecfileUrl = callRecfileUrl;
+	}
 
-    private String leftJoinTable; // 关联表
+	public Integer getJfFlag() {
+		return jfFlag;
+	}
+
+	public void setJfFlag(Integer jfFlag) {
+		this.jfFlag = jfFlag;
+	}
+
+	private String leftJoinField; // 关联表字段
+
+	private String leftJoinTable; // 关联表
 
     private String leftJoinWhere; // 关联表条件
 

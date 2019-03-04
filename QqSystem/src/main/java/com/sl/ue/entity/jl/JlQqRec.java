@@ -152,7 +152,7 @@ public class JlQqRec implements java.io.Serializable{
     @DbField("FL_BEGIN_COUNT_OUT")
     private Integer flBeginCountOut;
 
-    /**  */
+    /** 扣费标志 0:免费,1:扣费成功,2:扣费失败,-1:自动扣费中 */
     @DbField("Call_Count_Flag")
     private Integer callCountFlag;
 
@@ -164,7 +164,7 @@ public class JlQqRec implements java.io.Serializable{
     @DbField("Call_Count_No")
     private String callCountNo;
 
-    /**  */
+    /** 计费方式  0:普通, 1: 一卡通, 2: 翼支付*/
     @DbField("Call_Count_Type")
     private Integer callCountType;
 

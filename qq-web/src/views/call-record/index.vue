@@ -34,18 +34,18 @@
       </el-input>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入警察警号" v-model="listQuery.yjNo">
       </el-input>
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入警察姓名：" v-model="listQuery.yjName">
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入警察姓名" v-model="listQuery.yjName">
       </el-input>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jfType" placeholder="选择计费方式">
-        <el-option v-for="item in jfTypes" :key="item.id" :label="item.name" :value="item.id">
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.callCountType" placeholder="选择计费方式">
+        <el-option v-for="item in callCountTypes" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jfFlag" placeholder="选择是否计费">
         <el-option v-for="item in jfFlags" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
-      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.kfFlag" placeholder="选择扣费标志">
-        <el-option v-for="item in kfFlags" :key="item.id" :label="item.name" :value="item.id">
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.callCountFlag" placeholder="选择扣费标志">
+        <el-option v-for="item in callCountFlags" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.type" placeholder="选择通话类型">
@@ -57,7 +57,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 100%">
+      style="width: 1631px">
       <el-table-column width="160" align="center" label="通话开始时间">
         <template slot-scope="scope">
           <span>{{scope.row.callTimeStart}}</span>
@@ -115,73 +115,17 @@
           <span>{{scope.row.localTele}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.playAudioVideoPermission==1 || buttonRole.downAudioVideoPermission==1" width="130" align="center" label="音视频操作" fixed="right">
+
+      <el-table-column v-if="buttonRole.playAudioPermission==1 || buttonRole.downAudioPermission==1" width="200" align="center" label="录音操作" fixed="right">
         <template slot-scope="scope">
-        	<div>
-            <el-button v-if="buttonRole.playAudioVideoPermission==1" type="primary" size="mini" @click="playRecor(scope.row)">播放录音录像</el-button>
-          </div>
-          <div style="margin-top: 2px;">
-            <el-button v-if="buttonRole.downAudioVideoPermission==1" type="primary" size="mini" @click="downRecord(scope.row)">下载录音录像</el-button>
-       		</div>
+        	<el-button v-if="buttonRole.playAudioPermission==1" type="primary" size="mini" @click="palyTape(scope.row)">播放录音</el-button>
+        	<el-button v-if="buttonRole.downAudioPermission==1" type="primary" size="mini" @click="downVideo(scope.row.callRecfileUrl)">下载录音</el-button>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.playAudioPermission==1 || buttonRole.downAudioPermission==1" width="100" align="center" label="录音操作" fixed="right">
+      <el-table-column v-if="buttonRole.notesPermission==1 || buttonRole.seeNotesPermission==1" width="160" align="center" label="摘要操作" fixed="right">
         <template slot-scope="scope">
-        	<div>
-            <el-button v-if="buttonRole.playAudioPermission==1" type="primary" size="mini" @click="palyTape(scope.row)">播放录音</el-button>
-          </div>
-          <div style="margin-top: 2px;">
-            <el-button v-if="buttonRole.downAudioPermission==1" type="primary" size="mini" @click="down3(scope.row.callRecfileUrl)">下载录音</el-button>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="buttonRole.notesPermission==1 || buttonRole.seeNotesPermission==1" width="80" align="center" label="摘要操作" fixed="right">
-        <template slot-scope="scope">
-          <div>
-            <el-button v-if="buttonRole.notesPermission==1" type="primary" size="mini" @click="zhushi(scope.row)">注释</el-button>
-          </div>
-          <div style="margin-top: 2px;">
-            <el-button v-if="buttonRole.seeNotesPermission==1" type="primary" size="mini" @click="zhushiAll(scope.row)">查看</el-button>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column width="80" align="center" label="录音评级" >
-        <template slot-scope="scope">
-          <span v-if="scope.row.recRatingState==0">未评</span>
-          <span v-if="scope.row.recRatingState==1">异常</span>
-          <span v-if="scope.row.recRatingState==2">正常</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="buttonRole.ratingPermission==1 || buttonRole.seeRatingPermission==1" width="80" align="center" label="评级操作" fixed="right">
-        <template slot-scope="scope">
-        	<div>
-            <el-button v-if="buttonRole.ratingPermission==1" type="primary" size="mini" @click="openRatingState(scope.row)">评级</el-button>
-          </div>
-          <div style="margin-top: 2px;">
-            <el-button v-if="buttonRole.seeRatingPermission==1" type="primary" size="mini" @click="openRatingStateAll(scope.row)">查看</el-button>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column width="80" align="center" label="复听状态">
-        <template slot-scope="scope">
-          <span v-if="scope.row.recAssessmentState==0">未听</span>
-          <span v-if="scope.row.recAssessmentState==1">已听</span>
-        </template>
-      </el-table-column>
-      <el-table-column  v-if="buttonRole.seeAssessmentPermission==1" width="100" align="center" label="详情信息" fixed="right">
-        <template slot-scope="scope">
-        	<div>
-            <el-button type="primary" size="mini" @click="openAllAssessment(scope.row)">查看复听</el-button>
-          </div>
-          <div style="margin-top: 2px;">
-            <el-button type="primary" size="mini" @click="openOtherInfo(scope.row)">查看其他</el-button>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column width="80" align="center" label="复听超时">
-        <template slot-scope="scope">
-          <span v-if="scope.row.recordOverTime==0">未超时</span>
-          <span v-if="scope.row.recordOverTime==1">已超时</span>
+          <el-button v-if="buttonRole.notesPermission==1" type="primary" size="mini" @click="zhushi(scope.row)">注释</el-button>
+          <el-button v-if="buttonRole.seeNotesPermission==1" type="primary" size="mini" @click="zhushiAll(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -191,57 +135,6 @@
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
-
-    <!-- 播放录音录像 开始 -->
-    <el-dialog title="播放录音录像 " :visible.sync="dialogPlayVisible" @close='closePlayDialog'>
-    	<div style="position: relative;margin-top: 10px; margin-bottom: 30px;">
-    		<el-row :gutter="12">
-    			<el-col :span="8" :offset="1" style="margin-left: 50px;" >
-				    	<div>
-				    		<video id="video1" width="360" height="240" controls="controls">
-				    			<source :src="callRecfileUrl" type="video/ogg" />
-				    			<!--<source :src="callRecfileUrl" type="video/mp4" />-->
-				    			<!--<audio :src="callRecfileUrl" controls="controls" controlsList="nodownload"></audio>-->
-				    		</video>
-				    	</div>
-				  </el-col>
-				  
-				  <el-col :span="8" :offset="1" style="margin-left: 120px;">
-				    	<div>
-				    		<video id="video2" width="360" height="240" controls="controls">
-				    			<source :src="callRecfileUrl" type="video/ogg" />
-				    			<!--<source :src="callRecfileUrl" type="video/mp4" />-->
-				    			<!--<audio :src="callRecfileUrl" controls="controls" controlsList="nodownload"></audio>-->
-				    		</video>
-				    	</div>
-				  </el-col>
-				  
-		    </el-row>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogPlayVisible = false">关 闭</el-button>
-      </div>
-    </el-dialog>
-    <!-- 播放录音录像 结束 -->
-
-		<!-- 下载录音录像  IE浏览器 -->
-    <el-dialog title="录音录像下载" :visible.sync="dialogPlayDownVisible" width="40%">
-    	<div style="position: relative;margin-top: 10px; margin-bottom: 30px; margin-left: 20%;">
-    		<span style="margin-left: 20px;">
-    			<el-button type="primary" size="mini" @click="down1(callVideofile1Url)">录像文件1</el-button>
-    		</span>
-    		<span style="margin-left: 20px;">
-    			<el-button type="primary" size="mini" @click="down2(callVideofile2Url)">录像文件2</el-button>
-    		</span>
-    		<span style="margin-left: 20px;">
-    			<el-button type="primary" size="mini" @click="down3(callRecfileUrl)">录音文件</el-button>
-    		</span>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogPlayDownVisible = false">关 闭</el-button>
-      </div>
-    </el-dialog>
-    <!-- 下载录音录像 结束 下载 IE浏览器 -->
     
     <!-- 注释 开始 -->
     <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="50%">
@@ -266,7 +159,7 @@
 	  <!-- 查看所有注释  开始  -->
     <el-dialog title="查看所有注释" :visible.sync="dialogZsAllVisible" width="50%">
       <el-table :key='zsAllTableKey' :data="zsAllList" v-loading="zsAllListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 100%">
+	      style="width: 721px">
 	      <el-table-column width="160" align="center" label="用户编号">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.userNo}}</span>
@@ -277,14 +170,9 @@
 	          <span>{{scope.row.userName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="" align="center" label="注释摘要">
+	      <el-table-column width="400" align="center" label="注释摘要">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.writeTxt}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="180" align="center" label="摘要录入时间">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.createTime | dateFormat}}</span>
 	        </template>
 	      </el-table-column>
 	    </el-table>
@@ -310,183 +198,13 @@
       </div>
     </el-dialog>
     <!-- 播放录音 结束 -->
-    
-    <!-- 录音评级 开始 -->
-    <el-dialog title="录音评级" :visible.sync="dialogRatingStateVisible" >
-    	 <el-form :model="dataFormRatingState" ref="dataFormRatingState" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
-        <el-form-item label="呼叫ID" prop="callId">
-          <el-input v-model="dataFormRatingState.callId" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="用户编号" prop="userNo">
-          <el-input v-model="dataFormRatingState.userNo" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="用户姓名" prop="userName">
-          <el-input v-model="dataFormRatingState.userName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="评级状态" prop="recRatingState">
-          <el-select class="filter-item" v-model="dataFormRatingState.recRatingState" placeholder="请选择">
-            <el-option v-for="item in recRatingStates" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="评级内容" prop="writeTxt">
-          <el-input type="textarea" :rows="2" v-model="dataFormRatingState.writeTxt"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogRatingStateVisible = false">取 消</el-button>
-        <el-button type="primary" @click="updateRatingStateData">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 录音评级 开始 -->
-    
-    <!-- 查看所有录音评级  开始  -->
-    <el-dialog title="查看所有录音评级" :visible.sync="dialogRatingStateAllVisible" width="50%">
-      <el-table :key='ratingStateAllTableKey' :data="ratingStateAllList" v-loading="ratingStateAllListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 100%">
-	      <el-table-column width="160" align="center" label="用户编号">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.userNo}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="160" align="center" label="用户姓名">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.userName}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="" align="center" label="评级内容">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.writeTxt}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="180" align="center" label="评级时间">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.createTime | dateFormat}}</span>
-	        </template>
-	      </el-table-column>
-	    </el-table>
-	    <!-- 分页 -->
-	    <div class="pagination-container">
-	      <el-pagination background @size-change="handleRatingStateAllSizeChange" @current-change="handleRatingStateAllCurrentChange" :current-page="ratingStateAllListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="ratingStateAllListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="ratingStateAllTotal">
-	      </el-pagination>
-	    </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogRatingStateAllVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
-    <!-- 查看所有录音评级  结束  -->
-    
-    
-    <!-- 复听详情  开始  -->
-    <el-dialog title="复听详情" :visible.sync="dialogAllAssessmentVisible" width="50%">
-      <el-table :key='allAssessmentTableKey' :data="allAssessmentList" v-loading="allAssessmentListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 100%">
-	      <el-table-column width="160" align="center" label="用户编号">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.userNo}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="160" align="center" label="用户姓名">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.userName}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="" align="center" label="评级内容">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.writeTxt}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="180" align="center" label="评级时间">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.createTime | dateFormat}}</span>
-	        </template>
-	      </el-table-column>
-	    </el-table>
-	    <!-- 分页 -->
-	    <div class="pagination-container">
-	      <el-pagination background @size-change="handleAllAssessmentSizeChange" @current-change="handleAllAssessmentCurrentChange" :current-page="allAssessmentListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="allAssessmentListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="allAssessmentTotal">
-	      </el-pagination>
-	    </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogAllAssessmentVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
-    <!-- 复听详情  结束  -->
-    
-    <!-- 其他详情  开始  -->
-    <el-dialog title="其他详情" :visible.sync="dialogOtherInfoVisible" width="50%">
-      <el-card class="box-card">
-	      <el-table :key='otherInfoTableKey' :data="otherInfoList" v-loading="otherInfoListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-		      style="width: 100%">
-		      <el-table-column width="160" align="center" label="会见登记人">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.djUser}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="160" align="center" label="登记时间">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.djTime | dateFormat}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="" align="center" label="会见室审核人">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.frInUser}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="180" align="center" label="到达进入时间">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.frInTime | dateFormat}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="180" align="center" label="会见说明">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.hjInfo}}</span>
-		        </template>
-		      </el-table-column>
-		    </el-table>
-		  </el-card>
-		  
-	    <el-card class="box-card">
-	    	<el-table :key='otherQsInfoTableKey' :data="otherQsInfoList" v-loading="otherQsInfoListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-		      style="width: 100%">
-		      <el-table-column width="160" align="center" label="亲属姓名">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.qsName}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="160" align="center" label="身份证号码">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.qsSfz}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="" align="center" label="关系">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.gx}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="180" align="center" label="性别">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.xb}}</span>
-		        </template>
-		      </el-table-column>
-		      <el-table-column width="180" align="center" label="照片">
-		        <template slot-scope="scope">
-		          <span>{{scope.row.zp}}</span>
-		        </template>
-		      </el-table-column>
-		    </el-table>
-	    </el-card>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogOtherInfoVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
-    <!-- 其他详情  结束  -->
-    
+   
   </div>
 </template>
 
 <script>
-import { findPojo, findOne, findJqList, GetZwList, GetZs, AddRecordFlag, GetZsAllPojo, GetRatingState, UpdateRatingState, 
-	GetRatingStateAllPojo, GetAllAssessmentPojo, GetOtherInfo, exportExcel } from '@/api/callRecord'
+import { findPojo, findOne, findJqList, GetZs, AddRecordFlag, GetZsAllPojo, 
+	 exportExcel } from '@/api/callRecord'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -522,7 +240,7 @@ export default {
       jqs: [ // 监区下拉选框
       
       ],
-      jfTypes: [ // 计费方式
+      callCountTypes: [ // 计费方式
         {
       		id: 0,
       		name: '普通'
@@ -546,7 +264,7 @@ export default {
       		name: '计费'
       	}
       ],
-      kfFlags: [ // 扣费标志
+      callCountFlags: [ // 扣费标志
         {
       		id: 0,
       		name: '免费'
@@ -626,8 +344,7 @@ export default {
 	    
 	    dialogPlayDownVisible: false,
 	    callRecfileUrl: undefined,
-	    callVideofile1Url: undefined,
-	    callVideofile2Url: undefined,
+
 	    /** 播放录音录像 结束 */
 	   
 	   /** 注释 开始 */
@@ -657,83 +374,16 @@ export default {
 		  dialogTapeVisible: false,
 		  /** 录音操作 结束 */
 		 
-		  /** 录音评级 开始 */
-		  dialogRatingStateVisible: false,
-		  dataFormRatingState: {
-		  	webId: undefined,
-		  	callId: undefined,
-		  	userNo: undefined,
-		  	userName: undefined,
-		  	recRatingState: 0,
-		  	writeTxt: undefined,
-		  },
-		  recRatingStates: [
-		    {
-        	id: 0,
-        	name: '未评'
-        },
-      	{
-      		id: 1,
-      		name: '异常'
-      	},
-      	{
-      		id: 2,
-      		name: '正常'
-      	}
-		  ],
-		  /** 录音评级 结束 */
-		 
-		 /**  查看所有录音评级  开始 */
-		  dialogRatingStateAllVisible: false,
-		  ratingStateAllTableKey: 0,
-		  ratingStateAllList: null,
-		  ratingStateAllTotal: null,
-		  ratingStateAllListLoading: true,
-		  ratingStateAllListQuery: {
-		    pageNum: 1,
-		    pageSize: 10,
-		    callId: undefined
-		  },
-		  /**  查看所有录音评级  结束 */
-		 
-		  /**  复听详情 开始 */
-		  dialogAllAssessmentVisible: false,
-		  allAssessmentTableKey: 0,
-		  allAssessmentList: null,
-		  allAssessmentTotal: null,
-		  allAssessmentListLoading: true,
-		  allAssessmentListQuery: {
-		    pageNum: 1,
-		    pageSize: 10,
-		    callId: undefined
-		  },
-		  /**  复听详情  结束 */
-		 
-		  /**  其他详情 开始 */
-		  dialogOtherInfoVisible: false,
-		  otherInfoTableKey: 0,
-		  otherInfoList: null,
-		  otherInfoListLoading: true,
-		  
-		  otherQsInfoTableKey: 1,
-		  otherQsInfoList: null,
-		  otherQsInfoListLoading: true,
-		  /**  其他详情  结束 */
-		 
 		  //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
       	queryPermission: 1, 
       	exportPermission: 0, //导出
-      	playAudioVideoPermission: 0, //播放录音录像
-      	downAudioVideoPermission: 0, //下载录音录像
-      	notesPermission: 0, //注释
-      	seeNotesPermission: 0, //查看所有注释
       	playAudioPermission: 0, //播放录音
       	downAudioPermission: 0, //下载录音
-      	ratingPermission: 0, //评级
-      	seeRatingPermission: 0, //查看所有评级
-      	seeAssessmentPermission: 0, //查看复听详情
-      	seeOtherPermission: 0 //查看其它详情
+      	notesPermission: 0, //注释
+      	seeNotesPermission: 0, //查看所有注释
+      	
+  
       },
       
     }
@@ -752,7 +402,6 @@ export default {
     this.noSearch()
     
     this.getJqList()
-    this.getZwList()
   },
   mounted() {
     this.setButtonRole()
@@ -774,20 +423,7 @@ export default {
       }else{
       	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
       }
-//    if(!this.listQuery.jq){
-//    	this.listQuery.jq = undefined
-//    }else{
-//    	this.listQuery.jqNo = this.listQuery.jq
-//    }
-//    if(!this.listQuery.frName){
-//    	this.listQuery.frName = undefined
-//    }
-//    if(!this.listQuery.frNo){
-//    	this.listQuery.frNo = undefined
-//    }
-//    if(!this.listQuery.qsName){
-//    	this.listQuery.qsName = undefined
-//    }
+
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -809,19 +445,6 @@ export default {
 	    	})
     	}
     },
-    getZwList(){ // 座位下拉框
-    	if(this.zws.length === 0){
-    		GetZwList({}).then(res =>{
-    			let list = res.list
-	    		for(let x of list){
-					  let value = {}
-					  value.id = x.zw
-					  value.name = x.zw
-					  this.zws.push(value)
-					}
-    		})
-    	}
-    },
     handleFilter() {
       this.listQuery.pageNum = 1
       this.getList()
@@ -834,125 +457,6 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
-    /** 播放录音录像 开始 */
-    playRecor(row){ //播放录音录像
-    	if(!row.callRecfileUrl){
-    		Message({
-	        message: '录像文件已被删除，无法播放。',
-		      type: 'error',
-		      duration: 5 * 1000
-	      });
-    	}else{
-    		this.dialogPlayVisible =true
-    	  this.callRecfileUrl = row.callRecfileUrl
-    	}
-    	
-    },
-    downRecord(row){ //下载录音录像
-    	var userAgent = navigator.userAgent.toLowerCase();
-    	if(userAgent.indexOf("chrome")>-1 || userAgent.indexOf("firefox")>-1) { 
-       	this.down1(row.callRecfileUrl).then(() => {
-	    		this.down2(row.callVideofile1Url).then(() => {
-	    			  this.down3(row.callVideofile2Url).then(() => {
-	    			})
-	    		})
-	    	})
-    		
-      }else{ // 如果是IE浏览器
-	 	    this.callRecfileUrl= row.callRecfileUrl
-		    this.callVideofile1Url= row.callVideofile1Url
-		    this.callVideofile2Url= row.callVideofile2Url
-        this.dialogPlayDownVisible = true
-      }
-    },
-    down1(pathUrl){
-    	return new Promise((resolve, reject) => {
-    		if(pathUrl=='' ){
-    			Message({
-		        message: '录像文件1已被删除，无法下载。',
-			      type: 'error',
-			      duration: 5 * 1000
-		      });
-    		}else{
-    			// 1 录像
-    			let fileName = pathUrl.substring(pathUrl.lastIndexOf("/")+1)
-		    	const downloadElement = document.createElement('a')
-		    	downloadElement.href = pathUrl
-		    	downloadElement.download=fileName
-		    	document.body.appendChild(downloadElement)
-		    	downloadElement.click()
-		    	document.body.removeChild(downloadElement)
-    		}
-	    	
-      	
-				resolve()
-      })
-    	
-    },
-    down2(pathUrl){
-    	return new Promise((resolve, reject) => {
-    		if(pathUrl=='' ){
-    			Message({
-		        message: '录像文件2已被删除，无法下载。',
-			      type: 'error',
-			      duration: 5 * 1000
-		      });
-    		}else{
-    			// 2 录像
-    			let fileName = pathUrl.substring(pathUrl.lastIndexOf("/")+1)
-		    	const downloadElement = document.createElement('a')
-		    	downloadElement.href = pathUrl
-		    	downloadElement.download=fileName
-		    	document.body.appendChild(downloadElement)
-		    	downloadElement.click()
-		    	document.body.removeChild(downloadElement)
-    		}
-	    	
-      	
-				resolve()
-      })
-    	
-    		
-    },
-    down3(pathUrl){
-    	return new Promise((resolve, reject) => {
-    		if(pathUrl=='' ){
-    			Message({
-		        message: '录音文件已被删除，无法下载。',
-			      type: 'error',
-			      duration: 5 * 1000
-		      });
-    		}else{
-    			// 3 录音
-    			let fileName = pathUrl.substring(pathUrl.lastIndexOf("/")+1)
-		    	const downloadElement = document.createElement('a')
-		    	downloadElement.href = pathUrl
-		    	downloadElement.download=fileName
-		    	document.body.appendChild(downloadElement)
-		    	downloadElement.click()
-		    	document.body.removeChild(downloadElement)
-    		}
-	    	
-      	
-				resolve()
-      })
-    	
-    	
-    },
-    closePlayDialog(){ 
-    	var video1 = document.getElementById("video1")
-    	if(video1.play){
-    		video1.currentTime = 0;
-        video1.pause();
-    	}
-    	var video2 = document.getElementById("video2")
-    	if(video2.play){
-    		video2.currentTime = 0;
-        video2.pause();
-    	}
-    },
-    
-    /** 播放录音录像 结束 */
    
 		/** 注释 开始 */
 		resetFormZS() { //重置表单
@@ -1015,6 +519,25 @@ export default {
     	this.callRecfileUrl = row.callRecfileUrl
     	this.dialogTapeVisible = true
     },
+    downVideo(pathUrl){
+    	if(pathUrl=='' ){
+				Message({
+		        message: '录音文件已被删除，无法下载。',
+			      type: 'error',
+			      duration: 5 * 1000
+		      });
+			}else{
+				//  录音
+				let fileName = pathUrl.substring(pathUrl.lastIndexOf("/")+1)
+		    	const downloadElement = document.createElement('a')
+		    	downloadElement.href = pathUrl
+		    	downloadElement.download=fileName
+		    	document.body.appendChild(downloadElement)
+		    	downloadElement.click()
+		    	document.body.removeChild(downloadElement)
+			}
+    },
+    
     closeTapeDialog(){
     	var audio1 = document.getElementById("audio1")
     	if(audio1.play){
@@ -1024,106 +547,7 @@ export default {
     },
     /** 录音操作 结束 */
     
-    /** 录音评级 开始 */
-    resetFormRatingState() { //重置录音评级表单
-			if(this.$refs['dataFormRatingState'] !== undefined){
-				this.$refs['dataFormRatingState'].resetFields();
-			}
-			this.dataFormRatingState.webId = undefined
-	  },
-	  openRatingState(row){
-	  	this.resetFormRatingState()
-	  	let user = JSON.parse(sessionStorage.getItem("user"))
-	  	let param= {
-	   		callId: row.callId
-	   	}
-	   	GetRatingState(param).then(res => {
-	   		let jlHjRecRatingInfo = res.jlHjRecRatingInfo
-	   		
-	   		this.dataFormRatingState.webId=row.webId
-		  	this.dataFormRatingState.callId= row.callId
-		  	this.dataFormRatingState.userNo= user.userNo
-		  	this.dataFormRatingState.userName= user.userName
-		  	this.dataFormRatingState.recRatingState= row.recRatingState
-		  	this.dataFormRatingState.writeTxt= jlHjRecRatingInfo.writeTxt
-	   	})
-	   	this.dialogRatingStateVisible = true
-	   	
-	  },
-	  
-	  updateRatingStateData() {
-	  	UpdateRatingState(this.dataFormRatingState).then(res => {
-	  		this.getList()
-	  	})
-	  	this.dialogRatingStateVisible = false
-	  },
-	  /** 录音评级 结束 */
-	 
-	  /** 查看所有录音评级 开始 */
-    openRatingStateAll(row){
-    	this.ratingStateAllListQuery.callId=row.callId
-    	this.getRatingStateAllList()
-    	this.dialogRatingStateAllVisible= true
-    },
-    getRatingStateAllList(){ // 获取所有注释
-    	GetRatingStateAllPojo(this.ratingStateAllListQuery).then(res => {
-    		 this.ratingStateAllList = res.pojo.list
-      	 this.ratingStateAllTotal = res.pojo.count
-      	 this.ratingStateAllListLoading = false
-      }).catch(error => {
-         this.ratingStateAllListLoading = false
-      })
-    },
-    handleRatingStateAllSizeChange(val) {
-      this.ratingStateAllListQuery.pageSize = val
-      this.getRatingStateAllList()
-    },
-    handleRatingStateAllCurrentChange(val) {
-      this.ratingStateAllListQuery.pageNum = val
-      this.getRatingStateAllList()
-    },
-    /** 查看所有录音评级 结束 */
-   
-    /** 复听详情 开始 */
-    openAllAssessment(row){
-    	this.allAssessmentListQuery.callId=row.callId
-    	this.getAllAssessmentList()
-    	this.dialogAllAssessmentVisible= true
-    },
-    getAllAssessmentList(){ // 获取所有注释
-    	GetAllAssessmentPojo(this.allAssessmentListQuery).then(res => {
-    		 this.allAssessmentList = res.pojo.list
-      	 this.allAssessmentTotal = res.pojo.count
-      	 this.allAssessmentListLoading = false
-      }).catch(error => {
-         this.allAssessmentListLoading = false
-      })
-    },
-    handleAllAssessmentSizeChange(val) {
-      this.allAssessmentListQuery.pageSize = val
-      this.getAllAssessmentList()
-    },
-    handleAllAssessmentCurrentChange(val) {
-      this.allAssessmentListQuery.pageNum = val
-      this.getAllAssessmentList()
-    },
-    /** 复听详情 结束 */
-   
-    /** 其它详情 开始 */
-    openOtherInfo(row) {
-    	this.dialogOtherInfoVisible = true
-    	let param ={
-    		webId: row.webId
-    	}
-    	GetOtherInfo(param).then(res => {
-    		this.otherInfoList = res.jlHjDjList
-    		this.otherQsInfoList = jlHjDjQsList
-    		
-    	})
-    	this.otherInfoListLoading = false
-    	this.otherQsInfoListLoading = false
-    },
-    /** 其它详情 结束 */
+    
     
     /** 导出EXCEL 开始 */
     handleDownload() {
@@ -1137,15 +561,6 @@ export default {
       }else{
       	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
       }
-//			if(!this.listQuery.frName){
-//    	this.listQuery.frName = undefined
-//    }
-//    if(!this.listQuery.frNo){
-//    	this.listQuery.frNo = undefined
-//    }
-//    if(!this.listQuery.jq){
-//    	this.listQuery.jq = undefined
-//    }
 
       Message({
         message: '已准备导出会见记录文件，请稍等几秒。',
@@ -1156,12 +571,12 @@ export default {
 			exportExcel(this.listQuery).then(res => {
 	      var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
 	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
-        	window.navigator.msSaveOrOpenBlob(blob, '会见记录.xls');
+        	window.navigator.msSaveOrOpenBlob(blob, '通话记录.xls');
     		}else{ //非IE浏览器
     			var downloadElement = document.createElement('a')
 		     	var href = window.URL.createObjectURL(blob)
 		     	downloadElement.href = href
-		     	downloadElement.download = '会见记录.xls'
+		     	downloadElement.download = '通话记录.xls'
 		     	document.body.appendChild(downloadElement)
 		     	downloadElement.click()
 	     		document.body.removeChild(downloadElement) // 下载完成移除元素
@@ -1181,16 +596,11 @@ export default {
     	let roles = sessionStorage.getItem("roles")
     	if(roles.includes('admin')){
     		this.buttonRole.exportPermission= 1
-      	this.buttonRole.playAudioVideoPermission= 1
-      	this.buttonRole.downAudioVideoPermission= 1
       	this.buttonRole.notesPermission= 1
       	this.buttonRole.seeNotesPermission= 1
       	this.buttonRole.playAudioPermission= 1
       	this.buttonRole.downAudioPermission= 1
-      	this.buttonRole.ratingPermission= 1
-      	this.buttonRole.seeRatingPermission= 1
-      	this.buttonRole.seeAssessmentPermission= 1
-      	this.buttonRole.seeOtherPermission= 1
+      
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
     		let callRecord = buttonRoles.callRecord
@@ -1198,10 +608,6 @@ export default {
     			for(let value of callRecord){
     				if(value=='exportPermission'){
     					this.buttonRole.exportPermission= 1
-    				}else if(value=='playAudioVideoPermission'){
-    					this.buttonRole.playAudioVideoPermission= 1
-    				}else if(value=='downAudioVideoPermission'){
-    					this.buttonRole.downAudioVideoPermission= 1
     				}else if(value=='notesPermission'){
     					this.buttonRole.notesPermission= 1
     				}else if(value=='seeNotesPermission'){
@@ -1210,14 +616,6 @@ export default {
     					this.buttonRole.playAudioPermission= 1
     				}else if(value=='downAudioPermission'){
     					this.buttonRole.downAudioPermission= 1
-    				}else if(value=='ratingPermission'){
-    					this.buttonRole.ratingPermission= 1
-    				}else if(value=='seeRatingPermission'){
-    					this.buttonRole.seeRatingPermission= 1
-    				}else if(value=='seeAssessmentPermission'){
-    					this.buttonRole.seeAssessmentPermission= 1
-    				}else if(value=='seeOtherPermission'){
-    					this.buttonRole.seeOtherPermission= 1
     				}
     			}
     		}
@@ -1225,14 +623,6 @@ export default {
     },
     /** 设置权限 结束 */
    
-    dateFormat(row, column) {
-			//时间格式化  
-	    let date = row[column.property];  
-	    if (date == undefined) {  
-	      return "";  
-	    }  
-	    return moment(date).format("YYYY-MM-DD HH:mm:ss");  
-		},
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

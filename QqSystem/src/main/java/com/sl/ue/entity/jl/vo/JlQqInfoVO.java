@@ -1,19 +1,17 @@
-package com.sl.ue.entity.hj.vo;
+package com.sl.ue.entity.jl.vo;
 
-import com.sl.ue.entity.hj.HjdjAcdWindowsInfo;
+import com.sl.ue.entity.jl.JlQqInfo;
 
-public class HjdjAcdWindowsInfoVO extends HjdjAcdWindowsInfo{
+public class JlQqInfoVO extends JlQqInfo{
 
     /** 序列化 */
     private static final long serialVersionUID = 1L;
 
-
-
     /*---------------------------  处理关联表  -----------------------------*/
-
+    
     private String leftJoinField; // 关联表字段
 
-    private String leftJoinTable; // 关联表
+	private String leftJoinTable; // 关联表
 
     private String leftJoinWhere; // 关联表条件
 
