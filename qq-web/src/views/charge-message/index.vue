@@ -15,8 +15,8 @@
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
     </div>
     
-    <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 1001px">
+    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
+      style="width: 981px">
       <el-table-column width="200" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
@@ -37,10 +37,10 @@
           <span>{{scope.row.qqYe | qqYeFormat}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="200" >
+      <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="180" >
         <template slot-scope="scope">
           <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
-          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="openRefund(scope.row)">出狱退费</el-button>
+          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -81,12 +81,12 @@
 </template>
 
 <script>
-import { findPojo, RequestRecharge} from '@/api/chargeMessage'
+import { findPojo, RequestRecharge, RequestRefund} from '@/api/chargeMessage'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
 import waves from '@/directive/waves' // 水波纹指令
-
+import { Message, MessageBox } from 'element-ui'
 
 export default {
   name: 'chargeMessage',
@@ -98,6 +98,7 @@ export default {
       tableKey: 0,
       list: null,
       total: null,
+      listLoading: true,
       listQuery: {
       	jq: undefined,
       	frNo: undefined,
@@ -158,9 +159,12 @@ export default {
   },
   methods: {
     getList() {
+      this.listLoading = true
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
+      }).catch(error => {
+          this.listLoading = false
       })
     },
     handleFilter() {
@@ -211,6 +215,7 @@ export default {
     	}
     },
 
+	/*  充值 开始   */ 
     //重置表单
 	resetForm() {
 		this.dataRechargeForm.webId = undefined
@@ -230,7 +235,7 @@ export default {
 	  this.dataRechargeForm.frName = row.frName
 	  let qqYe = 0
 	  if(row.qqYe){
-	  	qqYe=row.qqYe
+	  	qqYe=row.qqYe/1000
 	  }
 	  this.dataRechargeForm.qqYe = qqYe
 	  this.dataRechargeForm.czje= row.czje
@@ -239,7 +244,7 @@ export default {
       this.$refs['dataRechargeForm'].validate((valid) => {
         if (valid) {
         	let param ={
-        		webId: this.dataRechargeForm.webId,
+        		id: this.dataRechargeForm.webId,
         		czje: this.dataRechargeForm.czje
         	}
           RequestRecharge(param).then(() => {
@@ -251,22 +256,34 @@ export default {
         }
       })
     },
-    //删除
-	handleDelete(row) {
-	    this.$confirm('确认删除该记录吗?', '提示', {
+    /*  充值 结束   */ 
+    
+    /*  出狱退费 开始 */
+    requestRefund(row){
+    	let qqYe = 0
+		if(row.qqYe){
+		  qqYe=row.qqYe/1000
+		}
+    	this.$confirm('罪犯当前余额:'+qqYe+'元，是否继续“出狱退费”操作？（点击确定后，罪犯余额将会被清零，状态变成出狱）', '提示', {
 		    type: 'warning'
 		}).then(() => {
-			this.listLoading = true;
 			let param = {
-	    		d: row.webId
+	    		id: row.webId
 	    	}
-			RequestDelete(param).then(() => {
+			RequestRefund(param).then(() => {
+				Message({
+			        message: '退费成功',
+				    type: 'success',
+				    duration: 5 * 1000
+			    });
 	    		this.getList()
 	        }).catch(error => {
-		        this.dialogFormVisible = false
+		        
 		    })
 		})
-	},
+    },
+    /*  出狱退费 结束  */
+   
 	dateFormats: function (val) {
 		if(!val){
 			return undefined

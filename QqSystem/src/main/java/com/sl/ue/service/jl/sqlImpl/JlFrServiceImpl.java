@@ -325,13 +325,13 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		return map;
 	}
 	
-	public String requestRecharge(Integer webId, Integer czje){
+	public String requestRecharge(Integer id, Integer czje){
 		Result result = new Result();
 		if(czje==null || czje==0){
 			result.error(Result.error_102, "充值必须大于0");
 			return result.toResult();
 		}
-		JlFrVO  jlFr = this.findOne(webId);
+		JlFrVO  jlFr = this.findOne(id);
 		if(jlFr==null){
 			result.error(Result.error_103, "数据错误，查询记录为空");
 			return result.toResult();
@@ -356,7 +356,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		jlQqCz.setCzzt(1);
 		jlQqCzSQL.add(jlQqCz);
 		
-		jlFr.setQqYe(jlFr.getQqYe()+(czje*1000));
+		jlFr.setQqYe((jlFr.getQqYe()==null?0:jlFr.getQqYe())+(czje*1000));
 		this.edit(jlFr);
 		
 		SysLogVO sysLog = new SysLogVO();
@@ -369,6 +369,70 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+now+"充值"+czje+"元");
 		sysLog.setOp("话费充值");
 		sysLogSQL.add(sysLog);
+		return result.toResult();
+	}
+	
+	public String requestRefund(Integer id){
+		Result result = new Result();
+		if(id==null){
+			result.error(Result.error_102);
+			return result.toResult();
+		}
+		JlFrVO jlFr = this.findOne(id);
+		
+		JlJqVO jlJq = new JlJqVO();
+		jlJq.setJqNo(jlFr.getJq());
+		List<JlJqVO> jlJqList = jlJqSQL.findList(jlJq);
+		if(jlJqList.size()>0){
+			jlJq = jlJqList.get(0);
+		}
+		
+		SysUserVO sysUser = TokenUser.getUser();
+		
+		Date nowDate = new Date();
+		
+		JlQqCzVO jlQqCz = new JlQqCzVO();
+		jlQqCz.setFrNo(jlFr.getFrNo());
+		jlQqCz.setFrName(jlFr.getFrName());
+		jlQqCz.setJy(jlFr.getJy());
+		jlQqCz.setJqNo(jlFr.getJq());
+		jlQqCz.setJqName(jlJq.getJqName());
+		jlQqCz.setCzsj(nowDate);
+		if(jlFr.getQqYe()!=null && jlFr.getQqYe()!=0){
+			jlQqCz.setCzje(-jlFr.getQqYe());
+		}else{
+			jlQqCz.setCzje(0);
+		}
+		jlQqCz.setCzrNo(sysUser.getUserNo());
+		jlQqCz.setCzrName(sysUser.getUserName());
+		jlQqCz.setCzzt(1);
+		jlQqCz.setCzState(1);
+		jlQqCzSQL.add(jlQqCz);
+		
+		SysLogVO sysLog = new SysLogVO();
+		sysLog.setType("正常");
+		sysLog.setLogTime(DateUtil.getDefault(nowDate));
+		sysLog.setUserName(sysUser.getUserName());
+		sysLog.setUserNo(sysUser.getUserNo());
+		sysLog.setModel("话费充值");
+		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"退还"+jlFr.getQqYe()+"元");
+		sysLog.setOp("话费退还");
+		sysLogSQL.add(sysLog);
+		
+		String qqYe = jlFr.getQqYe()+"";
+		
+		jlFr.setQqYe(0);
+		jlFr.setState(1);
+		jlFr.setOutTime(nowDate);
+		this.edit(jlFr);
+		
+		List<String> list = new ArrayList<String>();
+		list.add(jlFr.getFrNo());
+		list.add(qqYe);
+		list.add(jlFr.getFrName());
+		list.add(jlJq.getJqName());
+		list.add(jlQqCz.getCzId()+"");
+		result.putData("czList", list);
 		return result.toResult();
 	}
 }

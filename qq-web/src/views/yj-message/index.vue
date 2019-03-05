@@ -13,7 +13,7 @@
       <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
     </div>
     
-    <el-table :key='tableKey' :data="list"   border fit highlight-current-row
+    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
       style="width: 1001px">
       <el-table-column width="200" align="center" label="警察编号" >
         <template slot-scope="scope">
@@ -96,6 +96,7 @@ export default {
       tableKey: 0,
       list: null,
       total: null,
+      listLoading: true,
       listQuery: {
       	yjNo: undefined,
       	yjName: undefined,
@@ -136,13 +137,12 @@ export default {
     }
   },
   filters: {
-    dateFormat(row, column) {
+    dateFormat(data) {
 			//时间格式化  
-	    let date = row[column.property];  
-	    if (date == undefined) {  
+	    if (data == undefined) {  
 	      return "";  
 	    }  
-	    return moment(date).format("YYYY-MM-DD HH:mm:ss");  
+	    return moment(data).format("YYYY-MM-DD HH:mm:ss");  
 		}
   },
   created() {
@@ -154,10 +154,15 @@ export default {
   },
   methods: {
     getList() {
+    	this.listLoading = true
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
+      	 this.listLoading = false
+      }).catch(error => {
+          this.listLoading = false
       })
+      
     },
     handleFilter() {
       this.listQuery.pageNum = 1

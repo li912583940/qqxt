@@ -25,8 +25,12 @@ public class QqChargeMessageWeb extends Result{
 	}
 	
 	@RequestMapping("/requestRecharge")
-	public String requestRecharge(Integer webId, Integer czje){
-		
-		return this.toResult();
+	public String requestRecharge(Integer id, Integer czje){
+		return jlFrSQL.requestRecharge(id, czje);
+	}
+	
+	@RequestMapping("/requestRefund")
+	public String requestRefund(Integer id){
+		return jlFrSQL.requestRefund(id);
 	}
 }

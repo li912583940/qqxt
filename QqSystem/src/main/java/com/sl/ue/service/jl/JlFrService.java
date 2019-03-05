@@ -27,7 +27,15 @@ public interface JlFrService extends BaseService<JlFrVO>{
 	 * @return
 	 * L_晓天  @2019年3月5日
 	 */
-	public String requestRecharge(Integer webId, Integer czje);
+	public String requestRecharge(Integer id, Integer czje);
+	
+	/**
+	 * 说明 [出狱退费]
+	 * @param id 罪犯表主键
+	 * @return
+	 * L_晓天  @2019年3月5日
+	 */
+	public String requestRefund(Integer id);
 	
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum);
 	
