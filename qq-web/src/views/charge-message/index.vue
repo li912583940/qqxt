@@ -43,6 +43,11 @@
           <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
         </template>
       </el-table-column>
+      <el-table-column v-if="buttonRole.detailsPermission==1" align="center" label="摘要" width="100" >
+        <template slot-scope="scope">
+          <el-button v-if="buttonRole.detailsPermission==1" type="primary" size="mini" @click="openDetails(scope.row)">充值明细</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
 		<!-- 分页 -->
@@ -76,6 +81,64 @@
       </div>
     </el-dialog>
     <!-- 充值 结束 -->
+    
+    
+    <!-- 充值明细 结束 -->
+    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="1381px">
+        <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
+	      style="width: 1281px;margin-left: 10px;">
+	      <el-table-column width="110" align="center" label="充值时间">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.czsj | dateFormat}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="180" align="center" label="充值金额">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.czje | qqYeFormat}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="160" align="center" label="状态">
+	        <template slot-scope="scope">
+	          <span v-if="scope.row.czzt==1">已充值</span>
+	          <span v-if="scope.row.czzt==0">已修改</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="90" align="center" label="充值操作员">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.czrName}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="90" align="center" label="修改操作员">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.scrName}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="300" align="center" label="修改时间">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.scsj | dateFormat}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="140" align="center" label="电话号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tele}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="140" align="center" label="缩位号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.sw}}</span>
+	        </template>
+	      </el-table-column>
+	    </el-table>
+	    <!-- 分页 -->
+	    <div class="pagination-container">
+	      <el-pagination background @size-change="handleQsSizeChange" @current-change="handleQsCurrentChange" :current-page="qsListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="qsListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="qsTotal">
+	      </el-pagination>
+	    </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogDetailsVisible = false">关闭</el-button>
+        </span>
+    </el-dialog>
+    <!-- 充值明细 结束 -->
     
   </div>
 </template>
@@ -131,6 +194,7 @@ export default {
       	queryPermission: 1, 
       	rechargePermission: 0,
       	refundPermission: 0,
+      	detailsPermission: 0,
       }
       
     }
@@ -186,6 +250,7 @@ export default {
     		this.buttonRole.rechargePermission= 1
     		this.buttonRole.editPermission= 1
     		this.buttonRole.refundPermission= 1
+    		this.buttonRole.detailsPermission= 1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
     		let chargeMessage = buttonRoles.chargeMessage
@@ -195,6 +260,8 @@ export default {
     					this.buttonRole.rechargePermission= 1
     				}else if(value=='refundPermission'){
     					this.buttonRole.refundPermission= 1
+    				}else if(value=='detailsPermission'){
+    					this.buttonRole.detailsPermission= 1
     				}
     			}
     		}
@@ -283,6 +350,12 @@ export default {
 		})
     },
     /*  出狱退费 结束  */
+   
+    /* 充值明细 开始  */
+    openDetails(row){
+    	
+    },
+    /* 充值明细 结束  */
    
 	dateFormats: function (val) {
 		if(!val){
