@@ -37,6 +37,17 @@ public interface JlFrService extends BaseService<JlFrVO>{
 	 */
 	public String requestRefund(Integer id);
 	
+	/**
+	 * 说明 [查询充值明细]
+	 * @param frNo
+	 * @param pageSize
+	 * @param pageNum
+	 * @return
+	 * L_晓天  @2019年3月6日
+	 */
+	public Map<String, Object> findDetailsPojo(String frNo, Integer pageSize, Integer pageNum);
+	
+	
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum);
 	
 	/**

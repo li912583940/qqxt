@@ -118,20 +118,16 @@
 	          <span>{{scope.row.scsj | dateFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="140" align="center" label="电话号码">
+	      <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="180" >
 	        <template slot-scope="scope">
-	          <span>{{scope.row.tele}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="140" align="center" label="缩位号码">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.sw}}</span>
+	          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
+	          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
 	        </template>
 	      </el-table-column>
 	    </el-table>
 	    <!-- 分页 -->
 	    <div class="pagination-container">
-	      <el-pagination background @size-change="handleQsSizeChange" @current-change="handleQsCurrentChange" :current-page="qsListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="qsListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="qsTotal">
+	      <el-pagination background @size-change="handleDetailsSizeChange" @current-change="handleDetailsCurrentChange" :current-page="detailsListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="detailsListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="detailsTotal">
 	      </el-pagination>
 	    </div>
         <span slot="footer" class="dialog-footer">
@@ -144,7 +140,7 @@
 </template>
 
 <script>
-import { findPojo, RequestRecharge, RequestRefund} from '@/api/chargeMessage'
+import { findPojo, RequestRecharge, RequestRefund, findDetailsPojo} from '@/api/chargeMessage'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -167,7 +163,7 @@ export default {
       	frNo: undefined,
       	frName: undefined,
         pageNum: 1,
-        pageSize: 20
+        pageSize: 10
       },
       jqs: [],// 监区下拉选框
       
@@ -187,8 +183,20 @@ export default {
       },
       // 充值 结束 
       
-       
+      /* 充值明细 开始 */ 
+      detailsTableKey: 0,
+      detailsList: null,
+      detailsTotal: null,
+      detailsListLoading: true,
+      detailsListQuery: {
+      	frNo: undefined,
+        pageNum: 1,
+        pageSize: 10
+      },
+      dialogDetailsVisible: false,
       
+      /* 充值明细 结束 */
+     
       //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
       	queryPermission: 1, 
@@ -353,8 +361,28 @@ export default {
    
     /* 充值明细 开始  */
     openDetails(row){
-    	
+    	this.detailsListQuery.frNo = row.frNo
+    	this.dialogDetailsVisible=true
+    	this.getDetailsList()
     },
+    getDetailsList() {
+      this.detailsListLoading = true
+      findDetailsPojo(this.detailsListQuery).then((res) => {
+      	 this.detailsList = res.pojo.list
+      	 this.detailsTotal = res.pojo.count
+      }).catch(error => {
+          this.detailsListLoading = false
+      })
+    },
+    handleDetailsSizeChange(val) {
+      this.detailsListQuery.pageSize = val
+      this.getDetailsList()
+    },
+    handleDetailsCurrentChange(val) {
+      this.detailsListQuery.pageNum = val
+      this.getDetailsList()
+    },
+    
     /* 充值明细 结束  */
    
 	dateFormats: function (val) {

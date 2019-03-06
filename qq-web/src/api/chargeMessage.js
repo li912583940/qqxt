@@ -8,3 +8,7 @@ export const RequestRecharge = params => { return request.post('/qqChargeMessage
 
 //出狱退费
 export const RequestRefund = params => { return request.post('/qqChargeMessage/requestRefund', params ).then(res => res) }
+
+// 查询充值明细
+export const findDetailsPojo = params => { return request.get('/qqChargeMessage/findDetailsPojo', { params: params } ).then(res => res) }
+

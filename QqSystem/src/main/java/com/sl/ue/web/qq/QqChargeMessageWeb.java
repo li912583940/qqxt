@@ -33,4 +33,12 @@ public class QqChargeMessageWeb extends Result{
 	public String requestRefund(Integer id){
 		return jlFrSQL.requestRefund(id);
 	}
+	
+	@RequestMapping("/findDetailsPojo")
+	public String findDetailsPojo(String frNo, Integer pageSize, Integer pageNum){
+		Map<String, Object> map = jlFrSQL.findDetailsPojo(frNo, pageSize, pageNum);
+		this.putPojo(map);
+		return this.toResult();
+	}
+	
 }

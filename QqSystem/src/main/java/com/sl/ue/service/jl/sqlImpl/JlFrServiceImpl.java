@@ -435,4 +435,8 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		result.putData("czList", list);
 		return result.toResult();
 	}
+	
+	public Map<String, Object> findDetailsPojo(String frNo, Integer pageSize, Integer pageNum){
+		
+	}
 }
