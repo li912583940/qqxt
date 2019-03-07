@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 	private JlQqCzService jlQqCzSQL;
 	@Autowired
 	private JlJqService jlJqSQL;
+	@Autowired
+	private JlFrService jlFrSQL;
 	
 	@Override
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum) {
@@ -437,6 +440,58 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 	}
 	
 	public Map<String, Object> findDetailsPojo(String frNo, Integer pageSize, Integer pageNum){
-		
+		JlQqCzVO jlQqCz = new JlQqCzVO();
+		jlQqCz.setFrNo(frNo);
+		return jlQqCzSQL.findPojo(jlQqCz, pageSize, pageNum);
+	}
+	
+	public String requestDetailsUpdate(BigDecimal czId, Integer czje){
+		Result result = new Result();
+		if(czId==null){
+			result.error(Result.error_102);
+			return result.toResult();
+		}
+		JlQqCzVO jlQqCz = jlQqCzSQL.findOne(czId);
+		if(jlQqCz==null){
+			result.error(Result.error_103, "数据库记录不存在，无法继续操作");
+			return result.toResult();
+		}
+		Date nowDate = new Date();
+		Date gDate = DateUtil.addHours(jlQqCz.getCzsj(), 3); //过期时间 充值时间3小时后无法修改
+		if(nowDate.before(gDate)){
+			SysUserVO sysUser = TokenUser.getUser();
+			int oldJe = jlQqCz.getCzje();
+			JlFrVO jlFr = new JlFrVO();
+			jlFr.setFrNo(jlQqCz.getFrNo());
+			List<JlFrVO> jlFrList = jlFrSQL.findList(jlFr);
+			if(jlFrList.size()>0){
+				jlFr = jlFrList.get(0);
+				int nowCzje = czje*1000;
+				jlFr.setQqYe(jlFr.getQqYe()+nowCzje-oldJe);
+				jlFrSQL.edit(jlFr);
+				
+				jlQqCz.setCzje(nowCzje);
+				jlQqCz.setScrNo(sysUser.getUserNo());
+				jlQqCz.setScrName(sysUser.getUserName());
+				jlQqCz.setScsj(nowDate);
+				jlQqCz.setCzzt(0);
+				jlQqCzSQL.edit(jlQqCz);
+				
+				SysLogVO sysLog = new SysLogVO();
+				sysLog.setType("正常");
+				sysLog.setLogTime(DateUtil.getDefault(nowDate));
+				sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"充值"+(oldJe/1000)+"元修改为"+czje+"元");
+				sysLog.setModel("话费充值");
+				sysLog.setOp("修改充值记录");
+				sysLog.setUserName(sysUser.getUserName());
+				sysLog.setUserNo(sysUser.getUserNo());
+				sysLogSQL.add(sysLog);
+			}else{
+				result.msg("数据库记录已不存在，无法修改");
+			}
+		}else{
+			result.msg("充值已超过3小时，无法修改");
+		}
+		return result.toResult();
 	}
 }

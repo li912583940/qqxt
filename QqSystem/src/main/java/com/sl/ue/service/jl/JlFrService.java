@@ -1,5 +1,6 @@
 package com.sl.ue.service.jl;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,15 @@ public interface JlFrService extends BaseService<JlFrVO>{
 	 * L_晓天  @2019年3月6日
 	 */
 	public Map<String, Object> findDetailsPojo(String frNo, Integer pageSize, Integer pageNum);
+	
+	/**
+	 * 说明 [修改充值金额]
+	 * @param czId
+	 * @param czje
+	 * @return
+	 * L_晓天  @2019年3月7日
+	 */
+	public String requestDetailsUpdate(BigDecimal czId, Integer czje);
 	
 	
 	public Map<String, Object> findPojoJoin(JlFrVO model, Integer pageSize, Integer pageNum);

@@ -16,7 +16,7 @@
     </div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 981px">
+      style="width: 1081px">
       <el-table-column width="200" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
@@ -84,44 +84,43 @@
     
     
     <!-- 充值明细 结束 -->
-    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="1381px">
+    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="961px">
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 1281px;margin-left: 10px;">
-	      <el-table-column width="110" align="center" label="充值时间">
+	      style="width: 861px;margin-left: 20px;">
+	      <el-table-column width="160" align="center" label="充值时间">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.czsj | dateFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="180" align="center" label="充值金额">
+	      <el-table-column width="110" align="center" label="充值金额">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.czje | qqYeFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="状态">
+	      <el-table-column width="110" align="center" label="状态">
 	        <template slot-scope="scope">
 	          <span v-if="scope.row.czzt==1">已充值</span>
 	          <span v-if="scope.row.czzt==0">已修改</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="90" align="center" label="充值操作员">
+	      <el-table-column width="110" align="center" label="充值操作员">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.czrName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="90" align="center" label="修改操作员">
+	      <el-table-column width="110" align="center" label="修改操作员">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.scrName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="300" align="center" label="修改时间">
+	      <el-table-column width="160" align="center" label="修改时间">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.scsj | dateFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="180" >
+	      <el-table-column v-if="buttonRole.detailsUpdatePermission==1" align="center" :label="$t('criminal.actions')" width="100" >
 	        <template slot-scope="scope">
-	          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
-	          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
+	          <el-button v-if="buttonRole.detailsUpdatePermission==1" type="primary" size="mini" @click="openDetailsUpdate(scope.row)">修改</el-button>
 	        </template>
 	      </el-table-column>
 	    </el-table>
@@ -136,11 +135,33 @@
     </el-dialog>
     <!-- 充值明细 结束 -->
     
+    <!-- 修改充值 开始 -->
+    <el-dialog title="充值" :visible.sync="dialogDetailsUpdateVisible">
+      <el-form :rules="rulesDetailsUpdate" :model="dataDetailsUpdateForm" ref="dataDetailsUpdateForm" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
+        <el-form-item :label="$t('currency.jqName')">
+        	<el-input v-model="dataDetailsUpdateForm.jqName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('currency.frNo')">
+        	<el-input v-model="dataDetailsUpdateForm.frNo" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('currency.frName')">
+        	<el-input v-model="dataDetailsUpdateForm.frName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="充值金额(元)" prop="czje">
+          <el-input v-model="dataDetailsUpdateForm.czje"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogDetailsUpdateVisible = false">取 消</el-button>
+        <el-button type="primary" @click="requestDetailsUpdate">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 修改充值 结束 -->
   </div>
 </template>
 
 <script>
-import { findPojo, RequestRecharge, RequestRefund, findDetailsPojo} from '@/api/chargeMessage'
+import { findPojo, RequestRecharge, RequestRefund, findDetailsPojo, RequestDetailsUpdate} from '@/api/chargeMessage'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -194,15 +215,29 @@ export default {
         pageSize: 10
       },
       dialogDetailsVisible: false,
-      
       /* 充值明细 结束 */
      
+      /* 修改充值 开始 */
+      dialogDetailsUpdateVisible:false,
+      dataDetailsUpdateForm: {
+      	czId: undefined,
+        jqName: undefined,
+        frNo: undefined,
+        frName: undefined,
+        czje: undefined
+      },
+      rulesDetailsUpdate: {
+        czje: [{ required: true, message: '充值金额不能为空', trigger: 'blur' }]
+      },
+      /* 修改充值 结束 */
+      
       //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
       	queryPermission: 1, 
       	rechargePermission: 0,
       	refundPermission: 0,
       	detailsPermission: 0,
+      	detailsUpdatePermission: 0,
       }
       
     }
@@ -235,6 +270,7 @@ export default {
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
+      	 this.listLoading = false
       }).catch(error => {
           this.listLoading = false
       })
@@ -259,6 +295,7 @@ export default {
     		this.buttonRole.editPermission= 1
     		this.buttonRole.refundPermission= 1
     		this.buttonRole.detailsPermission= 1
+    		this.buttonRole.detailsUpdatePermission=1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
     		let chargeMessage = buttonRoles.chargeMessage
@@ -270,6 +307,8 @@ export default {
     					this.buttonRole.refundPermission= 1
     				}else if(value=='detailsPermission'){
     					this.buttonRole.detailsPermission= 1
+    				}else if(value=='detailsUpdatePermission'){
+    					this.buttonRole.detailsUpdatePermission= 1
     				}
     			}
     		}
@@ -370,6 +409,7 @@ export default {
       findDetailsPojo(this.detailsListQuery).then((res) => {
       	 this.detailsList = res.pojo.list
       	 this.detailsTotal = res.pojo.count
+      	 this.detailsListLoading = false
       }).catch(error => {
           this.detailsListLoading = false
       })
@@ -382,9 +422,40 @@ export default {
       this.detailsListQuery.pageNum = val
       this.getDetailsList()
     },
-    
     /* 充值明细 结束  */
    
+    /* 修改充值 开始 */
+    openDetailsUpdate(row){
+    	this.dataDetailsUpdateForm.czId= row.czId
+        this.dataDetailsUpdateForm.jqName= row.jqName
+        this.dataDetailsUpdateForm.frNo= row.frNo
+        this.dataDetailsUpdateForm.frName= row.frName
+        let czje = 0
+		if(row.czje){
+		    czje=row.czje/1000
+		}
+        this.dataDetailsUpdateForm.czje= czje
+    	this.dialogDetailsUpdateVisible=true
+    },
+    requestDetailsUpdate(){
+    	let param ={
+    		czId:this.dataDetailsUpdateForm.czId,
+    		czje:this.dataDetailsUpdateForm.czje
+    	}
+    	RequestDetailsUpdate(param).then(res =>{
+    		Message({
+		        message: res.errMsg,
+			    type: 'success',
+			    duration: 5 * 1000
+		    });
+		    this.getDetailsList()
+		    this.dialogDetailsUpdateVisible=false
+    	}).catch(error => {
+		    this.dialogDetailsUpdateVisible=false 
+		})
+    	
+    },
+    /* 修改充值 结束 */
 	dateFormats: function (val) {
 		if(!val){
 			return undefined

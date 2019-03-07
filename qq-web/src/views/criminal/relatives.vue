@@ -248,7 +248,7 @@ export default {
       	 this.total = res.pojo.count
       	 this.listLoading = false
       }).catch(error => {
-          this.listLoading = false
+         this.listLoading = false
       })
     },
     handleFilter() {

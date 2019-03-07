@@ -1,5 +1,6 @@
 package com.sl.ue.web.qq;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,4 +42,8 @@ public class QqChargeMessageWeb extends Result{
 		return this.toResult();
 	}
 	
+	@RequestMapping("/requestDetailsUpdate")
+	public String requestDetailsUpdate(BigDecimal czId, Integer czje){
+		return jlFrSQL.requestDetailsUpdate(czId, czje);
+	}
 }

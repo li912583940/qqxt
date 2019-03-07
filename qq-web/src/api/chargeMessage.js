@@ -12,3 +12,5 @@ export const RequestRefund = params => { return request.post('/qqChargeMessage/r
 // 查询充值明细
 export const findDetailsPojo = params => { return request.get('/qqChargeMessage/findDetailsPojo', { params: params } ).then(res => res) }
 
+//修改明细
+export const RequestDetailsUpdate = params => { return request.post('/qqChargeMessage/requestDetailsUpdate', params ).then(res => res) }
