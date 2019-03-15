@@ -16,7 +16,7 @@
     </div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1081px">
+      style="width: 1101px">
       <el-table-column width="200" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
@@ -43,7 +43,7 @@
           <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.detailsPermission==1" align="center" label="摘要" width="100" >
+      <el-table-column v-if="buttonRole.detailsPermission==1" align="center" label="摘要" width="120" >
         <template slot-scope="scope">
           <el-button v-if="buttonRole.detailsPermission==1" type="primary" size="mini" @click="openDetails(scope.row)">充值明细</el-button>
         </template>

@@ -4,7 +4,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-    	<el-date-picker
+      <el-date-picker
     		style="width: 200px"
     		class="filter-item"
 	      v-model="listQuery.callTimeStart"
@@ -12,16 +12,16 @@
 	      type="date"
 	      placeholder="选择开始日期"
 	      :picker-options="pickerOptionsStart">
-	    </el-date-picker>
-	    <el-date-picker
+	  </el-date-picker>
+	  <el-date-picker
 	    	style="width: 200px"
 	    	class="filter-item"
 	      v-model="listQuery.callTimeEnd"
 	      align="right"
 	      type="date"
 	      placeholder="选择结束日期">
-	    </el-date-picker>
-	    <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jqNo" placeholder="选择监区">
+	  </el-date-picker>
+	  <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jqNo" placeholder="选择监区">
         <el-option v-for="item in jqs" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
@@ -238,7 +238,10 @@ export default {
         localTele: undefined,
         yjNo: undefined,
         yjName: undefined,
-        
+        callCountType: undefined,
+        jfFlag: undefined,
+        callCountFlag: undefined,
+        type: undefined,
       },
       jqs: [ // 监区下拉选框
       
