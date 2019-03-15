@@ -12,6 +12,8 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 
 	public Map<String, Object> findPojoLeft(JlQqRecVO model, Integer pageSize, Integer pageNum);
 	
+	public Map<String, Object> findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum);
+	
 	/**
 	 * 说明 [获取当前用户在此次亲情电话记录的注释]
 	 * L_晓天  @2018年11月24日

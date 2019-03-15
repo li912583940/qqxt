@@ -10,6 +10,11 @@ public class JlQqRecVO extends JlQqRec{
     private String callRecfileUrl;
 
     private Integer jfFlag; // 是否计费 
+    
+    private Integer countIn; // 内部话费总额
+    private Integer countOut; // 外部话费总额
+    private Integer telCountNum; // 拨打次数
+    
     /*---------------------------  处理关联表  -----------------------------*/
     
     public String getCallRecfileUrl() {
@@ -26,6 +31,30 @@ public class JlQqRecVO extends JlQqRec{
 
 	public void setJfFlag(Integer jfFlag) {
 		this.jfFlag = jfFlag;
+	}
+	
+	public Integer getCountIn() {
+		return countIn;
+	}
+
+	public void setCountIn(Integer countIn) {
+		this.countIn = countIn;
+	}
+
+	public Integer getCountOut() {
+		return countOut;
+	}
+
+	public void setCountOut(Integer countOut) {
+		this.countOut = countOut;
+	}
+
+	public Integer getTelCountNum() {
+		return telCountNum;
+	}
+
+	public void setTelCountNum(Integer telCountNum) {
+		this.telCountNum = telCountNum;
 	}
 
 	private String leftJoinField; // 关联表字段

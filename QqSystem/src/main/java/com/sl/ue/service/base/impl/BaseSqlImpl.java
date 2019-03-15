@@ -65,7 +65,7 @@ public abstract class BaseSqlImpl<T> implements BaseService<T>{
 	 * @作者 LXT @2018年9月24日
 	 */
 	public List<T> findList(T model, Integer pageSize, Integer pageNum){
-		return findList(model, pageSize, pageNum, "DESC");
+		return findList(model, pageSize, pageNum, null);
 	}
 	
 	@Override
@@ -182,6 +182,8 @@ public abstract class BaseSqlImpl<T> implements BaseService<T>{
 			if(StringUtils.isBlank(table_fileds_str)){
 				table_fileds_str = "*";
 			}
+			sort = StringUtils.isNotBlank(sort)?sort:"DESC";
+			
 			String sql = "select a.*"+leftJoinField+" from " + tableName+" a "+leftJoinTable+" where 1=1 " + where_fields.toString()+" "+leftJoinWhere+" ORDER BY a."+id_field+" "+sort;
 			if(pageSize != null && pageNum != null){
 				int startNum = (pageNum-1)*pageSize;
@@ -207,8 +209,9 @@ public abstract class BaseSqlImpl<T> implements BaseService<T>{
 	}
 	
 	public Map<String, Object> findPojo(T model, Integer pageSize, Integer pageNum){
-		return findPojo(model, pageSize, pageNum, "DESC");
+		return findPojo(model, pageSize, pageNum, null);
 	}
+	
 	/**
 	 * 说明 [分页查询,带记录总数(count)]
 	 * @作者 LXT @2018年9月24日
@@ -327,6 +330,7 @@ public abstract class BaseSqlImpl<T> implements BaseService<T>{
 			if(StringUtils.isBlank(table_fileds_str)){
 				table_fileds_str = "*";
 			}
+			sort=StringUtils.isNotBlank(sort)?sort:"DESC";
 			
 			String sql = "select a.*"+leftJoinField+" from " + tableName+" a "+leftJoinTable+" where 1=1 " + where_fields.toString()+" "+leftJoinWhere+" ORDER BY a."+id_field+" "+sort;
 			if(pageSize != null && pageNum != null){

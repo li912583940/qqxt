@@ -21,7 +21,7 @@
 	      type="date"
 	      placeholder="选择结束日期">
 	  </el-date-picker>
-  	  <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jq" placeholder="选择罪犯监区">
+  	  <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jqNo" placeholder="选择罪犯监区">
         <el-option v-for="item in jqs" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
@@ -46,35 +46,49 @@
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
       style="width: 1101px">
-      <el-table-column width="200" align="center" :label="$t('currency.jqName')" >
+      <el-table-column width="160" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" :label="$t('currency.frNo')">
+      <el-table-column width="160" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" :label="$t('currency.frName')">
+      <el-table-column width="160" align="center" :label="$t('currency.frName')">
         <template slot-scope="scope">
           <span>{{scope.row.frName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="话费余额">
+      <el-table-column width="160" align="center" label="开始时间">
         <template slot-scope="scope">
-          <span>{{scope.row.qqYe | qqYeFormat}}</span>
+          <span>{{scope.row.callTimeStart}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="180" >
+      <el-table-column width="160" align="center" label="结束时间">
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
-          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
+          <span>{{scope.row.callTimeEnd}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.detailsPermission==1" align="center" label="摘要" width="120" >
+      <el-table-column width="200" align="center" label="内部话费总额(元)">
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.detailsPermission==1" type="primary" size="mini" @click="openDetails(scope.row)">充值明细</el-button>
+          <span>{{scope.row.countIn | qqYeFormat}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="200" align="center" label="外部话费总额(元)">
+        <template slot-scope="scope">
+          <span>{{scope.row.countOut | qqYeFormat}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="160" align="center" label="拨打次数">
+        <template slot-scope="scope">
+          <span>{{scope.row.telCountNum}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="buttonRole.rechargePermission==1" align="center" :label="$t('criminal.actions')" width="120" >
+        <template slot-scope="scope">
+          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">话费明细</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,32 +99,6 @@
       </el-pagination>
     </div>
 
-	<!-- 充值 开始 -->
-    <el-dialog title="充值" :visible.sync="dialogRechargeVisible">
-      <el-form :rules="rulesRecharge" :model="dataRechargeForm" ref="dataRechargeForm" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
-        <el-form-item :label="$t('currency.jqName')">
-        	<el-input v-model="dataRechargeForm.jqName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item :label="$t('currency.frNo')">
-        	<el-input v-model="dataRechargeForm.frNo" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item :label="$t('currency.frName')">
-        	<el-input v-model="dataRechargeForm.frName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="话费余额">
-        	<el-input v-model="dataRechargeForm.qqYe" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="充值金额(元)" prop="czje">
-          <el-input v-model="dataRechargeForm.czje"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogRechargeVisible = false">取 消</el-button>
-        <el-button type="primary" @click="requestRecharge">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 充值 结束 -->
-    
     
     <!-- 充值明细 结束 -->
     <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="961px">
@@ -163,34 +151,11 @@
         </span>
     </el-dialog>
     <!-- 充值明细 结束 -->
-    
-    <!-- 修改充值 开始 -->
-    <el-dialog title="充值" :visible.sync="dialogDetailsUpdateVisible">
-      <el-form :rules="rulesDetailsUpdate" :model="dataDetailsUpdateForm" ref="dataDetailsUpdateForm" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
-        <el-form-item :label="$t('currency.jqName')">
-        	<el-input v-model="dataDetailsUpdateForm.jqName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item :label="$t('currency.frNo')">
-        	<el-input v-model="dataDetailsUpdateForm.frNo" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item :label="$t('currency.frName')">
-        	<el-input v-model="dataDetailsUpdateForm.frName" :disabled="true"></el-input>
-        </el-form-item>
-        <el-form-item label="充值金额(元)" prop="czje">
-          <el-input v-model="dataDetailsUpdateForm.czje"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogDetailsUpdateVisible = false">取 消</el-button>
-        <el-button type="primary" @click="requestDetailsUpdate">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- 修改充值 结束 -->
   </div>
 </template>
 
 <script>
-import { findPojo, RequestRecharge, RequestRefund, findDetailsPojo, RequestDetailsUpdate} from '@/api/chargeMessage'
+import { findPojo} from '@/api/telCost'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -198,7 +163,7 @@ import waves from '@/directive/waves' // 水波纹指令
 import { Message, MessageBox } from 'element-ui'
 
 export default {
-  name: 'chargeMessage',
+  name: 'telCost',
   directives: {
     waves
   },
@@ -211,7 +176,7 @@ export default {
       listQuery: {
       	callTimeStart: undefined,
       	callTimeEnd: undefined,
-      	jq: undefined,
+      	jqNo: undefined,
       	frNo: undefined,
       	frName: undefined,
         pageNum: 1,

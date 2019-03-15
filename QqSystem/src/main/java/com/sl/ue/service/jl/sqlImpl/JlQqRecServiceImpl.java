@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 import com.sl.ue.entity.jl.vo.JlQqInfoVO;
@@ -100,6 +102,81 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     		
     	}
 		return map;
+	}
+	
+	public Map<String, Object> findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum){
+		StringBuffer leftJoinField = new StringBuffer();
+		leftJoinField.append(",a.JQ_Name AS jqName");
+		leftJoinField.append(",a.FR_No AS frNo");
+		leftJoinField.append(",a.FR_Name AS frName");
+		leftJoinField.append(",sum(a.Call_Count_IN) as countIn");
+		leftJoinField.append(",sum(a.Call_Count_OUT) as countOut");
+		leftJoinField.append(",count(a.Call_Count_IN) as telCountNum");
+		
+		StringBuffer group = new StringBuffer();
+		
+		StringBuffer leftJoinWhere = new StringBuffer();
+    	if(StringUtils.isNotBlank(model.getCallTimeStart())){ // 开始时间
+    		leftJoinWhere.append(" AND a.Call_Time_Start>='"+ model.getCallTimeStart() + "' ");
+    	}
+    	if(StringUtils.isNotBlank(model.getCallTimeEnd())){ // 结束时间
+    		leftJoinWhere.append(" AND a.Call_Time_Start<='"+ model.getCallTimeEnd() + "' ");
+    	}
+    	if(StringUtils.isNotBlank(model.getJqNo())){
+    		leftJoinWhere.append(",a.JQ_No='"+model.getJqNo()+"'");
+    	}
+    	if(StringUtils.isNotBlank(model.getFrNo())){
+    		leftJoinWhere.append(",a.FR_No='"+model.getFrNo()+"'");
+    	}
+    	if(StringUtils.isNotBlank(model.getFrName())){
+    		String str = model.getFrName();
+    		leftJoinWhere.append(" AND (a.FR_Name LIKE '%"+str+"%' OR dbo.f_get_fryp(a.FR_Name,'"+str+"') =1 )");
+    	}
+    	if(model.getJfFlag()!=null){
+    		if(model.getJfFlag()==0){
+    			leftJoinWhere.append(" AND a.Call_Count_Flag=0");
+    		}else{
+    			leftJoinWhere.append(" AND a.Call_Count_Flag<>0");
+    		}
+    	}
+    	if(model.getCallCountType()!=null){
+    		leftJoinWhere.append(" AND a.Call_Count_Type="+model.getCallCountType());
+    	}
+    	if(model.getCallCountFlag()!=null){
+    		leftJoinWhere.append(" AND a.Call_Count_Flag="+model.getCallCountFlag());
+    	}
+    	StringBuffer sql = new StringBuffer();
+    	sql.append("select ROW_NUMBER() OVER(ORDER BY a.JQ_No ASC) AS rowid");
+    	sql.append(leftJoinField.toString());
+    	sql.append(" FROM JL_QQ_REC AS a where 1=1");
+    	sql.append(leftJoinWhere.toString());
+    	sql.append(" GROUP BY a.FR_No,a.JQ_No,a.JQ_Name,a.FR_Name");
+    	int startNum = (pageNum-1)*pageSize;
+		int endNum = pageNum*pageSize;
+    	String sqlStr = "select * from("+sql.toString()+") t where t.rowid>"+startNum+" AND t.rowid<="+endNum;
+    	System.out.println(sqlStr);
+    	List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sqlStr);
+    	for(Map<String, Object> map: list){
+    		if(StringUtils.isNotBlank(model.getCallTimeStart())){
+    			map.put("callTimeStart", model.getCallTimeStart());
+    		}
+    		if(StringUtils.isNotBlank(model.getCallTimeEnd())){
+    			map.put("callTimeEnd", model.getCallTimeEnd());
+    		}
+    	}
+    	Map<String, Object> resultMap = new HashMap<>(); // 封装结果集
+    	resultMap.put("list", list);
+    	
+    	String countsql = "select ISNULL(count(*),0) AS count from JL_QQ_REC a where 1=1 " + leftJoinWhere.toString()+" GROUP BY a.FR_No"+group.toString();
+    	System.out.println(countsql);
+    	SqlRowSet rowSet =this.jdbcTemplate.queryForRowSet(countsql);
+    	Integer count = 0 ;
+		while(rowSet.next()) {
+			count = rowSet.getInt("count");
+		}
+		resultMap.put("count", count);
+    	return resultMap;
+		
 	}
 	
 	public String getZs(String callId){

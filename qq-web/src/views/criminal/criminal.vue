@@ -253,7 +253,6 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList } from '@/api/criminal'
 import { findList as findJqList} from '@/api/jqSet'
 
