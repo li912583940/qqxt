@@ -12,7 +12,25 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 
 	public Map<String, Object> findPojoLeft(JlQqRecVO model, Integer pageSize, Integer pageNum);
 	
+	/**
+	 * 说明 [话务统计]
+	 * @param model
+	 * @param pageSize
+	 * @param pageNum
+	 * @return
+	 * L_晓天  @2019年3月17日
+	 */
 	public Map<String, Object> findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum);
+	
+	/**
+	 * 说明 [话费明细]
+	 * @param frNo
+	 * @param pageSize
+	 * @param pageNum
+	 * @return
+	 * L_晓天  @2019年3月17日
+	 */
+	public String findDetailsPojo(String callTimeStart, String callTimeEnd, String frNo, Integer pageSize, Integer pageNum);
 	
 	/**
 	 * 说明 [获取当前用户在此次亲情电话记录的注释]

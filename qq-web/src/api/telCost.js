@@ -4,6 +4,8 @@ import request from '@/utils/request'
 
 export const findPojo = params => { return request.get('/telCost/findPojo', { params: params } ).then(res => res) }
 
+export const findDetailsPojo = params => { return request.get('/telCost/findDetailsPojo', { params: params } ).then(res => res) }
+
 // 导出EXCEL
 export function exportExcel(param) {
   return request({

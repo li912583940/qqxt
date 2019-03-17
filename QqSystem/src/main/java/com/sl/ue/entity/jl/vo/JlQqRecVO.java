@@ -14,7 +14,7 @@ public class JlQqRecVO extends JlQqRec{
     private Integer countIn; // 内部话费总额
     private Integer countOut; // 外部话费总额
     private Integer telCountNum; // 拨打次数
-    
+    private Double telCallLen; // 总时长
     /*---------------------------  处理关联表  -----------------------------*/
     
     public String getCallRecfileUrl() {
@@ -55,6 +55,14 @@ public class JlQqRecVO extends JlQqRec{
 
 	public void setTelCountNum(Integer telCountNum) {
 		this.telCountNum = telCountNum;
+	}
+
+	public Double getTelCallLen() {
+		return telCallLen;
+	}
+
+	public void setTelCallLen(Double telCallLen) {
+		this.telCallLen = telCallLen;
 	}
 
 	private String leftJoinField; // 关联表字段

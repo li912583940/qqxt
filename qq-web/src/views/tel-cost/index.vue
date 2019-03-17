@@ -45,13 +45,13 @@
     </div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1101px">
-      <el-table-column width="160" align="center" :label="$t('currency.jqName')" >
+      style="width: 1231px">
+      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="160" align="center" :label="$t('currency.frNo')">
+      <el-table-column width="100" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
         </template>
@@ -71,24 +71,24 @@
           <span>{{scope.row.callTimeEnd}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="内部话费总额(元)">
+      <el-table-column width="160" align="center" label="内部话费总额(元)">
         <template slot-scope="scope">
           <span>{{scope.row.countIn | qqYeFormat}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="外部话费总额(元)">
+      <el-table-column width="160" align="center" label="外部话费总额(元)">
         <template slot-scope="scope">
           <span>{{scope.row.countOut | qqYeFormat}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="160" align="center" label="拨打次数">
+      <el-table-column width="110" align="center" label="拨打次数">
         <template slot-scope="scope">
           <span>{{scope.row.telCountNum}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.rechargePermission==1" align="center" :label="$t('criminal.actions')" width="120" >
+      <el-table-column v-if="buttonRole.detailsPermission==1" align="center" :label="$t('criminal.actions')" width="120" >
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">话费明细</el-button>
+          <el-button v-if="buttonRole.detailsPermission==1" type="primary" size="mini" @click="openDetails(scope.row)">话费明细</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,47 +100,98 @@
     </div>
 
     
-    <!-- 充值明细 结束 -->
-    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="961px">
+    <!-- 话费明细 开始 -->
+    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="961px">
+    	<div class="filter-container">
+    	  <el-date-picker
+	    		style="width: 200px"
+	    		class="filter-item"
+		      v-model="detailsListQuery.callTimeStart"
+		      align="right"
+		      type="date"
+		      placeholder="选择开始日期"
+		      :picker-options="pickerOptionsStart">
+		  </el-date-picker>
+		  <el-date-picker
+		    	style="width: 200px"
+		    	class="filter-item"
+		      v-model="detailsListQuery.callTimeEnd"
+		      align="right"
+		      type="date"
+		      placeholder="选择结束日期">
+		  </el-date-picker>
+	      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleDetailsFilter">{{$t('criminal.search')}}</el-button>
+	    </div>
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
 	      style="width: 861px;margin-left: 20px;">
-	      <el-table-column width="160" align="center" label="充值时间">
+	      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
 	        <template slot-scope="scope">
-	          <span>{{scope.row.czsj | dateFormat}}</span>
+	          <span>{{scope.row.jqName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="充值金额">
+	      <el-table-column width="100" align="center" :label="$t('currency.frNo')">
 	        <template slot-scope="scope">
-	          <span>{{scope.row.czje | qqYeFormat}}</span>
+	          <span>{{scope.row.frNo}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="状态">
+	      <el-table-column width="160" align="center" :label="$t('currency.frName')">
 	        <template slot-scope="scope">
-	          <span v-if="scope.row.czzt==1">已充值</span>
-	          <span v-if="scope.row.czzt==0">已修改</span>
+	          <span>{{scope.row.frName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="充值操作员">
+	      <el-table-column width="160" align="center" label="开始时间">
 	        <template slot-scope="scope">
-	          <span>{{scope.row.czrName}}</span>
+	          <span>{{scope.row.callTimeStart}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="修改操作员">
+	      <el-table-column width="160" align="center" label="结束时间">
 	        <template slot-scope="scope">
-	          <span>{{scope.row.scrName}}</span>
+	          <span>{{scope.row.callTimeEnd}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="修改时间">
+	      <el-table-column width="160" align="center" label="亲属姓名">
 	        <template slot-scope="scope">
-	          <span>{{scope.row.scsj | dateFormat}}</span>
+	          <span>{{scope.row.qsName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column v-if="buttonRole.detailsUpdatePermission==1" align="center" :label="$t('criminal.actions')" width="100" >
+	      <el-table-column width="110" align="center" label="关系">
 	        <template slot-scope="scope">
-	          <el-button v-if="buttonRole.detailsUpdatePermission==1" type="primary" size="mini" @click="openDetailsUpdate(scope.row)">修改</el-button>
+	          <span>{{scope.row.gx}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="通话时长">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.callTimeLen}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="主叫号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.localTele}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="被叫号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tele}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="160" align="center" label="内部话费">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.callCountIn | qqYeFormat}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="160" align="center" label="外部话费">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.callCountOut | qqYeFormat}}</span>
 	        </template>
 	      </el-table-column>
 	    </el-table>
+	    <div class="filter-container">
+	    	<span v-if="costSum !=null">
+	    		<span>内部话费总额为：{{costSum.countIn/1000}}（元）</span>
+		    	<span>外部话费总额为：{{costSum.countOut/1000}}（元）</span>
+		    	<span>总时长：{{costSum.telCallLen}}（分钟）</span>
+	    	</span>
+	    </div>
 	    <!-- 分页 -->
 	    <div class="pagination-container">
 	      <el-pagination background @size-change="handleDetailsSizeChange" @current-change="handleDetailsCurrentChange" :current-page="detailsListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="detailsListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="detailsTotal">
@@ -150,12 +201,12 @@
           <el-button type="primary" @click="dialogDetailsVisible = false">关闭</el-button>
         </span>
     </el-dialog>
-    <!-- 充值明细 结束 -->
+    <!-- 话费明细 结束 -->
   </div>
 </template>
 
 <script>
-import { findPojo} from '@/api/telCost'
+import { findPojo, findDetailsPojo} from '@/api/telCost'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -273,56 +324,28 @@ export default {
       	}
       ],
       
-      // 充值 开始
-      frname: undefined,
-      dialogRechargeVisible: false,
-      dataRechargeForm: {
-      	webId: undefined,
-        jqName: undefined,
-        frNo: undefined,
-        frName: undefined,
-        qqYe: undefined,
-        czje: undefined
-      },
-      rulesRecharge: {
-        czje: [{ required: true, message: '充值金额不能为空', trigger: 'blur' }]
-      },
-      // 充值 结束 
-      
-      /* 充值明细 开始 */ 
+      /* 话费明细 开始 */ 
       detailsTableKey: 0,
       detailsList: null,
       detailsTotal: null,
       detailsListLoading: true,
       detailsListQuery: {
+      	callTimeStart: undefined,
+      	callTimeEnd: undefined,
       	frNo: undefined,
         pageNum: 1,
         pageSize: 10
       },
       dialogDetailsVisible: false,
-      /* 充值明细 结束 */
+      costSum: null,
+      /* 话费明细 结束 */
      
-      /* 修改充值 开始 */
-      dialogDetailsUpdateVisible:false,
-      dataDetailsUpdateForm: {
-      	czId: undefined,
-        jqName: undefined,
-        frNo: undefined,
-        frName: undefined,
-        czje: undefined
-      },
-      rulesDetailsUpdate: {
-        czje: [{ required: true, message: '充值金额不能为空', trigger: 'blur' }]
-      },
-      /* 修改充值 结束 */
       
       //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
       	queryPermission: 1, 
-      	rechargePermission: 0,
-      	refundPermission: 0,
-      	detailsPermission: 0,
-      	detailsUpdatePermission: 0,
+      	exportPermission: 0, //导出
+      	detailsPermission: 0, //话费明细
       }
       
     }
@@ -352,6 +375,16 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
+      if(!this.listQuery.callTimeStart){
+      	this.listQuery.callTimeStart = undefined
+      }else{
+      	this.listQuery.callTimeStart = this.dateFormatYMD(this.listQuery.callTimeStart)+" 00:00:00";
+      }
+      if(!this.listQuery.callTimeEnd){
+      	this.listQuery.callTimeEnd = undefined
+      }else{
+      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
+      }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -376,24 +409,17 @@ export default {
     setButtonRole() { //设置按钮的权限
     	let roles = sessionStorage.getItem("roles")
     	if(roles.includes('admin')){
-    		this.buttonRole.rechargePermission= 1
-    		this.buttonRole.editPermission= 1
-    		this.buttonRole.refundPermission= 1
+    		this.buttonRole.exportPermission= 1
     		this.buttonRole.detailsPermission= 1
-    		this.buttonRole.detailsUpdatePermission=1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
-    		let chargeMessage = buttonRoles.chargeMessage
-    		if(chargeMessage.length>0){
-    			for(let value of chargeMessage){
-    				if(value=='rechargePermission'){
-    					this.buttonRole.rechargePermission= 1
-    				}else if(value=='refundPermission'){
-    					this.buttonRole.refundPermission= 1
+    		let telCost = buttonRoles.telCost
+    		if(telCost.length>0){
+    			for(let value of telCost){
+    				if(value=='exportPermission'){
+    					this.buttonRole.exportPermission= 1
     				}else if(value=='detailsPermission'){
     					this.buttonRole.detailsPermission= 1
-    				}else if(value=='detailsUpdatePermission'){
-    					this.buttonRole.detailsUpdatePermission= 1
     				}
     			}
     		}
@@ -414,74 +440,6 @@ export default {
     	}
     },
 
-	/*  充值 开始   */ 
-    //重置表单
-	resetForm() {
-		this.dataRechargeForm.webId = undefined
-		this.dataRechargeForm.jqName = undefined
-        this.dataRechargeForm.frNo = undefined
-        this.dataRechargeForm.frName = undefined
-        this.dataRechargeForm.qqYe = undefined
-        this.dataRechargeForm.czje= undefined
-    },
-    openRecharge(row) {
-      this.resetForm()
-      this.dialogRechargeVisible = true
-      
-      this.dataRechargeForm.webId = row.webId
-      this.dataRechargeForm.jqName = row.jqName
-	  this.dataRechargeForm.frNo = row.frNo
-	  this.dataRechargeForm.frName = row.frName
-	  let qqYe = 0
-	  if(row.qqYe){
-	  	qqYe=row.qqYe/1000
-	  }
-	  this.dataRechargeForm.qqYe = qqYe
-	  this.dataRechargeForm.czje= row.czje
-    },
-    requestRecharge() {
-      this.$refs['dataRechargeForm'].validate((valid) => {
-        if (valid) {
-        	let param ={
-        		id: this.dataRechargeForm.webId,
-        		czje: this.dataRechargeForm.czje
-        	}
-          RequestRecharge(param).then(() => {
-            this.dialogRechargeVisible = false
-            this.getList()
-          }).catch(error => {
-		    this.dialogRechargeVisible = false
-		  })
-        }
-      })
-    },
-    /*  充值 结束   */ 
-    
-    /*  出狱退费 开始 */
-    requestRefund(row){
-    	let qqYe = 0
-		if(row.qqYe){
-		  qqYe=row.qqYe/1000
-		}
-    	this.$confirm('罪犯当前余额:'+qqYe+'元，是否继续“出狱退费”操作？（点击确定后，罪犯余额将会被清零，状态变成出狱）', '提示', {
-		    type: 'warning'
-		}).then(() => {
-			let param = {
-	    		id: row.webId
-	    	}
-			RequestRefund(param).then(() => {
-				Message({
-			        message: '退费成功',
-				    type: 'success',
-				    duration: 5 * 1000
-			    });
-	    		this.getList()
-	        }).catch(error => {
-		        
-		    })
-		})
-    },
-    /*  出狱退费 结束  */
    
     /* 充值明细 开始  */
     openDetails(row){
@@ -491,13 +449,34 @@ export default {
     },
     getDetailsList() {
       this.detailsListLoading = true
+      if(!this.detailsListQuery.callTimeStart){
+      	this.detailsListQuery.callTimeStart = undefined
+      }else{
+      	this.detailsListQuery.callTimeStart = this.dateFormatYMD(this.detailsListQuery.callTimeStart)+" 00:00:00";
+      }
+      if(!this.detailsListQuery.callTimeEnd){
+      	this.detailsListQuery.callTimeEnd = undefined
+      }else{
+      	this.detailsListQuery.callTimeEnd = this.dateFormatYMD(this.detailsListQuery.callTimeEnd)+" 23:59:59";
+      }
       findDetailsPojo(this.detailsListQuery).then((res) => {
       	 this.detailsList = res.pojo.list
       	 this.detailsTotal = res.pojo.count
+      	 
+      	 if(res.costSum){
+      	 	this.costSum = res.costSum
+      	 }else{
+      	 	this.costSum =null
+      	 }
+      	 
       	 this.detailsListLoading = false
       }).catch(error => {
           this.detailsListLoading = false
       })
+    },
+    handleDetailsFilter() {
+      this.detailsListQuery.pageNum = 1
+      this.getDetailsList()
     },
     handleDetailsSizeChange(val) {
       this.detailsListQuery.pageSize = val
@@ -509,43 +488,18 @@ export default {
     },
     /* 充值明细 结束  */
    
-    /* 修改充值 开始 */
-    openDetailsUpdate(row){
-    	this.dataDetailsUpdateForm.czId= row.czId
-        this.dataDetailsUpdateForm.jqName= row.jqName
-        this.dataDetailsUpdateForm.frNo= row.frNo
-        this.dataDetailsUpdateForm.frName= row.frName
-        let czje = 0
-		if(row.czje){
-		    czje=row.czje/1000
-		}
-        this.dataDetailsUpdateForm.czje= czje
-    	this.dialogDetailsUpdateVisible=true
-    },
-    requestDetailsUpdate(){
-    	let param ={
-    		czId:this.dataDetailsUpdateForm.czId,
-    		czje:this.dataDetailsUpdateForm.czje
-    	}
-    	RequestDetailsUpdate(param).then(res =>{
-    		Message({
-		        message: res.errMsg,
-			    type: 'success',
-			    duration: 5 * 1000
-		    });
-		    this.getDetailsList()
-		    this.dialogDetailsUpdateVisible=false
-    	}).catch(error => {
-		    this.dialogDetailsUpdateVisible=false 
-		})
-    	
-    },
-    /* 修改充值 结束 */
+    
 	dateFormats: function (val) {
 		if(!val){
 			return undefined
 		}
 		return moment(val).format("YYYY-MM-DD HH:mm:ss");
+	},
+	dateFormatYMD: function (val) {
+		if(!val){
+			return undefined
+		}
+		return moment(val).format("YYYY-MM-DD");
 	},
   }
 }

@@ -23,4 +23,9 @@ public class TelCostWeb extends Result{
 		this.putPojo(map);
 		return this.toResult();
 	}
+	
+	@RequestMapping("/findDetailsPojo")
+	public String findDetailsPojo(String callTimeStart, String callTimeEnd, String frNo, Integer pageSize, Integer pageNum){
+		return jlQqRecSQL.findDetailsPojo(callTimeStart, callTimeEnd, frNo, pageSize, pageNum);
+	}
 }

@@ -179,6 +179,42 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		
 	}
 	
+	public String findDetailsPojo(String callTimeStart, String callTimeEnd,String frNo, Integer pageSize, Integer pageNum){
+		Result result = new Result();
+		StringBuffer leftJoinWhere = new StringBuffer();
+		if(StringUtils.isNotBlank(callTimeStart)){
+			leftJoinWhere.append(" AND a.callTimeStart>='"+callTimeStart+"'");
+		}
+		if(StringUtils.isNotBlank(callTimeEnd)){
+			leftJoinWhere.append(" AND a.callTimeStart<='"+callTimeEnd+"'");
+		}
+		JlQqRecVO jlQqRec = new JlQqRecVO();
+		jlQqRec.setFrNo(frNo);
+		jlQqRec.setLeftJoinWhere(leftJoinWhere.toString());
+		Map<String, Object> map = this.findPojo(jlQqRec, pageSize, pageNum);
+		result.putPojo(map);
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT ");
+		sql.append("sum(a.Call_Count_IN) AS countIn");
+		sql.append(",sum(a.Call_Count_OUT) AS countOut");
+		sql.append(",sum(dbo.f_get_callTimeLen(a.Call_Time_Len)) AS telCallLen");
+		sql.append(" FROM JL_QQ_REC a");
+		sql.append(" WHERE 1=1");
+		sql.append(" AND a.FR_No='"+frNo+"'");
+		if(StringUtils.isNotBlank(callTimeStart)){
+			sql.append(" AND a.callTimeStart>='"+callTimeStart+"'");
+		}
+		if(StringUtils.isNotBlank(callTimeEnd)){
+			sql.append(" AND a.callTimeStart<='"+callTimeEnd+"'");
+		}
+		List<Map<String, Object>> sumList = this.jdbcTemplate.queryForList(sql.toString());
+		if(sumList.size()>0){
+			result.putJson("costSum", sumList.get(0));
+		}
+		return result.toResult();
+	}
+	
 	public String getZs(String callId){
 		Result result = new Result();
 		if(StringUtils.isBlank(callId)){
