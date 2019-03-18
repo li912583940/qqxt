@@ -56,7 +56,7 @@
         </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
-      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
+      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" type="primary" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
@@ -302,7 +302,6 @@ export default {
       ],
      
       
-      downloadLoading: false,
 	    pickerOptionsStart: {
 	      shortcuts: [{
 	        text: '今天',
@@ -559,7 +558,7 @@ export default {
     
     /** 导出EXCEL 开始 */
     handleDownload() {
-    	if(!this.callTimeStart){
+      if(!this.callTimeStart){
       	this.listQuery.callTimeStart = undefined
       }else{
       	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";

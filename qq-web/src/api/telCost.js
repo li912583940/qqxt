@@ -7,9 +7,20 @@ export const findPojo = params => { return request.get('/telCost/findPojo', { pa
 export const findDetailsPojo = params => { return request.get('/telCost/findDetailsPojo', { params: params } ).then(res => res) }
 
 // 导出EXCEL
-export function exportExcel(param) {
+export function exportCostExcel(param) {
   return request({
-    url: '/telCost/exportExcel',
+    url: '/telCost/exportCostExcel',
+    method: 'post',
+    data: param,
+    timeout: 600000,
+    responseType:'blob'
+  }).then(res => res)
+}
+
+// 导出EXCEL
+export function exportFrCostExcel(param) {
+  return request({
+    url: '/telCost/exportFrCostExcel',
     method: 'post',
     data: param,
     timeout: 600000,

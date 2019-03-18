@@ -23,7 +23,7 @@
       </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
       <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
-      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
+      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
     	<el-upload
     		v-if="buttonRole.importPermission==1"
     		ref="upload"
@@ -37,7 +37,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1211px">
+      style="width: 1311px">
       <el-table-column width="100" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
@@ -76,6 +76,12 @@
       <el-table-column width="160" align="center" label="电话卡号/密码">
         <template slot-scope="scope">
           <span>{{scope.row.qqZh}} / {{scope.row.qqMm}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="100" align="center" label="服刑状态">
+        <template slot-scope="scope">
+          <span v-if="scope.row.state==0">服刑中</span>
+          <span v-if="scope.row.state==1" style="color: red;">出狱</span>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.queryQsPermission==1 || buttonRole.editPermission==1 || buttonRole.deletePermission==1 || buttonRole.statePermission==1 || buttonRole.speciallyPermission==1" align="center" :label="$t('criminal.actions')" width="220" fixed="right">
@@ -327,7 +333,6 @@ export default {
         jbNo: [{ required: true, message: '级别不能为空', trigger: 'change' }],
         jq: [{ required: true, message: '监区不能为空', trigger: 'change' }]
       },
-      downloadLoading: false,
       
       // 亲属
       qs_frname: undefined, // 亲属弹框左上角显示犯人姓名

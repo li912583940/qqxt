@@ -418,7 +418,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		sysLog.setUserName(sysUser.getUserName());
 		sysLog.setUserNo(sysUser.getUserNo());
 		sysLog.setModel("话费充值");
-		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"退还"+jlFr.getQqYe()+"元");
+		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"退还"+(jlFr.getQqYe()/1000)+"元");
 		sysLog.setOp("话费退还");
 		sysLogSQL.add(sysLog);
 		

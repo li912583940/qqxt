@@ -104,7 +104,8 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		return map;
 	}
 	
-	public Map<String, Object> findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum){
+	public String findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum){
+		Result result = new Result();
 		StringBuffer leftJoinField = new StringBuffer();
 		leftJoinField.append(",a.JQ_Name AS jqName");
 		leftJoinField.append(",a.FR_No AS frNo");
@@ -112,8 +113,6 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		leftJoinField.append(",sum(a.Call_Count_IN) as countIn");
 		leftJoinField.append(",sum(a.Call_Count_OUT) as countOut");
 		leftJoinField.append(",count(a.Call_Count_IN) as telCountNum");
-		
-		StringBuffer group = new StringBuffer();
 		
 		StringBuffer leftJoinWhere = new StringBuffer();
     	if(StringUtils.isNotBlank(model.getCallTimeStart())){ // 开始时间
@@ -145,6 +144,18 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     	if(model.getCallCountFlag()!=null){
     		leftJoinWhere.append(" AND a.Call_Count_Flag="+model.getCallCountFlag());
     	}
+    	/** 监区权限 开始 */
+    	String token = WebContextUtil.getRequest().getHeader(Constants.TOKEN_NAME);
+		JqRoleManager jqRoleManager = new JqRoleManager();
+		String jqs = jqRoleManager.getJqs(token);
+		if("admin".equals(jqs)){
+			
+		}else if(StringUtils.isBlank(jqs)){
+			leftJoinWhere.append(" AND 1<>1 ");
+		}else if(StringUtils.isNotBlank(jqs)){
+			leftJoinWhere.append(" AND a.JQ_No in ("+jqs+") ");
+		}
+		/** 监区权限 结束 */
     	StringBuffer sql = new StringBuffer();
     	sql.append("select ROW_NUMBER() OVER(ORDER BY a.JQ_No ASC) AS rowid");
     	sql.append(leftJoinField.toString());
@@ -167,7 +178,7 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     	Map<String, Object> resultMap = new HashMap<>(); // 封装结果集
     	resultMap.put("list", list);
     	
-    	String countsql = "select ISNULL(count(*),0) AS count from JL_QQ_REC a where 1=1 " + leftJoinWhere.toString()+" GROUP BY a.FR_No"+group.toString();
+    	String countsql = "select ISNULL(count(*),0) AS count from JL_QQ_REC a where 1=1 " + leftJoinWhere.toString()+" GROUP BY a.FR_No";
     	System.out.println(countsql);
     	SqlRowSet rowSet =this.jdbcTemplate.queryForRowSet(countsql);
     	Integer count = 0 ;
@@ -175,7 +186,23 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 			count = rowSet.getInt("count");
 		}
 		resultMap.put("count", count);
-    	return resultMap;
+		result.putPojo(resultMap);
+		
+		// 话费总额
+		StringBuffer countSql = new StringBuffer();
+		countSql.append("SELECT ");
+		countSql.append("sum(a.Call_Count_IN) AS countIn");
+		countSql.append(",sum(a.Call_Count_OUT) AS countOut");
+		countSql.append(",sum(dbo.f_get_callTimeLen(a.Call_Time_Len)) AS telCallLen");
+		countSql.append(",count(a.Call_Count_IN) as countNum");
+		countSql.append(" FROM JL_QQ_REC a");
+		countSql.append(" WHERE 1=1");
+		countSql.append(leftJoinWhere.toString());
+		List<Map<String, Object>> sumList = this.jdbcTemplate.queryForList(countSql.toString());
+		if(sumList.size()>0){
+			result.putJson("costRecSum", sumList.get(0));
+		}
+    	return result.toResult();
 		
 	}
 	
@@ -415,5 +442,374 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     	List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
     	result.putData(list);
     	return result.toResult();
+    }
+    
+    public void exportCostExcel(JlQqRecVO model, HttpServletRequest request, HttpServletResponse response){
+    	StringBuffer leftJoinField = new StringBuffer();
+		leftJoinField.append(",a.JQ_Name AS jqName");
+		leftJoinField.append(",a.FR_No AS frNo");
+		leftJoinField.append(",a.FR_Name AS frName");
+		leftJoinField.append(",sum(a.Call_Count_IN) as countIn");
+		leftJoinField.append(",sum(a.Call_Count_OUT) as countOut");
+		leftJoinField.append(",count(a.Call_Count_IN) as telCountNum");
+		
+		StringBuffer group = new StringBuffer();
+		
+		StringBuffer leftJoinWhere = new StringBuffer();
+    	if(StringUtils.isNotBlank(model.getCallTimeStart())){ // 开始时间
+    		leftJoinWhere.append(" AND a.Call_Time_Start>='"+ model.getCallTimeStart() + "' ");
+    	}
+    	if(StringUtils.isNotBlank(model.getCallTimeEnd())){ // 结束时间
+    		leftJoinWhere.append(" AND a.Call_Time_Start<='"+ model.getCallTimeEnd() + "' ");
+    	}
+    	if(StringUtils.isNotBlank(model.getJqNo())){
+    		leftJoinWhere.append(",a.JQ_No='"+model.getJqNo()+"'");
+    	}
+    	if(StringUtils.isNotBlank(model.getFrNo())){
+    		leftJoinWhere.append(",a.FR_No='"+model.getFrNo()+"'");
+    	}
+    	if(StringUtils.isNotBlank(model.getFrName())){
+    		String str = model.getFrName();
+    		leftJoinWhere.append(" AND (a.FR_Name LIKE '%"+str+"%' OR dbo.f_get_fryp(a.FR_Name,'"+str+"') =1 )");
+    	}
+    	if(model.getJfFlag()!=null){
+    		if(model.getJfFlag()==0){
+    			leftJoinWhere.append(" AND a.Call_Count_Flag=0");
+    		}else{
+    			leftJoinWhere.append(" AND a.Call_Count_Flag<>0");
+    		}
+    	}
+    	if(model.getCallCountType()!=null){
+    		leftJoinWhere.append(" AND a.Call_Count_Type="+model.getCallCountType());
+    	}
+    	if(model.getCallCountFlag()!=null){
+    		leftJoinWhere.append(" AND a.Call_Count_Flag="+model.getCallCountFlag());
+    	}
+    	/** 监区权限 开始 */
+    	String token = WebContextUtil.getRequest().getHeader(Constants.TOKEN_NAME);
+		JqRoleManager jqRoleManager = new JqRoleManager();
+		String jqs = jqRoleManager.getJqs(token);
+		if("admin".equals(jqs)){
+			
+		}else if(StringUtils.isBlank(jqs)){
+			leftJoinWhere.append(" AND 1<>1 ");
+		}else if(StringUtils.isNotBlank(jqs)){
+			leftJoinWhere.append(" AND a.JQ_No in ("+jqs+") ");
+		}
+		/** 监区权限 结束 */
+    	StringBuffer sql = new StringBuffer();
+    	sql.append("select ROW_NUMBER() OVER(ORDER BY a.JQ_No ASC) AS rowid");
+    	sql.append(leftJoinField.toString());
+    	sql.append(" FROM JL_QQ_REC AS a where 1=1");
+    	sql.append(leftJoinWhere.toString());
+    	sql.append(" GROUP BY a.FR_No,a.JQ_No,a.JQ_Name,a.FR_Name");
+    	System.out.println(sql.toString());
+    	List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql.toString());
+  
+		
+		String fileName =  "话费帐单.xls";
+		
+		OutputStream out = null;
+		
+		try {
+			// EXCEL START
+			HSSFWorkbook book = new HSSFWorkbook();
+			HSSFSheet sheet = book.createSheet("话费帐单");
+			CellStyle cellStyle = book.createCellStyle();
+			cellStyle.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
+			// 设置标题
+			List<String> title = new ArrayList<String>();
+			title.add("监区名称");
+			title.add("罪犯编号");
+			title.add("罪犯姓名");
+			title.add("内部话费总额(元)");
+			title.add("外部话费总额(元)");
+			title.add("拨打次数");
+			// 标题 start
+			HSSFRow row1 = sheet.createRow(0);
+			for(int i=0; i<title.size(); i++){
+				String t = title.get(i);
+				HSSFCell cell = row1.createCell(i);
+				cell.setCellValue(t);
+			}
+			// 标题 end
+			
+			// 记录 start
+			for(int i=0; i<list.size(); i++){
+				Map<String, Object> map = list.get(i);
+				HSSFRow row2 = sheet.createRow(i+1);
+				
+				HSSFCell cell0 = row2.createCell(0);
+				cell0.setCellValue(map.get("jqName")+"");
+					
+				HSSFCell cell1 = row2.createCell(1);
+				cell1.setCellValue(map.get("frNo")+"");
+				
+				HSSFCell cell2 = row2.createCell(2);
+				cell2.setCellValue(map.get("frName")+"");
+				
+				HSSFCell cell3 = row2.createCell(3);
+				Double countIn = Double.parseDouble(map.get("countIn")+"") ;
+				countIn = countIn/1000;
+				cell3.setCellValue(countIn+"");
+				
+				HSSFCell cell4 = row2.createCell(4);
+				Double countOut = Double.parseDouble(map.get("countOut")+"");
+				countOut = countOut/1000;
+				cell4.setCellValue(countOut+"");
+				
+				HSSFCell cell5 = row2.createCell(5);
+				cell5.setCellValue(map.get("telCountNum")+"");
+				
+			}
+			
+			// 话费总额
+			StringBuffer countSql = new StringBuffer();
+			countSql.append("SELECT ");
+			countSql.append("sum(a.Call_Count_IN) AS countIn");
+			countSql.append(",sum(a.Call_Count_OUT) AS countOut");
+			countSql.append(",sum(dbo.f_get_callTimeLen(a.Call_Time_Len)) AS telCallLen");
+			countSql.append(",count(a.Call_Count_IN) as countNum");
+			countSql.append(" FROM JL_QQ_REC a");
+			countSql.append(" WHERE 1=1");
+			countSql.append(leftJoinWhere.toString());
+			List<Map<String, Object>> sumList = this.jdbcTemplate.queryForList(countSql.toString());
+			
+			HSSFSheet sheet1 =book.createSheet("话费总计");
+			CellStyle cellStyle1 = book.createCellStyle();
+			cellStyle1.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
+			// 设置标题
+			List<String> title1 = new ArrayList<String>();
+			title1.add("内部话费总额(元)");
+			title1.add("外部话费总额(元)");
+			title1.add("总时长(分钟)");
+			title1.add("总次数");
+			// 标题 start
+			HSSFRow rowFr = sheet1.createRow(0);
+			for(int i=0; i<title1.size(); i++){
+				String t = title1.get(i);
+				HSSFCell cell = rowFr.createCell(i);
+				cell.setCellValue(t);
+			}
+			// 标题 end
+			
+			// 记录 start
+			for(int i=0; i<sumList.size(); i++){
+				Map<String, Object> map = sumList.get(i);
+				HSSFRow rowFr2 = sheet1.createRow(i+1);
+				
+				HSSFCell cell0 = rowFr2.createCell(0);
+				Double countIn = Double.parseDouble(map.get("countIn")+"");
+				countIn = countIn/1000;
+				cell0.setCellValue(countIn+"");
+					
+				HSSFCell cell1 = rowFr2.createCell(1);
+				Double countOut = Double.parseDouble(map.get("countOut")+"");
+				countOut = countOut/1000;
+				cell1.setCellValue(countOut+"");
+				
+				HSSFCell cell2 = rowFr2.createCell(2);
+				cell2.setCellValue(map.get("telCallLen")+"");
+				
+				HSSFCell cell3 = rowFr2.createCell(3);
+				cell3.setCellValue(map.get("countNum")+"");
+				
+			}
+			
+			// 处理不同浏览器中文名称编码
+			String userAgent=request.getHeader("USER-AGENT");
+			if(userAgent.indexOf("Chrome")!=-1 || userAgent.indexOf("Safari")!=-1 || userAgent.indexOf("Firefox")!=-1){
+				fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+			}else{
+				fileName = URLEncoder.encode(fileName,"UTF8");
+			}
+			response.setHeader("Content-Disposition", "attachment;filename="+fileName);
+			response.setHeader("Cache-Control","no-cache");//设置头
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("application/octet-stream");
+			out = response.getOutputStream();
+			book.write(out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(out != null){
+				try {
+					out.close();
+				} catch (IOException e2) {
+				}
+			}
+		}
+		
+	
+    }
+    
+    public void exportFrCostExcel(String callTimeStart, String callTimeEnd, String frNo, HttpServletRequest request, HttpServletResponse response){
+    	StringBuffer leftJoinWhere = new StringBuffer();
+		if(StringUtils.isNotBlank(callTimeStart)){
+			leftJoinWhere.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
+		}
+		if(StringUtils.isNotBlank(callTimeEnd)){
+			leftJoinWhere.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
+		}
+		JlQqRecVO jlQqRec = new JlQqRecVO();
+		jlQqRec.setFrNo(frNo);
+		jlQqRec.setLeftJoinWhere(leftJoinWhere.toString());
+		List<JlQqRecVO> list = this.findList(jlQqRec);
+		
+		String fileName =  "编号"+frNo+"话费帐单.xls";
+		
+		OutputStream out = null;
+		
+		try {
+			// EXCEL START
+			HSSFWorkbook book = new HSSFWorkbook();
+			HSSFSheet sheet = book.createSheet("编号"+frNo+"话费帐单");
+			CellStyle cellStyle = book.createCellStyle();
+			cellStyle.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
+			// 设置标题
+			List<String> title = new ArrayList<String>();
+			title.add("监区名称");
+			title.add("罪犯编号");
+			title.add("罪犯姓名");
+			title.add("开始时间");
+			title.add("结束时间");
+			title.add("亲属姓名");
+			title.add("关系");
+			title.add("通话时长");
+			title.add("主叫号码");
+			title.add("被叫号码");
+			title.add("内部话费(元)");
+			title.add("外部话费(元)");
+			
+			// 标题 start
+			HSSFRow row1 = sheet.createRow(0);
+			for(int i=0; i<title.size(); i++){
+				String t = title.get(i);
+				HSSFCell cell = row1.createCell(i);
+				cell.setCellValue(t);
+			}
+			// 标题 end
+			
+			// 记录 start
+			for(int i=0; i<list.size(); i++){
+				JlQqRecVO t = list.get(i);
+				HSSFRow row2 = sheet.createRow(i+1);
+				
+				HSSFCell cell0 = row2.createCell(0);
+				cell0.setCellValue(t.getJqName());
+					
+				HSSFCell cell1 = row2.createCell(1);
+				cell1.setCellValue(t.getFrNo());
+				
+				HSSFCell cell2 = row2.createCell(2);
+				cell2.setCellValue(t.getFrName());
+				
+				HSSFCell cell3 = row2.createCell(3);
+				cell3.setCellValue(t.getCallTimeStart());
+				
+				HSSFCell cell4 = row2.createCell(4);
+				cell4.setCellValue(t.getCallTimeEnd());
+				
+				HSSFCell cell5 = row2.createCell(5);
+				cell5.setCellValue(t.getQsName());
+				
+				HSSFCell cell6 = row2.createCell(6);
+				cell6.setCellValue(t.getGx());
+				
+				HSSFCell cell7 = row2.createCell(7);
+				cell7.setCellValue(t.getCallTimeLen()+"");
+				
+				HSSFCell cell8 = row2.createCell(8);
+				cell8.setCellValue(t.getLocaltele());
+				
+				HSSFCell cell9 = row2.createCell(9);
+				cell9.setCellValue(t.getTele());
+				
+				HSSFCell cell10 = row2.createCell(10);
+				cell10.setCellValue(Float.parseFloat(t.getCallCountIn().toString())/1000+"");
+				
+				HSSFCell cell11 = row2.createCell(11);
+				cell11.setCellValue(Float.parseFloat(t.getCallCountOut().toString())/1000+"");
+			}
+			
+			// 话费总额
+			StringBuffer sql = new StringBuffer();
+			sql.append("SELECT ");
+			sql.append("sum(a.Call_Count_IN) AS countIn");
+			sql.append(",sum(a.Call_Count_OUT) AS countOut");
+			sql.append(",sum(dbo.f_get_callTimeLen(a.Call_Time_Len)) AS telCallLen");
+			sql.append(" FROM JL_QQ_REC a");
+			sql.append(" WHERE 1=1");
+			sql.append(" AND a.FR_No='"+frNo+"'");
+			if(StringUtils.isNotBlank(callTimeStart)){
+				sql.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
+			}
+			if(StringUtils.isNotBlank(callTimeEnd)){
+				sql.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
+			}
+			List<Map<String, Object>> sumList = this.jdbcTemplate.queryForList(sql.toString());
+			
+			HSSFSheet sheet1 =book.createSheet("编号"+frNo+"话费总计");
+			CellStyle cellStyle1 = book.createCellStyle();
+			cellStyle1.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
+			// 设置标题
+			List<String> title1 = new ArrayList<String>();
+			title1.add("内部话费总额(元)");
+			title1.add("外部话费总额(元)");
+			title1.add("总时长(分钟)");
+			// 标题 start
+			HSSFRow rowFr = sheet1.createRow(0);
+			for(int i=0; i<title1.size(); i++){
+				String t = title1.get(i);
+				HSSFCell cell = rowFr.createCell(i);
+				cell.setCellValue(t);
+			}
+			// 标题 end
+			
+			// 记录 start
+			for(int i=0; i<sumList.size(); i++){
+				Map<String, Object> map = sumList.get(i);
+				HSSFRow rowFr2 = sheet1.createRow(i+1);
+				
+				HSSFCell cell0 = rowFr2.createCell(0);
+				Double countIn = Double.parseDouble(map.get("countIn")+"");
+				countIn = countIn/1000;
+				cell0.setCellValue(countIn+"");
+					
+				HSSFCell cell1 = rowFr2.createCell(1);
+				Double countOut = Double.parseDouble(map.get("countOut")+"");
+				countOut = countOut/1000;
+				cell1.setCellValue(countOut+"");
+				
+				HSSFCell cell2 = rowFr2.createCell(2);
+				cell2.setCellValue(map.get("telCallLen")+"");
+				
+			}
+			
+			// 处理不同浏览器中文名称编码
+			String userAgent=request.getHeader("USER-AGENT");
+			if(userAgent.indexOf("Chrome")!=-1 || userAgent.indexOf("Safari")!=-1 || userAgent.indexOf("Firefox")!=-1){
+				fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+			}else{
+				fileName = URLEncoder.encode(fileName,"UTF8");
+			}
+			response.setHeader("Content-Disposition", "attachment;filename="+fileName);
+			response.setHeader("Cache-Control","no-cache");//设置头
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("application/octet-stream");
+			out = response.getOutputStream();
+			book.write(out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(out != null){
+				try {
+					out.close();
+				} catch (IOException e2) {
+				}
+			}
+		}
+		
+	
     }
 }

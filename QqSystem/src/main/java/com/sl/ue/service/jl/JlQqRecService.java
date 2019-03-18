@@ -20,7 +20,7 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 	 * @return
 	 * L_晓天  @2019年3月17日
 	 */
-	public Map<String, Object> findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum);
+	public String findPojoByTelCost(JlQqRecVO model, Integer pageSize, Integer pageNum);
 	
 	/**
 	 * 说明 [话费明细]
@@ -56,4 +56,15 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 	 */
 	public String getWeekCount();
 	
+	/**
+	 * 说明 [导出话费帐单excel]
+	 * L_晓天  @2018年11月30日
+	 */
+	public void exportCostExcel(JlQqRecVO model, HttpServletRequest request, HttpServletResponse response);
+	
+	/**
+	 * 说明 [犯人详细账单excel]
+	 * L_晓天  @2018年11月30日
+	 */
+	public void exportFrCostExcel(String callTimeStart, String callTimeEnd, String frNo, HttpServletRequest request, HttpServletResponse response);
 }

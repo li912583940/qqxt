@@ -42,7 +42,8 @@
         </el-option>
       </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
-    </div>
+      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
+  	</div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
       style="width: 1231px">
@@ -92,7 +93,14 @@
         </template>
       </el-table-column>
     </el-table>
-
+	<div class="filter-container">
+    	<span v-if="costRecSum !=null" style="margin-top: 15px;">
+    		<span style="margin-left: 20px;">内部话费总额为：{{costRecSum.countIn/1000}}（元）</span>
+	    	<span style="margin-left: 20px;">外部话费总额为：{{costRecSum.countOut/1000}}（元）</span>
+	    	<span style="margin-left: 20px;">总时长：{{costRecSum.telCallLen}}（分钟）</span>
+	    	<span style="margin-left: 20px;">总次数：{{costRecSum.countNum}}</span>
+    	</span>
+    </div>
 		<!-- 分页 -->
     <div class="pagination-container">
       <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
@@ -101,7 +109,7 @@
 
     
     <!-- 话费明细 开始 -->
-    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="961px">
+    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="70%">
     	<div class="filter-container">
     	  <el-date-picker
 	    		style="width: 200px"
@@ -121,9 +129,10 @@
 		      placeholder="选择结束日期">
 		  </el-date-picker>
 	      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleDetailsFilter">{{$t('criminal.search')}}</el-button>
-	    </div>
+	      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleFrDownload">{{$t('criminal.export')}}</el-button>
+    	</div>
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 861px;margin-left: 0px;">
+	      style="width: 100%;margin-left: 0px;">
 	      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
 	        <template slot-scope="scope">
 	          <span>{{scope.row.jqName}}</span>
@@ -134,7 +143,7 @@
 	          <span>{{scope.row.frNo}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" :label="$t('currency.frName')">
+	      <el-table-column width="110" align="center" :label="$t('currency.frName')">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.frName}}</span>
 	        </template>
@@ -149,7 +158,7 @@
 	          <span>{{scope.row.callTimeEnd}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="亲属姓名">
+	      <el-table-column width="110" align="center" label="亲属姓名">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.qsName}}</span>
 	        </template>
@@ -174,19 +183,19 @@
 	          <span>{{scope.row.tele}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="内部话费">
+	      <el-table-column width="110" align="center" label="内部话费">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.callCountIn | qqYeFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="外部话费">
+	      <el-table-column width="110" align="center" label="外部话费">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.callCountOut | qqYeFormat}}</span>
 	        </template>
 	      </el-table-column>
 	    </el-table>
 	    <div class="filter-container">
-	    	<span v-if="costSum !=null" style="margin-top: 5px;">
+	    	<span v-if="costSum !=null" style="margin-top: 15px;">
 	    		<span style="margin-left: 20px;">内部话费总额为：{{costSum.countIn/1000}}（元）</span>
 		    	<span style="margin-left: 20px;">外部话费总额为：{{costSum.countOut/1000}}（元）</span>
 		    	<span style="margin-left: 20px;">总时长：{{costSum.telCallLen}}（分钟）</span>
@@ -206,7 +215,7 @@
 </template>
 
 <script>
-import { findPojo, findDetailsPojo} from '@/api/telCost'
+import { findPojo, findDetailsPojo, exportCostExcel, exportFrCostExcel} from '@/api/telCost'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -239,6 +248,7 @@ export default {
         callCountFlag: undefined,
       },
       jqs: [],// 监区下拉选框
+      costRecSum: null,
       
       pickerOptionsStart: {
 	      shortcuts: [{
@@ -392,6 +402,13 @@ export default {
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
+      	 
+      	 if(res.costRecSum){
+      	 	this.costRecSum = res.costRecSum
+      	 }else{
+      	 	this.costRecSum = null
+      	 }
+      	 
       	 this.listLoading = false
       }).catch(error => {
           this.listLoading = false
@@ -444,6 +461,42 @@ export default {
     	}
     },
 
+    handleDownload() { //导出
+   		Message({
+	        message: '已准备导出话费帐单文件，请稍等几秒。',
+		      type: 'success',
+		      duration: 5 * 1000
+	    });
+        if(!this.callTimeStart1){
+	      	this.listQuery.callTimeStart = undefined
+	    }else{
+	      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart1)+" 00:00:00";
+	    }
+	    if(!this.callTimeEnd1){
+	      	this.listQuery.callTimeEnd = undefined
+	    }else{
+	      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd1)+" 23:59:59";
+	    }
+		exportCostExcel(this.listQuery).then(res => {
+	        var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
+	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
+        	window.navigator.msSaveOrOpenBlob(blob, '话费帐单.xls');
+    		}else{ //非IE浏览器
+    			var downloadElement = document.createElement('a')
+		     	var href = window.URL.createObjectURL(blob)
+		     	downloadElement.href = href
+		     	downloadElement.download = '话费帐单.xls'
+		     	document.body.appendChild(downloadElement)
+		     	downloadElement.click()
+	     		document.body.removeChild(downloadElement) // 下载完成移除元素
+		     	window.URL.revokeObjectURL(href) // 释放掉blob对象
+    		}
+	     	
+			}).catch(error => {
+         console.log(error)
+      })
+
+    },
    
     /* 充值明细 开始  */
     openDetails(row){
@@ -490,6 +543,44 @@ export default {
       this.detailsListQuery.pageNum = val
       this.getDetailsList()
     },
+    
+    handleFrDownload() { //导出
+   		Message({
+	        message: '已准备导出编号'+this.detailsListQuery.frNo+'话费明细文件，请稍等几秒。',
+		      type: 'success',
+		      duration: 5 * 1000
+	    });
+        if(!this.callTimeStart2){
+	      	this.detailsListQuery.callTimeStart = undefined
+	    }else{
+	      	this.detailsListQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart2)+" 00:00:00";
+	    }
+	    if(!this.callTimeEnd2){
+	      	this.detailsListQuery.callTimeEnd = undefined
+	    }else{
+	      	this.detailsListQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd2)+" 23:59:59";
+	    }
+		exportFrCostExcel(this.detailsListQuery).then(res => {
+	        var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
+	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
+        	window.navigator.msSaveOrOpenBlob(blob, '编号'+this.detailsListQuery.frNo+'话费帐单.xls');
+    		}else{ //非IE浏览器
+    			var downloadElement = document.createElement('a')
+		     	var href = window.URL.createObjectURL(blob)
+		     	downloadElement.href = href
+		     	downloadElement.download = '编号'+this.detailsListQuery.frNo+'话费帐单.xls'
+		     	document.body.appendChild(downloadElement)
+		     	downloadElement.click()
+	     		document.body.removeChild(downloadElement) // 下载完成移除元素
+		     	window.URL.revokeObjectURL(href) // 释放掉blob对象
+    		}
+	     	
+			}).catch(error => {
+         console.log(error)
+      })
+
+    },
+    
     /* 充值明细 结束  */
    
     
