@@ -7,7 +7,7 @@
   	  <el-date-picker
     		style="width: 200px"
     		class="filter-item"
-	      v-model="listQuery.callTimeStart"
+	      v-model="callTimeStart1"
 	      align="right"
 	      type="date"
 	      placeholder="选择开始日期"
@@ -16,7 +16,7 @@
 	  <el-date-picker
 	    	style="width: 200px"
 	    	class="filter-item"
-	      v-model="listQuery.callTimeEnd"
+	      v-model="callTimeEnd1"
 	      align="right"
 	      type="date"
 	      placeholder="选择结束日期">
@@ -106,7 +106,7 @@
     	  <el-date-picker
 	    		style="width: 200px"
 	    		class="filter-item"
-		      v-model="detailsListQuery.callTimeStart"
+		      v-model="callTimeStart2"
 		      align="right"
 		      type="date"
 		      placeholder="选择开始日期"
@@ -115,7 +115,7 @@
 		  <el-date-picker
 		    	style="width: 200px"
 		    	class="filter-item"
-		      v-model="detailsListQuery.callTimeEnd"
+		      v-model="callTimeEnd2"
 		      align="right"
 		      type="date"
 		      placeholder="选择结束日期">
@@ -123,7 +123,7 @@
 	      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleDetailsFilter">{{$t('criminal.search')}}</el-button>
 	    </div>
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 861px;margin-left: 20px;">
+	      style="width: 861px;margin-left: 0px;">
 	      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
 	        <template slot-scope="scope">
 	          <span>{{scope.row.jqName}}</span>
@@ -186,10 +186,10 @@
 	      </el-table-column>
 	    </el-table>
 	    <div class="filter-container">
-	    	<span v-if="costSum !=null">
-	    		<span>内部话费总额为：{{costSum.countIn/1000}}（元）</span>
-		    	<span>外部话费总额为：{{costSum.countOut/1000}}（元）</span>
-		    	<span>总时长：{{costSum.telCallLen}}（分钟）</span>
+	    	<span v-if="costSum !=null" style="margin-top: 5px;">
+	    		<span style="margin-left: 20px;">内部话费总额为：{{costSum.countIn/1000}}（元）</span>
+		    	<span style="margin-left: 20px;">外部话费总额为：{{costSum.countOut/1000}}（元）</span>
+		    	<span style="margin-left: 20px;">总时长：{{costSum.telCallLen}}（分钟）</span>
 	    	</span>
 	    </div>
 	    <!-- 分页 -->
@@ -224,6 +224,8 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      callTimeStart1: undefined,
+      callTimeEnd1: undefined,
       listQuery: {
       	callTimeStart: undefined,
       	callTimeEnd: undefined,
@@ -329,6 +331,8 @@ export default {
       detailsList: null,
       detailsTotal: null,
       detailsListLoading: true,
+      callTimeStart2: undefined,
+      callTimeEnd2: undefined,
       detailsListQuery: {
       	callTimeStart: undefined,
       	callTimeEnd: undefined,
@@ -375,15 +379,15 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      if(!this.listQuery.callTimeStart){
+      if(!this.callTimeStart1){
       	this.listQuery.callTimeStart = undefined
       }else{
-      	this.listQuery.callTimeStart = this.dateFormatYMD(this.listQuery.callTimeStart)+" 00:00:00";
+      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart1)+" 00:00:00";
       }
-      if(!this.listQuery.callTimeEnd){
+      if(!this.callTimeEnd1){
       	this.listQuery.callTimeEnd = undefined
       }else{
-      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
+      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd1)+" 23:59:59";
       }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
@@ -449,15 +453,15 @@ export default {
     },
     getDetailsList() {
       this.detailsListLoading = true
-      if(!this.detailsListQuery.callTimeStart){
+      if(!this.callTimeStart2){
       	this.detailsListQuery.callTimeStart = undefined
       }else{
-      	this.detailsListQuery.callTimeStart = this.dateFormatYMD(this.detailsListQuery.callTimeStart)+" 00:00:00";
+      	this.detailsListQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart2)+" 00:00:00";
       }
-      if(!this.detailsListQuery.callTimeEnd){
+      if(!this.callTimeEnd2){
       	this.detailsListQuery.callTimeEnd = undefined
       }else{
-      	this.detailsListQuery.callTimeEnd = this.dateFormatYMD(this.detailsListQuery.callTimeEnd)+" 23:59:59";
+      	this.detailsListQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd2)+" 23:59:59";
       }
       findDetailsPojo(this.detailsListQuery).then((res) => {
       	 this.detailsList = res.pojo.list

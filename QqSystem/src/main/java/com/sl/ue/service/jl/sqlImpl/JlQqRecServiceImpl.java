@@ -183,10 +183,10 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		Result result = new Result();
 		StringBuffer leftJoinWhere = new StringBuffer();
 		if(StringUtils.isNotBlank(callTimeStart)){
-			leftJoinWhere.append(" AND a.callTimeStart>='"+callTimeStart+"'");
+			leftJoinWhere.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
 		}
 		if(StringUtils.isNotBlank(callTimeEnd)){
-			leftJoinWhere.append(" AND a.callTimeStart<='"+callTimeEnd+"'");
+			leftJoinWhere.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
 		}
 		JlQqRecVO jlQqRec = new JlQqRecVO();
 		jlQqRec.setFrNo(frNo);
@@ -203,10 +203,10 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		sql.append(" WHERE 1=1");
 		sql.append(" AND a.FR_No='"+frNo+"'");
 		if(StringUtils.isNotBlank(callTimeStart)){
-			sql.append(" AND a.callTimeStart>='"+callTimeStart+"'");
+			sql.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
 		}
 		if(StringUtils.isNotBlank(callTimeEnd)){
-			sql.append(" AND a.callTimeStart<='"+callTimeEnd+"'");
+			sql.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
 		}
 		List<Map<String, Object>> sumList = this.jdbcTemplate.queryForList(sql.toString());
 		if(sumList.size()>0){

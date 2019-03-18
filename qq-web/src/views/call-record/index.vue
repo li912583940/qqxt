@@ -7,7 +7,7 @@
       <el-date-picker
     		style="width: 200px"
     		class="filter-item"
-	      v-model="listQuery.callTimeStart"
+	      v-model="callTimeStart"
 	      align="right"
 	      type="date"
 	      placeholder="选择开始日期"
@@ -16,7 +16,7 @@
 	  <el-date-picker
 	    	style="width: 200px"
 	    	class="filter-item"
-	      v-model="listQuery.callTimeEnd"
+	      v-model="callTimeEnd"
 	      align="right"
 	      type="date"
 	      placeholder="选择结束日期">
@@ -225,6 +225,8 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      callTimeStart: undefined,
+      callTimeEnd: undefined,
       listQuery: {
         pageNum: 1,
         pageSize: 10,
@@ -419,15 +421,15 @@ export default {
   	},
     getList() {
       this.listLoading = true
-      if(!this.listQuery.callTimeStart){
+      if(!this.callTimeStart){
       	this.listQuery.callTimeStart = undefined
       }else{
-      	this.listQuery.callTimeStart = this.dateFormatYMD(this.listQuery.callTimeStart)+" 00:00:00";
+      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";
       }
-      if(!this.listQuery.callTimeEnd){
+      if(!this.callTimeEnd){
       	this.listQuery.callTimeEnd = undefined
       }else{
-      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
+      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
       }
 
       findPojo(this.listQuery).then((res) => {
@@ -557,15 +559,15 @@ export default {
     
     /** 导出EXCEL 开始 */
     handleDownload() {
-    	if(!this.listQuery.callTimeStart){
+    	if(!this.callTimeStart){
       	this.listQuery.callTimeStart = undefined
       }else{
-      	this.listQuery.callTimeStart = this.dateFormatYMD(this.listQuery.callTimeStart)+" 00:00:00";
+      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";
       }
-      if(!this.listQuery.callTimeEnd){
+      if(!this.callTimeEnd){
       	this.listQuery.callTimeEnd = undefined
       }else{
-      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.listQuery.callTimeEnd)+" 23:59:59";
+      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
       }
 
       Message({
