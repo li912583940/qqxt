@@ -4,6 +4,9 @@ import com.sl.ue.entity.jl.JlQqCz;
 
 public class JlQqCzVO extends JlQqCz{
 
+	private String callTimeStart;  // 开始日期
+	private String callTimeEnd; // 结束日期
+	private Integer type; //充值方式  1:充值, 2:退费
     /** 序列化 */
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +20,32 @@ public class JlQqCzVO extends JlQqCz{
 
     private String leftJoinWhere; // 关联表条件
 
-    public String getLeftJoinField() {
+    
+    public String getCallTimeStart() {
+		return callTimeStart;
+	}
+
+	public void setCallTimeStart(String callTimeStart) {
+		this.callTimeStart = callTimeStart;
+	}
+
+	public String getCallTimeEnd() {
+		return callTimeEnd;
+	}
+
+	public void setCallTimeEnd(String callTimeEnd) {
+		this.callTimeEnd = callTimeEnd;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getLeftJoinField() {
         return leftJoinField;
     }
 

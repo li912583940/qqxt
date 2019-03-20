@@ -812,4 +812,142 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 		
 	
     }
+    
+    public Map<String, Object> findPojoRemind(String callTimeStart, String callTimeEnd, Integer pageSize, Integer pageNum){
+    	StringBuffer sql = new StringBuffer();
+    	sql.append("SELECT 1 FROM JL_QQ_REC a");
+    	sql.append(" WHERE a.FR_No=jl.FR_No");
+    	if(StringUtils.isNotBlank(callTimeStart)){
+			sql.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
+		}
+		if(StringUtils.isNotBlank(callTimeEnd)){
+			sql.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
+		}
+		/** 监区权限 开始 */
+    	String token = WebContextUtil.getRequest().getHeader(Constants.TOKEN_NAME);
+		JqRoleManager jqRoleManager = new JqRoleManager();
+		String jqs = jqRoleManager.getJqs(token);
+		if("admin".equals(jqs)){
+			
+		}else if(StringUtils.isBlank(jqs)){
+			sql.append(" AND 1<>1 ");
+		}else if(StringUtils.isNotBlank(jqs)){
+			sql.append(" AND a.JQ_No in ("+jqs+") ");
+		}
+		/** 监区权限 结束 */
+		
+		String sqlStr = "SELECT ROW_NUMBER() OVER(ORDER BY jl.JQ ASC) AS rowid, jl.FR_No AS frNo,jl.FR_Name AS frName,jq.JQ_Name AS jqName FROM JL_FR jl left join JL_JQ jq ON jq.JQ_No=jl.JQ where not exists("+sql.toString()+")";
+		int startNum = (pageNum-1)*pageSize;
+		int endNum = pageNum*pageSize;
+    	String sqlStr1 = "select * from("+sqlStr+") t where t.rowid>"+startNum+" AND t.rowid<="+endNum;
+    	System.out.println(sqlStr1);
+    	List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sqlStr1);
+    	
+    	Map<String, Object> map = new HashMap();
+    	map.put("list", list);
+    	
+    	String countSql = "SELECT ISNULL(count(*),0) AS count FROM JL_FR jl where not exists("+sql.toString()+")";
+    	System.out.println(countSql);
+    	SqlRowSet rowSet =this.jdbcTemplate.queryForRowSet(countSql);
+    	Integer count = 0 ;
+		while(rowSet.next()) {
+			count = rowSet.getInt("count");
+		}
+		map.put("count", count);
+    	return map;
+		
+    }
+    
+    public void exportExcelByRemind(String callTimeStart, String callTimeEnd, HttpServletRequest request, HttpServletResponse response){
+    	StringBuffer sql = new StringBuffer();
+    	sql.append("SELECT 1 FROM JL_QQ_REC a");
+    	sql.append(" WHERE a.FR_No=jl.FR_No");
+    	if(StringUtils.isNotBlank(callTimeStart)){
+			sql.append(" AND a.Call_Time_Start>='"+callTimeStart+"'");
+		}
+		if(StringUtils.isNotBlank(callTimeEnd)){
+			sql.append(" AND a.Call_Time_Start<='"+callTimeEnd+"'");
+		}
+		/** 监区权限 开始 */
+    	String token = WebContextUtil.getRequest().getHeader(Constants.TOKEN_NAME);
+		JqRoleManager jqRoleManager = new JqRoleManager();
+		String jqs = jqRoleManager.getJqs(token);
+		if("admin".equals(jqs)){
+			
+		}else if(StringUtils.isBlank(jqs)){
+			sql.append(" AND 1<>1 ");
+		}else if(StringUtils.isNotBlank(jqs)){
+			sql.append(" AND a.JQ_No in ("+jqs+") ");
+		}
+		/** 监区权限 结束 */
+		String sqlStr = "SELECT jl.FR_No AS frNo,jl.FR_Name AS frName,jq.JQ_Name AS jqName FROM JL_FR jl left join JL_JQ jq ON jq.JQ_No=jl.JQ where not exists("+sql.toString()+")";
+		System.out.println(sqlStr);
+    	List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sqlStr);
+		
+		String fileName =  "未打电话罪犯名单.xls";
+		
+		OutputStream out = null;
+		
+		try {
+			// EXCEL START
+			HSSFWorkbook book = new HSSFWorkbook();
+			HSSFSheet sheet = book.createSheet("未打电话罪犯名单");
+			CellStyle cellStyle = book.createCellStyle();
+			cellStyle.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
+			// 设置标题
+			List<String> title = new ArrayList<String>();
+			title.add("监区名称");
+			title.add("罪犯编号");
+			title.add("罪犯姓名");
+			
+			// 标题 start
+			HSSFRow row1 = sheet.createRow(0);
+			for(int i=0; i<title.size(); i++){
+				String t = title.get(i);
+				HSSFCell cell = row1.createCell(i);
+				cell.setCellValue(t);
+			}
+			// 标题 end
+			
+			// 记录 start
+			for(int i=0; i<list.size(); i++){
+				Map<String, Object> map = list.get(i);
+				HSSFRow row2 = sheet.createRow(i+1);
+				
+				HSSFCell cell0 = row2.createCell(0);
+				cell0.setCellValue(map.get("jqName")+"");
+					
+				HSSFCell cell1 = row2.createCell(1);
+				cell1.setCellValue(map.get("frNo")+"");
+				
+				HSSFCell cell2 = row2.createCell(2);
+				cell2.setCellValue(map.get("frName")+"");
+			}
+			
+			
+			// 处理不同浏览器中文名称编码
+			String userAgent=request.getHeader("USER-AGENT");
+			if(userAgent.indexOf("Chrome")!=-1 || userAgent.indexOf("Safari")!=-1 || userAgent.indexOf("Firefox")!=-1){
+				fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+			}else{
+				fileName = URLEncoder.encode(fileName,"UTF8");
+			}
+			response.setHeader("Content-Disposition", "attachment;filename="+fileName);
+			response.setHeader("Cache-Control","no-cache");//设置头
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("application/octet-stream");
+			out = response.getOutputStream();
+			book.write(out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(out != null){
+				try {
+					out.close();
+				} catch (IOException e2) {
+				}
+			}
+		}
+    
+    }
 }

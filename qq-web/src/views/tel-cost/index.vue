@@ -93,8 +93,9 @@
         </template>
       </el-table-column>
     </el-table>
+    <span style="margin-top: 15px;"></span>
 	<div class="filter-container">
-    	<span v-if="costRecSum !=null" style="margin-top: 15px;">
+    	<span v-if="costRecSum !=null" >
     		<span style="margin-left: 20px;">内部话费总额为：{{costRecSum.countIn/1000}}（元）</span>
 	    	<span style="margin-left: 20px;">外部话费总额为：{{costRecSum.countOut/1000}}（元）</span>
 	    	<span style="margin-left: 20px;">总时长：{{costRecSum.telCallLen}}（分钟）</span>
@@ -194,8 +195,9 @@
 	        </template>
 	      </el-table-column>
 	    </el-table>
+	    <span style="margin-top: 15px;"></span>
 	    <div class="filter-container">
-	    	<span v-if="costSum !=null" style="margin-top: 15px;">
+	    	<span v-if="costSum !=null" >
 	    		<span style="margin-left: 20px;">内部话费总额为：{{costSum.countIn/1000}}（元）</span>
 		    	<span style="margin-left: 20px;">外部话费总额为：{{costSum.countOut/1000}}（元）</span>
 		    	<span style="margin-left: 20px;">总时长：{{costSum.telCallLen}}（分钟）</span>

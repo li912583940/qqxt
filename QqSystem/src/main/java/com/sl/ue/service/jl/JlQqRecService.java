@@ -67,4 +67,26 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 	 * L_晓天  @2018年11月30日
 	 */
 	public void exportFrCostExcel(String callTimeStart, String callTimeEnd, String frNo, HttpServletRequest request, HttpServletResponse response);
+	
+	/**
+	 * 说明 [亲情提醒]
+	 * @param callTimeStart
+	 * @param callTimeEnd
+	 * @param pageSize
+	 * @param pageNum
+	 * @return
+	 * L_晓天  @2019年3月19日
+	 */
+	public Map<String, Object> findPojoRemind(String callTimeStart, String callTimeEnd, Integer pageSize, Integer pageNum);
+	
+	/**
+	 * 说明 [亲情提醒 导出]
+	 * @param callTimeStart
+	 * @param callTimeEnd
+	 * @param request
+	 * @param response
+	 * L_晓天  @2019年3月19日
+	 */
+	public void exportExcelByRemind(String callTimeStart, String callTimeEnd, HttpServletRequest request, HttpServletResponse response);
+
 }
