@@ -4,6 +4,8 @@ import request from '@/utils/request'
 
 export const findPojo = params => { return request.get('/czCount/findPojo', { params: params } ).then(res => res) }
 
+export const findPrint = params => { return request.get('/czCount/findPrint', { params: params } ).then(res => res) }
+
 // 导出EXCEL
 export function exportExcel(param) {
   return request({

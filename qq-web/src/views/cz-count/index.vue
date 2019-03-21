@@ -39,7 +39,7 @@
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
       style="width: 1231px">
-      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
+      <el-table-column width="160" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
         </template>
@@ -91,7 +91,7 @@
       </el-table-column>
       <el-table-column v-if="buttonRole.printPermission==1" align="center" :label="$t('criminal.actions')" width="120" >
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.printPermission==1 && scope.row.ccState==1" type="primary" size="mini" @click="openPrint(scope.row)">打印</el-button>
+          <el-button v-if="buttonRole.printPermission==1 && scope.row.czState==1" type="primary" size="mini" @click="openPrint(scope.row)">打印</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,7 +100,7 @@
     	<span v-if="czCountSum !=null" >
     		<span style="margin-left: 20px;">充值总额为：{{czCountSum.countIn/1000}}（元）</span>
 	    	<span style="margin-left: 20px;">退费总额为：{{czCountSum.thcountOutZe/1000}}（元）</span>
-	    	<span style="margin-left: 20px;">实际金额：{{czCountSum.sjcountInZe/1000}}（元）</span>
+	    	<span style="margin-left: 20px;">实际金额为：{{czCountSum.sjcountInZe/1000}}（元）</span>
     	</span>
     </div>
 		<!-- 分页 -->
@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import { findPojo, findDetailsPojo, exportExcel} from '@/api/czCount'
+import { findPojo, findPrint, exportExcel} from '@/api/czCount'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
@@ -161,6 +161,11 @@ export default {
       jqs: [],// 监区下拉选框
       czCountSum: null,
       
+      /***  打印开始  ***/
+      dialogFormVisible: false,
+      
+      /***  打印结束  ***/
+     
       pickerOptionsStart: {
 	      shortcuts: [{
 	        text: '今天',
@@ -324,7 +329,7 @@ export default {
 
     handleDownload() { //导出
    		Message({
-	        message: '已准备导出话费帐单文件，请稍等几秒。',
+	        message: '已准备导出充值统计文件，请稍等几秒。',
 		      type: 'success',
 		      duration: 5 * 1000
 	    });
@@ -341,12 +346,12 @@ export default {
 		exportExcel(this.listQuery).then(res => {
 	        var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
 	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
-        	window.navigator.msSaveOrOpenBlob(blob, '话费帐单.xls');
+        	window.navigator.msSaveOrOpenBlob(blob, '充值统计.xls');
     		}else{ //非IE浏览器
     			var downloadElement = document.createElement('a')
 		     	var href = window.URL.createObjectURL(blob)
 		     	downloadElement.href = href
-		     	downloadElement.download = '话费帐单.xls'
+		     	downloadElement.download = '充值统计.xls'
 		     	document.body.appendChild(downloadElement)
 		     	downloadElement.click()
 	     		document.body.removeChild(downloadElement) // 下载完成移除元素
@@ -358,6 +363,15 @@ export default {
       })
 
     },
+   
+    /***  打印开始  ***/
+    openPrint() {
+    	this.dialogFormVisible = true
+    	findPrint({}).then(res =>{
+    		
+    	})
+    },
+    /***  打印结束  ***/
    
 	dateFormats: function (val) {
 		if(!val){
