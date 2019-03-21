@@ -7,6 +7,7 @@ public class JlQqCzVO extends JlQqCz{
 	private String callTimeStart;  // 开始日期
 	private String callTimeEnd; // 结束日期
 	private Integer type; //充值方式  1:充值, 2:退费
+	private Integer count;
     /** 序列化 */
     private static final long serialVersionUID = 1L;
 
@@ -43,6 +44,14 @@ public class JlQqCzVO extends JlQqCz{
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
 	}
 
 	public String getLeftJoinField() {

@@ -3,11 +3,14 @@ package com.sl.ue.web.other;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.sl.ue.entity.jl.vo.JlQqCzVO;
 import com.sl.ue.service.jl.JlQqCzService;
 import com.sl.ue.util.http.Result;
 
+@RestController
+@RequestMapping("/czCount")
 public class CzCountWeb extends Result{
 
 	@Autowired
