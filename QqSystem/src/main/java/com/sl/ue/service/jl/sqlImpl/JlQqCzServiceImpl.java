@@ -374,5 +374,26 @@ public class JlQqCzServiceImpl extends BaseSqlImpl<JlQqCzVO> implements JlQqCzSe
 		resultMap.put("createTime", jlFr.getCreateTime()!=null?DateUtil.getDefault(jlFr.getCreateTime()):"");
 		resultMap.put("endTime", jlQqCz.getCzsj()!=null?DateUtil.getDefault(jlQqCz.getCzsj()):"");
 		resultMap.put("jqName", jlQqCz.getJqName());
+		
+		//通话次数
+		String telCountNumSql = "select ISNULL(count(Call_Count_IN),0) AS telCountNum  from JL_QQ_REC where FR_No='"+frNo+"'";
+		Integer telCountNum = this.jdbcTemplate.queryForObject(telCountNumSql, Integer.class);
+		resultMap.put("telCountNum", telCountNum);
+		
+		//话费累计
+		String neiBuZongJeSql = "select ISNULL(sum(Call_Count_IN),0) AS neiBuZongJe from JL_QQ_REC where FR_No='"+frNo+"'";
+		Integer neiBuZongJe = this.jdbcTemplate.queryForObject(neiBuZongJeSql, Integer.class);
+		resultMap.put("neiBuZongJe", neiBuZongJe.doubleValue()/1000);
+		
+		//累计充值
+		String ljjeSql = "select ISNULL(sum(CZJE),0) AS ljje from JL_QQ_CZ where FR_No='"+frNo+"' and CZJE>0";
+		Integer ljje = this.jdbcTemplate.queryForObject(ljjeSql, Integer.class);
+		resultMap.put("ljje", ljje.doubleValue()/1000);
+		
+		//话费余额
+		resultMap.put("qqYe", 0-jlQqCz.getCzje().doubleValue()/1000);
+		
+		result.putJson(resultMap);
+		return result.toResult();
 	}
 }

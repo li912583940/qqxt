@@ -33,8 +33,6 @@ public class JlJb implements java.io.Serializable {
 	private String downJb;
 	@DbField("HJ_QY")
 	private Integer hjQy;
-	@DbField("record_over_time")
-	private Integer recordOverTime;
 	
 	public Integer getWebId() {
 		return this.webId;
@@ -124,12 +122,5 @@ public class JlJb implements java.io.Serializable {
 		this.downJb = downJb;
 	}
 
-	public Integer getRecordOverTime() {
-		return recordOverTime;
-	}
-
-	public void setRecordOverTime(Integer recordOverTime) {
-		this.recordOverTime = recordOverTime;
-	}
 
 }

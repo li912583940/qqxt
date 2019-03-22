@@ -20,12 +20,12 @@
       </el-table-column>
       <el-table-column width="200" align="center" label="监听端口">
         <template slot-scope="scope">
-          <span>{{scope.row.audioPort}}</span>
+          <span>{{scope.row.audioport}}</span>
         </template>
       </el-table-column>
       <el-table-column width="280" align="center" label="录音网络地址">
         <template slot-scope="scope">
-          <span>{{scope.row.recUrl}}</span>
+          <span>{{scope.row.recurl}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="200">
@@ -53,11 +53,11 @@
         <el-form-item label="状态端口" prop="port">
           <el-input v-model="dataForm.port"></el-input>
         </el-form-item>
-        <el-form-item label="监听端口" prop="audioPort">
-          <el-input v-model="dataForm.audioPort"></el-input>
+        <el-form-item label="监听端口" prop="audioport">
+          <el-input v-model="dataForm.audioport"></el-input>
         </el-form-item>
-        <el-form-item label="录音网络地址" prop="recUrl">
-          <el-input v-model="dataForm.recUrl"></el-input>
+        <el-form-item label="录音网络地址" prop="recurl">
+          <el-input v-model="dataForm.recurl"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -72,14 +72,14 @@
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/sysParam'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/sysQqServer'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
 
 
 export default {
-  name: 'criminal',
+  name: 'sysParam',
   directives: {
     waves
   },
@@ -95,12 +95,12 @@ export default {
       },
       // 新增或编辑弹窗
       dataForm: { 
-        webId: undefined,
+        webid: undefined,
         serverName: undefined,
         ip: undefined,
         port: undefined,
-        audioPort: undefined,
-        recUrl: undefined
+        audioport: undefined,
+        recurl: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -150,7 +150,7 @@ export default {
 		if(this.$refs[formName] !== undefined){
 			this.$refs[formName].resetFields();
 		}
-		this.dataForm.webId = undefined
+		this.dataForm.webid = undefined
     },
     handleCreate() {
       this.dialogStatus = 'create'
@@ -174,15 +174,15 @@ export default {
     },
     handleUpdate(row) {
     	let param = {
-    		id: row.webId
+    		id: row.webid
     	}
     	findOne(param).then((res) =>{
-    		this.dataForm.webId = res.data.webId,
+    		this.dataForm.webid = res.data.webid,
 	        this.dataForm.serverName =  res.data.serverName,
 	        this.dataForm.ip = res.data.ip,
 	        this.dataForm.port = res.data.port,
-	        this.dataForm.audioPort = res.data.audioPort,
-	        this.dataForm.recUrl = res.data.recUrl
+	        this.dataForm.audioport = res.data.audioport,
+	        this.dataForm.recurl = res.data.recurl
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true
@@ -209,7 +209,7 @@ export default {
 		}).then(() => {
 			this.listLoading = true;
 			let param = {
-    			id: row.webId
+    			id: row.webid
     		}
 			RequestDelete(param).then(() => {
     		this.getList()

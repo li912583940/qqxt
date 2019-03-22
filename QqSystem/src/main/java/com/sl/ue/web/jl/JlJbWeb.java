@@ -87,4 +87,13 @@ public class JlJbWeb extends Result{
         return this.toResult();
     }
 
+    @RequestMapping("/resetQqCount")
+    public String resetQqCount(){
+    	return jlJbSQL.resetQqCount();
+    }
+    
+    @RequestMapping("/qzResetQqCount")
+    public String qzResetQqCount(){
+    	return jlJbSQL.qzResetQqCount();
+    }
 }

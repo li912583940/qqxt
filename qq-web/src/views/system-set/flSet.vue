@@ -1,5 +1,5 @@
 <!--
-	描述： 部门管理
+	描述： 费率设置
 -->
 <template>
   <div class="app-container">
@@ -9,9 +9,9 @@
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
       style="width: 401px">
-      <el-table-column width="200" align="center" label="部门名称" >
+      <el-table-column width="200" align="center" label="亲属关系" >
         <template slot-scope="scope">
-          <span>{{scope.row.deptName}}</span>
+          <span>{{scope.row.qsGx}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="200">
@@ -31,8 +31,8 @@
 	<!-- 新增或编辑 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="180px" style='width: 400px; margin-left:17%;' >
-        <el-form-item label="部门名称" prop="deptName">
-          <el-input v-model="dataForm.deptName"></el-input>
+        <el-form-item label="亲属关系" prop="qsGx">
+          <el-input v-model="dataForm.qsGx"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/deptManage'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/gxManage'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -69,7 +69,7 @@ export default {
       // 新增或编辑弹窗
       dataForm: { 
         id: undefined,
-        deptName: undefined
+        qsGx: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -78,7 +78,7 @@ export default {
         create: '新 增'
       },
        rules: {
-        deptName: [{ required: true, message: '部门名称不能为空', trigger: 'blur' }]
+        qsGx: [{ required: true, message: '亲属关系不能为空', trigger: 'blur' }]
       }
     }
   },
@@ -140,7 +140,7 @@ export default {
     	}
     	findOne(param).then((res) =>{
     		this.dataForm.id = res.data.id,
-    		this.dataForm.deptName = res.data.deptName
+    		this.dataForm.qsGx = res.data.qsGx
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true
@@ -170,10 +170,10 @@ export default {
     			id: row.id
     		}
 			RequestDelete(param).then(() => {
-    		    this.getList()
-	    	}).catch(error => {
-		        this.dialogFormVisible = false
-		    })
+    		this.getList()
+    	}).catch(error => {
+	        this.dialogFormVisible = false
+	      })
 		})
 	},
 

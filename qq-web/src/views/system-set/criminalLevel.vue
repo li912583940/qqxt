@@ -10,10 +10,11 @@
       </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="ResetQqCount" type="info">复位亲情电话次数</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 1201px">
+      style="width: 1001px">
       <el-table-column width="200" align="center" label="级别编号" >
         <template slot-scope="scope">
           <span>{{scope.row.jbNo}}</span>
@@ -24,19 +25,14 @@
           <span>{{scope.row.jbName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="每月会见次数">
+      <el-table-column width="200" align="center" label="每月亲情电话次数">
         <template slot-scope="scope">
-          <span>{{scope.row.hjCount}}</span>
+          <span>{{scope.row.qqCount}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="每次会见时长（分钟）">
+      <el-table-column width="200" align="center" label="每次亲情电话时长">
         <template slot-scope="scope">
-          <span>{{scope.row.hjTime}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="200" align="center" label="复听录音超时时间（天）">
-        <template slot-scope="scope">
-          <span>{{scope.row.recordOverTime}}</span>
+          <span>{{scope.row.qqTime}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="200">
@@ -63,14 +59,11 @@
         <el-form-item label="级别名称" prop="jbName">
           <el-input v-model="dataForm.jbName"></el-input>
         </el-form-item>
-        <el-form-item label="每月会见次数" prop="hjCount">
-          <el-input v-model="dataForm.hjCount"></el-input>
+        <el-form-item label="每月亲情电话次数" prop="qqCount">
+          <el-input v-model="dataForm.qqCount"></el-input>
         </el-form-item>
-        <el-form-item label="每次会见时长（分钟）" prop="hjTime">
-          <el-input v-model="dataForm.hjTime"></el-input>
-        </el-form-item>
-        <el-form-item label="复听录音超时时间（天）" prop="recordOverTime">
-          <el-input v-model="dataForm.recordOverTime"></el-input>
+        <el-form-item label="每次亲情电话时长" prop="qqTime">
+          <el-input v-model="dataForm.qqTime"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -84,11 +77,11 @@
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/criminalLevel'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, resetQqCount, qzResetQqCount } from '@/api/criminalLevel'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
-
+import { Message, MessageBox } from 'element-ui'
 
 export default {
   name: 'criminal',
@@ -110,9 +103,8 @@ export default {
         webId: undefined,
         jbNo: undefined,
         jbName: undefined,
-        hjCount: undefined,
-        hjTime: undefined,
-        recordOverTime: undefined
+        qqCount: undefined,
+        qqTime: undefined,
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -134,9 +126,6 @@ export default {
   },
   methods: {
     getList() {
-    	if(!this.listQuery.jbName){
-      	this.listQuery.jbName = undefined
-      }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -189,9 +178,8 @@ export default {
     		this.dataForm.webId = res.data.webId,
     		this.dataForm.jbNo = res.data.jbNo,
 	        this.dataForm.jbName =  res.data.jbName,
-	        this.dataForm.hjCount = res.data.hjCount,
-	        this.dataForm.hjTime = res.data.hjTime,
-	        this.dataForm.recordOverTime = res.data.recordOverTime
+	        this.dataForm.qqCount = res.data.qqCount,
+	        this.dataForm.qqTime = res.data.qqTime
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true
@@ -221,13 +209,33 @@ export default {
     			id: row.webId
     		}
 			RequestDelete(param).then(() => {
-    		this.getList()
-    	}).catch(error => {
-	        this.dialogFormVisible = false
-	      })
+    			this.getList()
+    		}).catch(error => {
+	        	this.dialogFormVisible = false
+	      	})
 		})
 	},
 
+    //
+    ResetQqCount(){
+    	resetQqCount({}).then(res =>{
+    		let result = res.data
+    		if(result==0){
+    			this.$confirm('是否强制复位?', '提示', {
+					type: 'warning'
+				}).then(() => {
+					qzResetQqCount({}).then(res => {
+			    	})
+				})
+    		}else{
+    			Message({
+			        message: '复位成功',
+				      type: 'success',
+				      duration: 5 * 1000
+			    });
+    		}
+    	})
+    },
 	dateFormats: function (val) {
 		if(!val){
 			return undefined

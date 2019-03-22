@@ -1,8 +1,8 @@
-package com.sl.ue.entity.jl.vo;
+package com.sl.ue.entity.sys.vo;
 
-import com.sl.ue.entity.jl.JlHjJqWeek;
+import com.sl.ue.entity.sys.SysHoliday;
 
-public class JlHjJqWeekVO extends JlHjJqWeek{
+public class SysHolidayVO extends SysHoliday{
 
     /** 序列化 */
     private static final long serialVersionUID = 1L;

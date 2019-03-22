@@ -98,22 +98,8 @@ public class JlJqWeb extends Result{
         return this.toResult();
     }
 
-    /**
-     * 说明 [获取当前监区选中的会见星期日]
-     * L_晓天  @2018年11月2日
-     */
-    @RequestMapping("/getCheckedWeek")
-    public String getCheckedWeek(String jqNo){
-    	return jlJqSQL.getCheckedWeek(jqNo);
-    }
+
     
-    /**
-     * 说明 [提交当前监区的会见星期日]
-     * L_晓天  @2018年11月2日
-     */
-    @RequestMapping("/addJqWeek")
-    public String addJqWeek(String jqNo, String weeks){
-    	return jlJqSQL.addJqWeek(jqNo, weeks);
-    }
+   
 
 }

@@ -75,17 +75,6 @@ export const constantRouterMap = [
     }]
   },
   
-  { // 罪犯管理-添加家属
-    path: '/addCriQs',
-    component: Layout,
-    children: [
-      {
-        path: '/addCriQs',
-        component: () => import('@/views/criminal/addQs'),
-      }
-    ],
-    hidden: true
-  },
 ]
 
 export default new Router({
@@ -241,8 +230,10 @@ export const asyncRouterMap = [
       { path: 'jqSet', component: () => import('@/views/system-set/jqSet'), name: 'jqSet', meta: { title: 'jqSet', icon: 'tab', roles:'jqSet' }}, //监区设置
       //{ path: 'spSet', component: () => import('@/views/system-set/spSet'), name: 'spSet', meta: { title: 'spSet', icon: 'tab', roles:'spSet' }}, //审批设置
       { path: 'lineSet', component: () => import('@/views/system-set/lineSet'), name: 'lineSet', meta: { title: 'lineSet', icon: 'tab', roles:'lineSet' }}, // 线路设置
+      { path: 'holidaySet', component: () => import('@/views/system-set/holidaySet'), name: 'holidaySet', meta: { title: 'holidaySet', icon: 'tab', roles:'holidaySet' }}, //亲情节假日
       { path: 'gxManage', component: () => import('@/views/system-set/gxManage'), name: 'gxManage', meta: { title: 'gxManage', icon: 'tab', roles:'gxManage' }}, // 亲属关系
       { path: 'deptManage', component: () => import('@/views/system-set/deptManage'), name: 'deptManage', meta: { title: 'deptManage', icon: 'tab', roles:'deptManage' }}, // 部门管理
+      { path: 'flSet', component: () => import('@/views/system-set/flSet'), name: 'flSet', meta: { title: 'flSet', icon: 'tab', roles:'flSet' }}, // 费率设置
       { path: 'sysParam', component: () => import('@/views/system-set/sysParam'), name: 'sysParam', meta: { title: 'sysParam', icon: 'tab', roles:'sysParam' }} // 系统参数
     ]
   },

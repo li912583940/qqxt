@@ -11,25 +11,15 @@
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 1141px">
+      style="width: 671px">
       <el-table-column width="100" align="center" :label="$t('currency.jqNo')">
         <template slot-scope="scope">
           <span>{{scope.row.jqNo}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100" align="center" :label="$t('currency.jqName')">
+      <el-table-column width="150" align="center" :label="$t('currency.jqName')">
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="100" align="center" label="楼层">
-        <template slot-scope="scope">
-          <span>{{scope.row.floor}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="300" align="center" label="会见星期时间">
-        <template slot-scope="scope">
-          <span>{{scope.row.jqWeek}}</span>
         </template>
       </el-table-column>
       <el-table-column width="100" align="center" label="特殊监区">
@@ -38,11 +28,11 @@
           <span v-if="scope.row.isTs==1" style="color: red;">是</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('criminal.actions')" width="440" fixed="right">
+      <el-table-column align="center" :label="$t('criminal.actions')" width="320" fixed="right">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">设置会见星期</el-button>
+          <el-button size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">亲情星期设置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -80,34 +70,105 @@
       </div>
     </el-dialog>
     
-    <!-- 设置会见星期 -->
-		<el-dialog title="设置会见星期" :visible.sync="dialogWeekVisible">
-			<el-card style="width: 540px; margin-left: 19%;">
-				<el-transfer
-			    v-model="weekValue"
-			    :data="weekData"
-			    :titles="['未拥有', '已拥有']">
-			  </el-transfer>
-		  </el-card>
-		  <div slot="footer" class="dialog-footer">
-		    <el-button @click="dialogWeekVisible = false">取 消</el-button>
-		    <el-button type="primary" @click="updateWeekData">确 定</el-button>
-		  </div>
+    <!-- 亲情星期设置开始   -->
+		<el-dialog title="亲情星期设置" :visible.sync="dialogWeekVisible"width="820px">
+			<div class="filter-container">
+	      <el-button class="filter-item" style="margin-left: 10px;" @click="openWeekAdd" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
+	    </div>
+      <el-table :key='weekTableKey' :data="weekList" v-loading="weekListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
+	      style="width: 751px;margin-left: 10px;">
+	      <el-table-column width="110" align="center" :label="$t('currency.jqNo')">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.jqNo}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" :label="$t('currency.jqName')">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.jqName}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="会见星期">
+	        <template slot-scope="scope">
+	          <span v-if="scope.row.jqWeek==0">星期天</span>
+	          <span v-if="scope.row.jqWeek==1">星期一</span>
+	          <span v-if="scope.row.jqWeek==2">星期二</span>
+	          <span v-if="scope.row.jqWeek==3">星期三</span>
+	          <span v-if="scope.row.jqWeek==4">星期四</span>
+	          <span v-if="scope.row.jqWeek==5">星期五</span>
+	          <span v-if="scope.row.jqWeek==6">星期六</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="开始时间">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.jqStarttime}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="110" align="center" label="结束时间">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.jqEndtime}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column  align="center" :label="$t('criminal.actions')" width="200"  fixed="right">
+	        <template slot-scope="scope">
+	          <el-button  type="primary" size="mini" icon="el-icon-edit" @click="openWeekUpdate(scope.row)">编辑</el-button>
+	          <el-button  size="mini" type="danger" icon="el-icon-delete" @click="handleWeekDelete(scope.row)">删除</el-button>
+	        </template>
+	      </el-table-column>
+	    </el-table>
+	    <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogWeekVisible = false">关闭</el-button>
+      </span>
 		</el-dialog>
-	
+	  
+	  <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogWeekFormVisible">
+      <el-form :model="dataFormWeek"  label-position="right" label-width="180px" style='width: 400px; margin-left:10%;' >
+        <el-form-item label="监区编号" prop="jqNo">
+          <el-input v-model="dataFormWeek.jqNo" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="监区名称" prop="jqName">
+          <el-input v-model="dataFormWeek.jqName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="星期" prop="jqWeek">
+          <el-select class="filter-item" v-model="dataFormWeek.jqWeek" placeholder="请选择">
+            <el-option v-for="item in jqWeeks" :key="item.id" :label="item.name" :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="通话时间段" prop="jqTime">
+          <el-time-picker
+				    is-range
+				    v-model="jqTime"
+				    range-separator="至"
+				    start-placeholder="开始时间"
+				    end-placeholder="结束时间"
+				    placeholder="选择时间范围"
+				    value-format="HH:mm"
+				    format="HH:mm"
+				    >
+				  </el-time-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogWeekFormVisible = false">取 消</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createWeekData">确 定</el-button>
+        <el-button v-else type="primary" @click="updateWeekData">确 定</el-button>
+      </div>
+    </el-dialog>	
+	  <!-- 亲情星期设置 结束   -->
 	  
   </div>
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, GetCheckedWeek, AddJqWeek} from '@/api/jqSet'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, 
+	findWeekList, findWeekOne, RequestWeekAdd, RequestWeekEdit, RequestWeekDelete} from '@/api/jqSet'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
-
+import { Message, MessageBox } from 'element-ui'
 
 export default {
-  name: 'criminal',
+  name: 'jqSet',
   directives: {
     waves
   },
@@ -135,24 +196,41 @@ export default {
         update: '编 辑',
         create: '新 增'
       },
-       rules: {
+      rules: {
        	jqNo: [{ required: true, message: '监区编号不能为空', trigger: 'blur' }],
         jqName: [{ required: true, message: '监区名称不能为空', trigger: 'blur' }]
       },
-      /**--------------------设置会见星期日   开始--------------------------*/
-      jqNo: undefined,
+      
+      /**--------------------亲情星期设置   开始--------------------------*/
       dialogWeekVisible: false,
-      weekValue: [],
-      weekData: [
-      	{label: '星期一',key:1},
-      	{label: '星期二',key:2},
-      	{label: '星期三',key:3},
-      	{label: '星期四',key:4},
-      	{label: '星期五',key:5},
-      	{label: '星期六',key:6},
-      	{label: '星期日',key:7}
+      weekTableKey: 0,
+      weekList: null,
+      weekListLoading: true,
+      weekListQuery: {
+        jqNo: undefined,
+        jqName: undefined,
+      },
+      
+      dialogWeekFormVisible: false,
+      jqTime: null,
+      dataFormWeek: { 
+        timeIndex: undefined,
+        jqNo: undefined,
+        jqName: undefined,
+        jqWeek: undefined,
+        jqStarttime: undefined,
+        jqEndtime: undefined
+      },
+      jqWeeks: [
+        {name: '星期一',id:1},
+      	{name: '星期二',id:2},
+      	{name: '星期三',id:3},
+      	{name: '星期四',id:4},
+      	{name: '星期五',id:5},
+      	{name: '星期六',id:6},
+      	{name: '星期日',id:0}
       ],
-      /**---------------------设置会见星期日   结束--------------------------*/
+      /**---------------------亲情星期设置   结束--------------------------*/
 
     }
   },
@@ -247,60 +325,164 @@ export default {
       })
     },
     //删除
-	handleDelete(row) {
-		this.$confirm('确认删除该记录吗?', '提示', {
-			type: 'warning'
-		}).then(() => {
-			this.listLoading = true;
-			let param = {
-    			id: row.webId
-    		}
-			RequestDelete(param).then(() => {
-    		this.getList()
-    	}).catch(error => {
-	        this.dialogFormVisible = false
+	  handleDelete(row) {
+			this.$confirm('确认删除该记录吗?', '提示', {
+				type: 'warning'
+			}).then(() => {
+				this.listLoading = true;
+				let param = {
+	    			id: row.webId
+	    		}
+				RequestDelete(param).then(() => {
+	    		this.getList()
+	    	}).catch(error => {
+		    })
+			})
+		},
+		
+		
+		/**------------------ 设置会见星期日开始 ----------------------*/
+		getWeekList() { 
+	    	this.weekListLoading = true
+	      findWeekList(this.weekListQuery).then((res) => {
+	      	 this.weekList = res.list
+	      	 this.weekListLoading = false
+	      }).catch(error => {
+	         this.weekListLoading = false
 	      })
-		})
-	},
-	/**------------------ 设置会见星期日开始 ----------------------*/
-	resetCheckedRole(){ //重置
-		this.weekValue = []
-	},
-	openWeek(row){
-		this.resetCheckedRole()
-		
-		this.dialogWeekVisible = true
-		
-		this.jqNo = row.jqNo
-		
-		// 获取当前监区的会见星期日
-		let param ={
-	 		jqNo: this.jqNo
-	 	}
-	 	GetCheckedWeek(param).then(res => {
-	 		this.weekValue = res.data
-	 	})
-	},
-	// 添加会见星期日
-	updateWeekData(){
-		let weeks = this.weekValue.join()
-		let param = {
-			jqNo: this.jqNo,
-			weeks: weeks
-		}
-		AddJqWeek(param).then(res => {
-			this.dialogWeekVisible = false
-			this.getList()
-		})
-	},
-	/**------------------ 设置会见星期日结束 ----------------------*/
-
-	dateFormats: function (val) {
-		if(!val){
-			return undefined
-		}
-		return moment(val).format("YYYY-MM-DD HH:mm:ss");
-	},
+	    },
+		resetChecked(){ //重置
+			this.dataFormWeek.timeIndex = undefined
+			this.dataFormWeek.jqNo = undefined
+			this.dataFormWeek.jqName = undefined
+			this.dataFormWeek.jqWeek = undefined
+			this.dataFormWeek.jqStarttime = undefined
+      this.dataFormWeek.jqEndtime = undefined
+			this.jqTime = null
+		},
+		openWeek(row){
+			this.dialogWeekVisible = true
+			
+			this.weekListQuery.jqNo = row.jqNo
+			this.weekListQuery.jqName = row.jqName
+			this.getWeekList()
+			
+		},
+		openWeekAdd(){
+			 this.dialogStatus = 'create'
+			 this.dialogWeekFormVisible = true
+			 this.resetChecked()
+			 
+			 this.dataFormWeek.jqNo = this.weekListQuery.jqNo
+			 this.dataFormWeek.jqName = this.weekListQuery.jqName
+		},
+		createWeekData() {
+			  if(this.dataFormWeek.jqWeek==undefined){
+	  	  	Message({
+		        message: '请选择星期',
+			      type: 'error',
+			      duration: 5 * 1000
+		      });
+		      return false
+	  	  }
+			  if(this.jqTime){
+			  	this.dataFormWeek.jqStarttime=this.jqTime[0]
+			  	this.dataFormWeek.jqEndtime=this.jqTime[1]
+			  }else{
+			  	Message({
+		        message: '请选择通话时间段',
+			      type: 'error',
+			      duration: 5 * 1000
+		      });
+		      return false
+			  }
+			  RequestWeekAdd(this.dataFormWeek).then(() => {
+	        this.dialogWeekFormVisible = false
+	        this.getWeekList()
+        }).catch(error => {
+	        //this.dialogWeekFormVisible = false
+	      })
+	     
+	  },
+	  openWeekUpdate(row){
+	  	this.dataFormWeek.timeIndex = row.timeIndex
+			this.dataFormWeek.jqNo = row.jqNo
+			this.dataFormWeek.jqName = row.jqName
+			this.dataFormWeek.jqWeek = row.jqWeek
+			this.dataFormWeek.jqStarttime = row.jqStarttime
+      this.dataFormWeek.jqEndtime = row.jqEndtime
+	    
+	    this.jqTime = []
+	    let time0 = row.jqStarttime
+	    time0 = '2019-01-01 '+time0
+	    this.jqTime.push(new Date(Date.parse(time0.replace(/-/g, "/"))))
+	    let time1 = row.jqEndtime
+	    time1 = '2019-01-01 '+time1
+	    this.jqTime.push(new Date(Date.parse(time1.replace(/-/g, "/"))))
+	    this.dialogStatus = 'update'
+	    this.dialogWeekFormVisible = true
+	 
+	  },
+	  updateWeekData(){
+	  	  if(this.dataFormWeek.jqWeek==undefined){
+	  	  	Message({
+		        message: '请选择星期',
+			      type: 'error',
+			      duration: 5 * 1000
+		      });
+		      return false
+	  	  }
+	  	  if(this.jqTime){
+	  	  	if(this.jqTime[0].length!=undefined && this.jqTime[0].length==5 ){
+	  	  		this.dataFormWeek.jqStarttime = this.jqTime[0]
+			  	  this.dataFormWeek.jqEndtime = this.jqTime[1]
+	  	  	}else{
+	  	  		this.dataFormWeek.jqStarttime = this.dateFormatsHM(this.jqTime[0])
+	  	  		this.dataFormWeek.jqEndtime = this.dateFormatsHM(this.jqTime[1])
+	  	  	}
+			  }else{
+			  	Message({
+		        message: '请选择通话时间段',
+			      type: 'error',
+			      duration: 5 * 1000
+		      });
+		      return false
+			  }
+	  	  RequestWeekEdit(this.dataFormWeek).then(() => {
+          this.dialogWeekFormVisible = false
+          this.getWeekList()
+        }).catch(error => {
+	        //this.dialogWeekFormVisible = false
+	      })
+	  },
+	  handleWeekDelete(row){
+	  	this.$confirm('确认删除该记录吗?', '提示', {
+				type: 'warning'
+			}).then(() => {
+				this.listLoading = true;
+				let param = {
+	    			id: row.timeIndex
+	    		}
+				RequestWeekDelete(param).then(() => {
+	    		this.getWeekList()
+	    	}).catch(error => {
+		    })
+			})
+	  },
+		/**------------------ 设置会见星期日结束 ----------------------*/
+	
+		dateFormats: function (val) {
+			if(!val){
+				return undefined
+			}
+			return moment(val).format("YYYY-MM-DD HH:mm:ss");
+		},
+		dateFormatsHM: function (val) {
+			if(!val){
+				return undefined
+			}
+			return moment(val).format("HH:mm");
+		},
   }
 }
 </script>

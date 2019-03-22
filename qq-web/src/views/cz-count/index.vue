@@ -89,7 +89,7 @@
           <span>{{scope.row.scUserName}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.printPermission==1" align="center" :label="$t('criminal.actions')" width="120" >
+      <el-table-column v-if="buttonRole.printPermission==1" align="center" :label="$t('criminal.actions')" width="120" fixed="right">
         <template slot-scope="scope">
           <el-button v-if="buttonRole.printPermission==1 && scope.row.czState==1" type="primary" size="mini" @click="openPrint(scope.row)">打印</el-button>
         </template>
@@ -113,10 +113,49 @@
    <!-- 打印小票 -->
     <el-dialog title="" :visible.sync="dialogFormVisible">
       <div id="wrap" class="wrap">
-		  	<span v-for="x in this.printList">
-		  	  <li>{{ x}}</li>
-		  	</span>
-		  </div>
+      	<span v-if="printList">
+	      	<div style="text-align: center"><font size="5">出狱话费结算单</font></div>
+	      	<table width="80%" style="margin-left: 10%" border="1"  cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">服刑人员编号</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.frNo}}</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">服刑人员姓名</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.frName}}</td>
+				</tr>
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">登记时间</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.createTime}}</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">结账时间</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.endTime}}</td>
+				</tr>
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">所属监区</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.jqName}}</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">所属中队</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">无</td>
+				</tr>
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">通话次数</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.telCountNum}}</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">话费累计</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.neiBuZongJe}}<font color="red">（元）</font></td>
+				</tr>
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">累计充值</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.ljje}}<font color="red">（元）</font></td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">话费余额</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.qqYe}}<font color="red">（元）</font></td>
+				</tr>	
+				<tr>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">应退还款</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">{{printList.qqYe}}<font color="red">（元）</font></td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">应补交款</td>
+					<td width="25%" height="30px" nowrap="nowrap" align="center">0.00<font color="red">（元）</font></td>
+				</tr>
+			</table>
+      	</span>
+		 
+	  </div>
       <div slot="footer" class="dialog-footer">
       	<el-button type="primary" @click="print">打 印</el-button>
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -163,7 +202,7 @@ export default {
       
       /***  打印开始  ***/
       dialogFormVisible: false,
-      
+      printList: null,
       /***  打印结束  ***/
      
       pickerOptionsStart: {
@@ -365,11 +404,27 @@ export default {
     },
    
     /***  打印开始  ***/
-    openPrint() {
-    	this.dialogFormVisible = true
-    	findPrint({}).then(res =>{
+    openPrint(row) {
+    	let param={
+    		czId: row.czId,
+    		frNo: row.frNo
+    	}
+    	findPrint(param).then(res =>{
+    		if(res.data){
+    			this.printList = res.data
+    		}else{
+    			this.printList = null
+    		}
     		
     	})
+    	this.dialogFormVisible = true
+    },
+    print(){
+    	var newstr = document.getElementsByClassName('wrap')[0].innerHTML
+    	document.body.innerHTML = newstr
+        window.print()
+        // 重新加载页面，以刷新数据
+        window.location.reload()
     },
     /***  打印结束  ***/
    

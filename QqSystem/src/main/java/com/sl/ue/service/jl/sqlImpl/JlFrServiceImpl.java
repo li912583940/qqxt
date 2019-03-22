@@ -426,7 +426,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		
 		jlFr.setQqYe(0);
 		jlFr.setState(1);
-		jlFr.setOutTime(nowDate);
+		jlFr.setOuttime(nowDate);
 		this.edit(jlFr);
 		
 		List<String> list = new ArrayList<String>();

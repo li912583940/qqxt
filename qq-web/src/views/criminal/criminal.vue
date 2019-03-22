@@ -153,7 +153,7 @@
     <!-- 亲属弹框  -->
     <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1381px">
     	<div class="filter-container">
-	      <el-button v-if="buttonRole.addQsPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleQsCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
+	      <el-button v-if="buttonRole.addQsPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleQsCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
 	    </div>
       <el-table :key='qsTableKey' :data="qsList" v-loading="qsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
 	      style="width: 1281px;margin-left: 10px;">
@@ -604,7 +604,6 @@ export default {
 				RequestDelete(param).then(() => {
 	    		this.getList()
 	    	}).catch(error => {
-	        this.dialogFormVisible = false
 	      })
 			})
 		},
@@ -768,7 +767,6 @@ export default {
 				RequestQsDelete(param).then(() => {
 	    		this.getQsList()
 	    	}).catch(error => {
-	        this.dialogQsFormVisible = false
 	      })
 			})
 		},

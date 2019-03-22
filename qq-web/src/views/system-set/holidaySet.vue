@@ -1,11 +1,10 @@
 <!--
-	描述： 特殊会见日
+	描述： 亲情节假日
 -->
 <template>
   <div class="app-container">
   	<div class="filter-container">
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('currency.add')}}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="openConfJq" type="info" icon="el-icon-setting">{{$t('currency.confJq')}}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="emptyDate" type="danger" icon="el-icon-delete">清空日期</el-button>
   	</div>
     
@@ -13,7 +12,7 @@
       style="width: 401px">
       <el-table-column width="200" align="center" label="日期" >
         <template slot-scope="scope">
-          <span>{{scope.row.holiday}}</span>
+          <span>{{scope.row.holidayDate}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="200">
@@ -48,26 +47,11 @@
       </div>
     </el-dialog>
     
-    <!-- 配置监区 -->
-	<el-dialog :title="$t('currency.confJq')" :visible.sync="dialogJqVisible">
-		<el-card style="width: 540px; margin-left: 19%;">
-			<el-transfer
-		    v-model="jqValue"
-		    :data="jqData"
-		    :titles="['未拥有', '已拥有']">
-		  </el-transfer>
-	  </el-card>
-	  <div slot="footer" class="dialog-footer">
-	    <el-button @click="dialogJqVisible = false">取 消</el-button>
-	    <el-button type="primary" @click="confJqData">确 定</el-button>
-	  </div>
-	</el-dialog>
-		
   </div>
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, FindJqList, GetCheckedJq, AddJqHoliday, EmptyDate} from '@/api/holidaySet'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, EmptyDate} from '@/api/holidaySet'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -90,10 +74,7 @@ export default {
       // 新增或编辑弹窗
       holidayValue: [],
       dialogFormVisible: false,
-      
-      dialogJqVisible:false,
-      jqData:[],
-      jqValue:[],
+
     }
   },
   filters: {
@@ -101,7 +82,6 @@ export default {
   },
   created() {
     this.getList()
-    this.findJqList()
   },
   methods: {
     getList() {
@@ -146,7 +126,7 @@ export default {
 		}).then(() => {
 			this.listLoading = true;
 			let param = {
-    			holiday: row.holiday
+    			id: row.webid
     		}
 			RequestDelete(param).then(() => {
     		this.getList()
@@ -155,45 +135,6 @@ export default {
 	      })
 		})
 	},
-	
-	/*****************   配置监区 开始  ***********************/
-	findJqList() { //
-		if(this.jqData.length===0){
-			FindJqList({}).then(res =>{
-				let list = res.list
-	    		for(let x of list){
-				  let value = {}
-				  value.key = x.jqNo
-				  value.label = x.jqName
-				  this.jqData.push(value)
-				}
-			})
-		}
-	},
-	getCheckedJq() {
-		GetCheckedJq({}).then(res =>{
-			this.jqValue=res.data
-		})
-	},
-	openConfJq(){ // 配置监区
-		this.dialogJqVisible = true
-		this.getCheckedJq()
-	},
-	confJqData(){
-		let jqValues = this.jqValue.join()
-		let param ={
-			jqValues: jqValues
-		}
-		AddJqHoliday(param).then(res =>{
-			this.dialogJqVisible = false
-			Message({
-		        message: '操作成功',
-			      type: 'success',
-			      duration: 5 * 1000
-		    });
-		})
-	},
-    /*****************   配置监区 结束   ***********************/
    
     emptyDate() {
     	this.$confirm('确认清空所有日期吗?', '提示', {

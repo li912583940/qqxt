@@ -23,6 +23,17 @@ public class SysQqLineServiceImpl extends BaseSqlImpl<SysQqLineVO> implements Sy
 	
 	private JlQqMonService jlQqMonSQL;
 	
+	public Map<String, Object> findPojoLeft(SysQqLineVO model, Integer pageSize, Integer pageNum){
+		StringBuffer leftJoinField = new StringBuffer();
+		leftJoinField.append(",b.JQ_Name AS jqName");
+		model.setLeftJoinField(leftJoinField.toString());
+		
+		StringBuffer leftJoinTable = new StringBuffer();
+		leftJoinTable.append(" LEFT JOIN JL_JQ b ON a.JQ=b.JQ_No");
+		model.setLeftJoinTable(leftJoinTable.toString());
+		return this.findPojo(model, pageSize, pageNum);
+	}
+	
 	@Override
 	public Map<String, Object> findPojoMonitor(Integer pageSize, Integer pageNum) {
 		

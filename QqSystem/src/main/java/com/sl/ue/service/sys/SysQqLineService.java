@@ -7,6 +7,8 @@ import com.sl.ue.service.base.BaseService;
 
 public interface SysQqLineService extends BaseService<SysQqLineVO>{
 
+	public Map<String, Object> findPojoLeft(SysQqLineVO model, Integer pageSize, Integer pageNum);
+	
 	public Map<String, Object> findPojoMonitor(Integer pageSize, Integer pageNum);
 	
 	

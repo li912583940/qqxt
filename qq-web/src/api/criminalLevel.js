@@ -10,3 +10,7 @@ export const RequestAdd = params => { return request.post('/jlJb/add', params ).
 export const RequestEdit = params => { return request.post('/jlJb/edit', params ).then(res => res) }
 
 export const RequestDelete = params => { return request.post('/jlJb/delete', params ).then(res => res) }
+
+export const resetQqCount = params => { return request.post('/jlJb/resetQqCount', params ).then(res => res) }
+
+export const qzResetQqCount = params => { return request.post('/jlJb/qzResetQqCount', params ).then(res => res) }

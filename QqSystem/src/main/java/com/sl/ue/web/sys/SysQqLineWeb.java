@@ -27,7 +27,7 @@ public class SysQqLineWeb extends Result{
 
     @RequestMapping("/findPojo")
     public String findPojo(SysQqLineVO model, Integer pageSize, Integer pageNum){
-        Map<String, Object> map = sysQqLineSQL.findPojo(model, pageSize, pageNum);
+        Map<String, Object> map = sysQqLineSQL.findPojoLeft(model, pageSize, pageNum);
         this.putPojo(map);
         return this.toResult();
     }
