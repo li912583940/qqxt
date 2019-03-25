@@ -449,6 +449,7 @@ export default {
 			    duration: 5 * 1000
 		    });
 		    this.getDetailsList()
+		    this.getList()
 		    this.dialogDetailsUpdateVisible=false
     	}).catch(error => {
 		    this.dialogDetailsUpdateVisible=false 
