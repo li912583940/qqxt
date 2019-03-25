@@ -130,7 +130,7 @@ public class JlQsWeb extends Result{
     public String edit(JlQsVO model){
     	JlQsVO oldJlQs = new JlQsVO();
     	if(StringUtils.isNotBlank(model.getQsSfz())){
-    		oldJlQs = jlQsSQL.findOne(model.getWebId()); //之前的家属
+    		oldJlQs = jlQsSQL.findOne(model.getWebid()); //之前的家属
     		if(oldJlQs.getFrNo().equals(model.getFrNo()) && oldJlQs.getQsSfz().equals(model.getQsSfz())){
     			
     		}else{

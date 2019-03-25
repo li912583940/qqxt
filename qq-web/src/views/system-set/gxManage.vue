@@ -4,7 +4,7 @@
 <template>
   <div class="app-container">
   	<div class="filter-container">
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
@@ -53,7 +53,7 @@ import waves from '@/directive/waves' // 水波纹指令
 import { Message, MessageBox } from 'element-ui'
 
 export default {
-  name: 'criminal',
+  name: 'gxManage',
   directives: {
     waves
   },

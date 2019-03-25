@@ -4,14 +4,35 @@
 <template>
   <div class="app-container">
   	<div class="filter-container">
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="openFlUsable" type="info" icon="el-icon-setting">费率切换</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 401px">
-      <el-table-column width="200" align="center" label="亲属关系" >
+      style="width: 951px">
+      <el-table-column width="150" align="center" label="费率字冠" >
         <template slot-scope="scope">
-          <span>{{scope.row.qsGx}}</span>
+          <span>{{scope.row.flFlag}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="150" align="center" label="费率类别" >
+        <template slot-scope="scope">
+          <span>{{scope.row.flMc}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="150" align="center" label="费率单位(秒)" >
+        <template slot-scope="scope">
+          <span>{{scope.row.flUnit}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="150" align="center" label="内部费率值(元)" >
+        <template slot-scope="scope">
+          <span>{{scope.row.flCountIn | qqYeFormat}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="150" align="center" label="外部费率值(元)" >
+        <template slot-scope="scope">
+          <span>{{scope.row.flCountOut | qqYeFormat}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="200">
@@ -30,9 +51,39 @@
 
 	<!-- 新增或编辑 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="180px" style='width: 400px; margin-left:17%;' >
-        <el-form-item label="亲属关系" prop="qsGx">
-          <el-input v-model="dataForm.qsGx"></el-input>
+      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="100px" style='width: 520px; margin-left:17%;' >
+        <el-form-item label="费率字冠" prop="flFlag">
+          <el-input v-model="dataForm.flFlag"></el-input>
+        </el-form-item>
+        <el-form-item label="费率类别" prop="flMc">
+          <el-input v-model="dataForm.flMc"></el-input>
+        </el-form-item>
+        <el-form-item label="通话期计费" >
+         	 <span>每</span>
+         	 <el-input v-model="dataForm.flUnit" style="width:60px"></el-input>
+         	 <span>秒</span>
+         	 <el-input v-model="dataForm.flCountIn" style="width:60px"></el-input>
+         	 <span>元,</span>
+         	 <span v-if="sysParam && sysParam.paramData1=='1'">
+         	 	<span>(外部</span>
+         	 	<el-input v-model="dataForm.flCountOut" style="width:60px"></el-input>
+         	 	<span>元)</span>
+         	 </span>
+        </el-form-item>
+        <el-form-item label="通话前期计费" >
+        	 <span>前</span>
+	     	 <el-input v-model="dataForm.flBeginTime" style="width:60px"></el-input>
+	     	 <span>秒,</span>
+             <span>每</span>
+	     	 <el-input v-model="dataForm.flBeginUnit" style="width:60px"></el-input>
+	     	 <span>秒</span>
+	     	 <el-input v-model="dataForm.flBeginCountIn" style="width:60px"></el-input>
+	     	 <span>元,</span>
+	     	 <span v-if="sysParam && sysParam.paramData1=='1'">
+	     	 	<span>(外部</span>
+	     	 	<el-input v-model="dataForm.flBeginCountOut" style="width:60px"></el-input>
+	     	 	<span>元)</span>
+	     	 </span>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -42,18 +93,34 @@
       </div>
     </el-dialog>
     
+    <!-- 费率切换  开始 -->
+    <el-dialog title="费率切换" :visible.sync="dialogFormFlVisible">
+      <el-form :model="dataFlForm" label-position="right" label-width="180px" style='width: 400px; margin-left:17%;' >
+        <el-form-item label="对内对外费率" prop="paramData1">
+          <el-radio-group v-model="dataFlForm.paramData1">
+		    <el-radio :label="'0'">关闭</el-radio>
+		    <el-radio :label="'1'">开启</el-radio>
+		  </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormFlVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updateFlData">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 费率切换  结束 -->
   </div>
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete} from '@/api/gxManage'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, findSysParam, RequestFlData} from '@/api/flSet'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
 import { Message, MessageBox } from 'element-ui'
 
 export default {
-  name: 'criminal',
+  name: 'flSet',
   directives: {
     waves
   },
@@ -68,8 +135,16 @@ export default {
       },
       // 新增或编辑弹窗
       dataForm: { 
-        id: undefined,
-        qsGx: undefined
+        webid: undefined,
+        flFlag: undefined,
+        flMc: undefined,
+        flUnit: undefined,
+        flCountIn: undefined,
+        flCountOut: undefined,
+        flBeginTime: undefined,
+        flBeginUnit: undefined,
+        flBeginCountIn: undefined,
+        flBeginCountOut: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -79,14 +154,38 @@ export default {
       },
        rules: {
         qsGx: [{ required: true, message: '亲属关系不能为空', trigger: 'blur' }]
-      }
+      },
+      sysParam: null,
+      
+      /**** 费率切换  开始 ****/
+      dialogFormFlVisible: false,
+      dataFlForm:{
+      	webid: undefined,
+      	paramData1: '0',
+      },
+      /**** 费率切换  结束 ****/
     }
   },
   filters: {
-    
+    dateFormat(data) {
+		//时间格式化  
+	    if (data == undefined) {  
+	      return "";  
+	    }  
+	    return moment(data).format("YYYY-MM-DD HH:mm:ss");  
+	},
+	qqYeFormat(data){
+		if(data == undefined){
+			return 0;
+		}
+		return data/1000;
+	},
   },
   created() {
     this.getList()
+  },
+  mounted() {
+    this.getSysParam()
   },
   methods: {
     getList() {
@@ -107,25 +206,59 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    getSysParam(){
+    	findSysParam({}).then(res =>{
+    		this.sysParam = res.data
+    		this.dataFlForm.webid = res.data.webid
+    		this.dataFlForm.paramData1 = res.data.paramData1
+    	})
+    },
     //重置表单
-	resetForm(formName) {
-		if(this.$refs[formName] !== undefined){
-			this.$refs[formName].resetFields();
-		}
-		this.dataForm.id = undefined
+	resetForm() {
+		this.dataForm.webid = undefined
+		this.dataForm.flFlag = undefined
+    	this.dataForm.flMc = undefined
+        this.dataForm.flUnit = undefined
+        this.dataForm.flCountIn = undefined
+        this.dataForm.flCountOut = undefined
+        this.dataForm.flBeginTime = undefined
+        this.dataForm.flBeginUnit = undefined
+        this.dataForm.flBeginCountIn = undefined
+        this.dataForm.flBeginCountOut = undefined
     },
     handleCreate() {
       this.dialogStatus = 'create'
-      this.resetForm('dataForm')
+      this.resetForm()
       this.dialogFormVisible = true
 //    this.$nextTick(() => {
 //      this.$refs['dataForm'].clearValidate()
 //    })
     },
     createData() {
+      if(this.dataForm.flFlag==undefined){
+      	Message({
+	        message: '费率字冠不能为空',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false
+      }
+      if(this.dataForm.flCountIn==undefined || this.dataForm.flUnit==undefined){
+      	Message({
+	        message: '通话期计费不能为空',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false
+      }
+      let param = Object.assign({},this.dataForm)
+      param.flCountIn=this.dataForm.flCountIn!=undefined?this.dataForm.flCountIn*1000:60
+      param.flCountOut=this.dataForm.flCountOut!=undefined?this.dataForm.flCountOut*1000:0
+      param.flBeginCountIn=this.dataForm.flBeginCountIn!=undefined?this.dataForm.flBeginCountIn*1000:0
+      param.flBeginCountOut=this.dataForm.flBeginCountOut!=undefined?this.dataForm.flBeginCountOut*1000:0
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          RequestAdd(this.dataForm).then(res => {
+          RequestAdd(param).then(res => {
             this.dialogFormVisible = false
             this.getList()
           }).catch(error => {
@@ -136,11 +269,19 @@ export default {
     },
     handleUpdate(row) {
     	let param = {
-    		id: row.id
+    		id: row.webid
     	}
     	findOne(param).then((res) =>{
-    		this.dataForm.id = res.data.id,
-    		this.dataForm.qsGx = res.data.qsGx
+    		this.dataForm.webid = res.data.webid
+    		this.dataForm.flFlag = res.data.flFlag
+        	this.dataForm.flMc = res.data.flMc
+	        this.dataForm.flUnit = res.data.flUnit
+	        this.dataForm.flCountIn = res.data.flCountIn/1000
+	        this.dataForm.flCountOut = res.data.flCountOut/1000
+	        this.dataForm.flBeginTime = res.data.flBeginTime
+	        this.dataForm.flBeginUnit = res.data.flBeginUnit
+	        this.dataForm.flBeginCountIn = res.data.flBeginCountIn/1000
+	        this.dataForm.flBeginCountOut = res.data.flBeginCountOut/1000
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true
@@ -149,9 +290,30 @@ export default {
       })
     },
     updateData() {
+      if(this.dataForm.flFlag==undefined){
+      	Message({
+	        message: '费率字冠不能为空',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false
+      }
+      if(this.dataForm.flCountIn==undefined || this.dataForm.flUnit==undefined){
+      	Message({
+	        message: '通话期计费不能为空',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false
+      }
+      let param = Object.assign({},this.dataForm)
+      param.flCountIn=this.dataForm.flCountIn!=undefined?this.dataForm.flCountIn*1000:60
+      param.flCountOut=this.dataForm.flCountOut!=undefined?this.dataForm.flCountOut*1000:0
+      param.flBeginCountIn=this.dataForm.flBeginCountIn!=undefined?this.dataForm.flBeginCountIn*1000:0
+      param.flBeginCountOut=this.dataForm.flBeginCountOut!=undefined?this.dataForm.flBeginCountOut*1000:0
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          RequestEdit(this.dataForm).then(res => {
+          RequestEdit(param).then(res => {
       		this.dialogFormVisible = false
             this.getList()
           }).catch(error => {
@@ -176,7 +338,26 @@ export default {
 	      })
 		})
 	},
-
+	/**** 费率切换  开始 ****/
+	openFlUsable(){
+		this.dialogFormFlVisible = true
+	},
+	updateFlData(){
+		let param ={
+			webid: this.dataFlForm.webid,
+    		paramData1: this.dataFlForm.paramData1
+		}
+		RequestFlData(param).then(res =>{
+			Message({
+		        message: res.errMsg,
+			    type: 'success',
+			    duration: 5 * 1000
+		    });
+		    this.getSysParam()
+		    this.dialogFormFlVisible = false
+		})
+	},
+	/**** 费率切换  结束 ****/
 	dateFormats: function (val) {
 		if(!val){
 			return undefined

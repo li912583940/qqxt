@@ -12,7 +12,7 @@ public class JlJb implements java.io.Serializable {
 	private static final long serialVersionUID = -7785962855203180609L;
 	@Id
 	@DbField("WebID")
-	private Integer webId;
+	private Integer webid;
 	@DbField("JB_No")
 	private String jbNo;
 	@DbField("JB_Name")
@@ -34,8 +34,14 @@ public class JlJb implements java.io.Serializable {
 	@DbField("HJ_QY")
 	private Integer hjQy;
 	
-	public Integer getWebId() {
-		return this.webId;
+	
+
+	public Integer getWebid() {
+		return webid;
+	}
+
+	public void setWebid(Integer webid) {
+		this.webid = webid;
 	}
 
 	public Integer getHjQy() {
@@ -44,10 +50,6 @@ public class JlJb implements java.io.Serializable {
 
 	public void setHjQy(Integer hjQy) {
 		this.hjQy = hjQy;
-	}
-
-	public void setWebId(Integer webId) {
-		this.webId = webId;
 	}
 
 	public String getJbNo() {

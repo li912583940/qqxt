@@ -7,61 +7,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.sl.ue.entity.sys.vo.SysUserJqVO;
-import com.sl.ue.service.sys.SysUserJqService;
+import com.sl.ue.entity.sys.vo.SysQqFlVO;
+import com.sl.ue.service.sys.SysQqFlService;
 import com.sl.ue.util.http.Result;
 
 @RestController
-@RequestMapping("/sysUserJq")
-public class SysUserJqWeb extends Result{
+@RequestMapping("/sysQqFl")
+public class SysQqFlWeb extends Result{
 
     @Autowired
-    private SysUserJqService sysUserJqSQL;
+    private SysQqFlService sysQqFlSQL;
 
     @RequestMapping("/findList")
-    public String findList(SysUserJqVO model,Integer pageSize, Integer pageNum){
-        List<SysUserJqVO> list = sysUserJqSQL.findList(model, pageSize, pageNum);
+    public String findList(SysQqFlVO model,Integer pageSize, Integer pageNum){
+        List<SysQqFlVO> list = sysQqFlSQL.findList(model, pageSize, pageNum, "ASC");
         this.putData(list);
         return this.toResult();
     }
 
     @RequestMapping("/findPojo")
-    public String findPojo(SysUserJqVO model, Integer pageSize, Integer pageNum){
-        Map<String, Object> map = sysUserJqSQL.findPojo(model, pageSize, pageNum);
+    public String findPojo(SysQqFlVO model, Integer pageSize, Integer pageNum){
+        Map<String, Object> map = sysQqFlSQL.findPojo(model, pageSize, pageNum);
         this.putPojo(map);
         return this.toResult();
     }
 
     @RequestMapping("/findCount")
-    public String findCount(SysUserJqVO model){
-        Integer count = sysUserJqSQL.count(model);
+    public String findCount(SysQqFlVO model){
+        Integer count = sysQqFlSQL.count(model);
         this.putJson("count", count);
         return this.toResult();
     }
 
     @RequestMapping("/findOne")
     public String findOne(Integer id){
-        SysUserJqVO model = sysUserJqSQL.findOne(id);
+        SysQqFlVO model = sysQqFlSQL.findOne(id);
         this.putJson(model);
         return this.toResult();
     }
 
     @RequestMapping("/add")
-    public String add(SysUserJqVO model){
-        sysUserJqSQL.add(model);
+    public String add(SysQqFlVO model){
+        sysQqFlSQL.add(model);
         return this.toResult();
     }
 
     @RequestMapping("/edit")
-    public String edit(SysUserJqVO model){
-        sysUserJqSQL.edit(model);
+    public String edit(SysQqFlVO model){
+        sysQqFlSQL.edit(model);
         return this.toResult();
     }
 
     @RequestMapping("/delete")
     public String del(Integer id){
-        sysUserJqSQL.deleteKey(id);
+        sysQqFlSQL.deleteKey(id);
         return this.toResult();
     }
 
+    @RequestMapping("/findSysParam")
+    public String findSysParam(){
+        return sysQqFlSQL.findSysParam();
+    }
 }

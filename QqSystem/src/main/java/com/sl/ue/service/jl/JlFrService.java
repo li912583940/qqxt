@@ -23,7 +23,7 @@ public interface JlFrService extends BaseService<JlFrVO>{
 	
 	/**
 	 * 说明 [充值金额]
-	 * @param webId 犯人表主键
+	 * @param id 犯人表主键
 	 * @param czje 充值金额 元
 	 * @return
 	 * L_晓天  @2019年3月5日

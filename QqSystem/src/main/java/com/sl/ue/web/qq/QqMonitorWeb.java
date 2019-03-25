@@ -27,14 +27,14 @@ public class QqMonitorWeb extends Result {
 	
 	/**
 	 * 说明 [更新监听警察信息]
-	 * @param webId
+	 * @param webid
 	 * @param state 1:添加警察信息， 0:清除警察信息
 	 * @return
 	 * L_晓天  @2018年12月28日
 	 */
 	@RequestMapping("/updateYJ")
-	public String updateYJ(Integer webId, Integer state){
-		return sysQqLineSQL.updateYJ(webId, state);
+	public String updateYJ(Integer webid, Integer state){
+		return sysQqLineSQL.updateYJ(webid, state);
 	}
 	
 	/**

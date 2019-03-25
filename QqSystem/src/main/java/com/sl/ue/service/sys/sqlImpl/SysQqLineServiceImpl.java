@@ -59,13 +59,13 @@ public class SysQqLineServiceImpl extends BaseSqlImpl<SysQqLineVO> implements Sy
 		return map;
 	}
 
-	public String updateYJ(Integer webId, Integer state){
+	public String updateYJ(Integer webid, Integer state){
 		Result result = new Result();
-		if(webId == null){
-			result.error(Result.error_102, "webId为NULL");
+		if(webid == null){
+			result.error(Result.error_102, "webid为NULL");
 			return result.toResult();
 		}
-		SysQqLineVO sysQqLine = this.findOne(webId);
+		SysQqLineVO sysQqLine = this.findOne(webid);
 		
 		if(sysQqLine == null){
 			result.error(Result.error_103, "查询不到此记录");

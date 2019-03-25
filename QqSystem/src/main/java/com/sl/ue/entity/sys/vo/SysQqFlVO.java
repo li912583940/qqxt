@@ -1,8 +1,8 @@
 package com.sl.ue.entity.sys.vo;
 
-import com.sl.ue.entity.sys.SysUserJq;
+import com.sl.ue.entity.sys.SysQqFl;
 
-public class SysUserJqVO extends SysUserJq{
+public class SysQqFlVO extends SysQqFl{
 
     /** 序列化 */
     private static final long serialVersionUID = 1L;

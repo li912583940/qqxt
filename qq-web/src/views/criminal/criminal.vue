@@ -37,7 +37,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1311px">
+      style="width: 1511px">
       <el-table-column width="100" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
@@ -84,14 +84,18 @@
           <span v-if="scope.row.state==1" style="color: red;">出狱</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.queryQsPermission==1 || buttonRole.editPermission==1 || buttonRole.deletePermission==1 || buttonRole.statePermission==1 || buttonRole.speciallyPermission==1" align="center" :label="$t('criminal.actions')" width="220" fixed="right">
+      <el-table-column v-if="buttonRole.editPermission==1 || buttonRole.deletePermission==1" align="center" :label="$t('criminal.actions')" width="200" fixed="right">
         <template slot-scope="scope">
         	<div>
 	          <el-button v-if="buttonRole.editPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">{{$t('criminal.edit')}}</el-button>
 	          <el-button v-if="buttonRole.deletePermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">{{$t('criminal.delete')}}</el-button>
           </div>
-          <div style="margin-top: 2px;">
-          	<el-button v-if="buttonRole.queryQsPermission==1" type="primary" size="mini" @click="handleQsManage(scope.row)">亲属</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="buttonRole.queryQsPermission==1 || buttonRole.statePermission==1 || buttonRole.speciallyPermission==1" align="center" :label="$t('criminal.actions')" width="220" fixed="right">
+        <template slot-scope="scope">
+        	<div>
+        		<el-button v-if="buttonRole.queryQsPermission==1" type="primary" size="mini" @click="handleQsManage(scope.row)">亲属</el-button>
 	          <el-button v-if="buttonRole.statePermission==1" type="primary" size="mini" @click="openState(scope.row)">状态</el-button>
 	        	<el-button v-if="buttonRole.speciallyPermission==1" type="primary" size="mini" @click="openSpecially(scope.row)">特批</el-button>
           </div>
@@ -293,7 +297,7 @@ export default {
       
       // 新增或编辑弹窗
       dataForm: { 
-        webId: undefined,
+        webid: undefined,
         frName: undefined,
         frNo: undefined,
         frCard: undefined,
@@ -349,7 +353,7 @@ export default {
       },
       // 新增或编辑弹窗
       dataQsForm: { 
-        webId: undefined,
+        webid: undefined,
         frNo: undefined,
         qsSfz: undefined,
         qsName: undefined,
@@ -534,7 +538,7 @@ export default {
 //			if(this.$refs[formName] !== undefined){
 //				this.$refs[formName].resetFields();
 //			}
-			this.dataForm.webId= undefined
+			this.dataForm.webid= undefined
 	    this.dataForm.frName= undefined
 	    this.dataForm.frNo= ''
 	    this.dataForm.frCard= undefined
@@ -562,10 +566,10 @@ export default {
     },
     handleUpdate(row) {
     	let param = {
-    		id: row.webId
+    		id: row.webid
     	}
     	findOne(param).then((res) =>{
-    		this.dataForm.webId = res.data.webId
+    		this.dataForm.webid = res.data.webid
         this.dataForm.frName =  res.data.frName
         this.dataForm.frNo = res.data.frNo
         this.dataForm.frCard = res.data.frCard
@@ -599,7 +603,7 @@ export default {
 			}).then(() => {
 				this.listLoading = true;
 				let param = {
-	    		id: row.webId
+	    		id: row.webid
 	    	}
 				RequestDelete(param).then(() => {
 	    		this.getList()
@@ -696,8 +700,8 @@ export default {
 			if(this.$refs[formName] !== undefined){
 				this.$refs[formName].resetFields();
 			}
-			this.dataForm.webId= undefined
-			this.dataQsForm.webId= undefined
+			this.dataForm.webid= undefined
+			this.dataQsForm.webid= undefined
 	  },
     handleQsCreate() {
       this.dialogStatus = 'create'
@@ -720,10 +724,10 @@ export default {
     },
     handleQsUpdate(row) {
     	let param = {
-    		id: row.webId
+    		id: row.webid
     	}
     	findQsOne(param).then((res) =>{
-    		this.dataQsForm.webId = res.data.webId
+    		this.dataQsForm.webid = res.data.webid
         this.dataQsForm.frNo = this.qsListQuery.frNo
         this.dataQsForm.qsSfz = res.data.qsSfz
         this.dataQsForm.qsName = res.data.qsName
@@ -740,7 +744,7 @@ export default {
         this.$refs['dataQsForm'].clearValidate()
       })
       
-      this.getSwList(row.webId)
+      this.getSwList(row.webid)
       
     },
     updateQsData() {
@@ -762,7 +766,7 @@ export default {
 			}).then(() => {
 				this.qsListLoading = true;
 				let param = {
-	    		id: row.webId
+	    		id: row.webid
 	    	}
 				RequestQsDelete(param).then(() => {
 	    		this.getQsList()

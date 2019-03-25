@@ -353,13 +353,13 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		jlQqCz.setJqNo(jlFr.getJq());
 		jlQqCz.setJqName(jlJq.getJqName());
 		jlQqCz.setCzsj(nowDate);
-		jlQqCz.setCzje(czje*1000);
+		jlQqCz.setCzje(czje);
 		jlQqCz.setCzrNo(sysUser.getUserNo());
 		jlQqCz.setCzrName(sysUser.getUserName());
 		jlQqCz.setCzzt(1);
 		jlQqCzSQL.add(jlQqCz);
 		
-		jlFr.setQqYe((jlFr.getQqYe()==null?0:jlFr.getQqYe())+(czje*1000));
+		jlFr.setQqYe((jlFr.getQqYe()==null?0:jlFr.getQqYe())+czje);
 		this.edit(jlFr);
 		
 		SysLogVO sysLog = new SysLogVO();
@@ -369,7 +369,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		sysLog.setUserNo(sysUser.getUserNo());
 		sysLog.setUserName(sysUser.getUserName());
 		sysLog.setModel("话费充值");
-		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+now+"充值"+czje+"元");
+		sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+now+"充值"+((double)czje/1000)+"元");
 		sysLog.setOp("话费充值");
 		sysLogSQL.add(sysLog);
 		return result.toResult();
@@ -466,7 +466,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 			List<JlFrVO> jlFrList = jlFrSQL.findList(jlFr);
 			if(jlFrList.size()>0){
 				jlFr = jlFrList.get(0);
-				int nowCzje = czje*1000;
+				int nowCzje = czje;
 				jlFr.setQqYe(jlFr.getQqYe()+nowCzje-oldJe);
 				jlFrSQL.edit(jlFr);
 				
@@ -480,7 +480,7 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 				SysLogVO sysLog = new SysLogVO();
 				sysLog.setType("正常");
 				sysLog.setLogTime(DateUtil.getDefault(nowDate));
-				sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"充值"+(oldJe/1000)+"元修改为"+czje+"元");
+				sysLog.setInfo("罪犯编号为"+jlFr.getFrNo()+" 罪犯姓名为"+jlFr.getFrName()+"在"+DateUtil.getDefault(nowDate)+"充值"+((double)oldJe/1000)+"元修改为"+((double)czje/1000)+"元");
 				sysLog.setModel("话费充值");
 				sysLog.setOp("修改充值记录");
 				sysLog.setUserName(sysUser.getUserName());

@@ -16,7 +16,7 @@ public class JlQs implements java.io.Serializable {
 	private static final long serialVersionUID = 2069344982939357038L;
 	@Id
 	@DbField("WebID")
-	private Integer webId;
+	private Integer webid;
 	@DbField("FR_No")
 	private String frNo;
 	@DbField("QS_ZJLB")
@@ -76,12 +76,12 @@ public class JlQs implements java.io.Serializable {
 	@DbField("enclosure_url")
 	private String enclosureUrl;
 	
-	public Integer getWebId() {
-		return this.webId;
+	public Integer getWebid() {
+		return this.webid;
 	}
 
-	public void setWebId(Integer webId) {
-		this.webId = webId;
+	public void setWebid(Integer webid) {
+		this.webid = webid;
 	}
 
 	public String getFrNo() {

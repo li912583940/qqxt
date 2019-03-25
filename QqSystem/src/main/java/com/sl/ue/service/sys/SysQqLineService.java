@@ -14,11 +14,11 @@ public interface SysQqLineService extends BaseService<SysQqLineVO>{
 	
 	/**
 	 * 说明 [更新监听警察信息]
-	 * @param webId
+	 * @param webid
 	 * @return
 	 * L_晓天  @2018年12月28日
 	 */
-	public String updateYJ(Integer webId, Integer state);
+	public String updateYJ(Integer webid, Integer state);
 	
 	/**
 	 * 说明 [获取当前用户在此次通话的注释]

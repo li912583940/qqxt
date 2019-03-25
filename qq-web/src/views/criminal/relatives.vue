@@ -188,7 +188,7 @@ export default {
       
       // 新增或编辑弹窗
       dataForm: { 
-        webId: undefined,
+        webid: undefined,
         frNo: '',
         frName: undefined,
         qsSfz: undefined,
@@ -344,7 +344,7 @@ export default {
 			if(this.$refs[formName] !== undefined){
 				this.$refs[formName].resetFields();
 			}
-			this.dataForm.webId = undefined
+			this.dataForm.webid = undefined
 	  },
     handleCreate() {
       this.dialogStatus = 'create'
@@ -368,10 +368,10 @@ export default {
     },
     handleUpdate(row) {
     	let param = {
-    		id: row.webId
+    		id: row.webid
     	}
     	findOne(param).then((res) =>{
-    		this.dataForm.webId = res.data.webId,
+    		this.dataForm.webid = res.data.webid,
         this.dataForm.frName =  res.data.frName,
         this.dataForm.frNo = res.data.frNo,
         this.dataForm.qsSfz = res.data.qsSfz,
@@ -389,7 +389,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
       
-      this.getSwList(row.webId)
+      this.getSwList(row.webid)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -410,7 +410,7 @@ export default {
 			}).then(() => {
 				this.listLoading = true;
 				let param = {
-	    		id: row.webId
+	    		id: row.webid
 	    	}
 				RequestDelete(param).then(() => {
 	    		this.getList()

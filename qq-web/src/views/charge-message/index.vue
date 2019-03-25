@@ -192,7 +192,7 @@ export default {
       frname: undefined,
       dialogRechargeVisible: false,
       dataRechargeForm: {
-      	webId: undefined,
+      	webid: undefined,
         jqName: undefined,
         frNo: undefined,
         frName: undefined,
@@ -332,7 +332,7 @@ export default {
 	/*  充值 开始   */ 
     //重置表单
 	resetForm() {
-		this.dataRechargeForm.webId = undefined
+		this.dataRechargeForm.webid = undefined
 		this.dataRechargeForm.jqName = undefined
         this.dataRechargeForm.frNo = undefined
         this.dataRechargeForm.frName = undefined
@@ -343,7 +343,7 @@ export default {
       this.resetForm()
       this.dialogRechargeVisible = true
       
-      this.dataRechargeForm.webId = row.webId
+      this.dataRechargeForm.webid = row.webid
       this.dataRechargeForm.jqName = row.jqName
 	  this.dataRechargeForm.frNo = row.frNo
 	  this.dataRechargeForm.frName = row.frName
@@ -358,8 +358,8 @@ export default {
       this.$refs['dataRechargeForm'].validate((valid) => {
         if (valid) {
         	let param ={
-        		id: this.dataRechargeForm.webId,
-        		czje: this.dataRechargeForm.czje
+        		id: this.dataRechargeForm.webid,
+        		czje: this.dataRechargeForm.czje*1000
         	}
           RequestRecharge(param).then(() => {
             this.dialogRechargeVisible = false
@@ -382,7 +382,7 @@ export default {
 		    type: 'warning'
 		}).then(() => {
 			let param = {
-	    		id: row.webId
+	    		id: row.webid
 	    	}
 			RequestRefund(param).then(() => {
 				Message({
@@ -440,7 +440,7 @@ export default {
     requestDetailsUpdate(){
     	let param ={
     		czId:this.dataDetailsUpdateForm.czId,
-    		czje:this.dataDetailsUpdateForm.czje
+    		czje:this.dataDetailsUpdateForm.czje*1000
     	}
     	RequestDetailsUpdate(param).then(res =>{
     		Message({
