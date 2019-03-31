@@ -140,4 +140,14 @@ public class JlFrWeb extends Result{
     	return jlFrSQL.importExcel(request, response);
     } 
     
+    /**
+     * 说明 [设置出狱状态]
+     * @param model
+     * @return
+     * L_晓天  @2019年3月31日
+     */
+    @RequestMapping("/setState")
+    public String setState(JlFrVO model){
+    	return jlFrSQL.setState(model);
+    }
 }

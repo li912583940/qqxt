@@ -494,4 +494,29 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 		}
 		return result.toResult();
 	}
+	
+	public String setState(JlFrVO model){
+		Result result = new Result();
+		if(model.getWebid()==null){
+			result.error(Result.error_102);
+    		return result.toResult();
+    	}
+    	JlFrVO old = jlFrSQL.findOne(model.getWebid());
+    	if(old == null){
+    		result.error(Result.error_103, "数据库错误，当前记录已不存在。");
+    		return result.toResult();
+    	}
+    	if(model.getState()==0){
+    		if(old.getOuttime()!=null){
+    			String sql = "update JL_FR set OutTime=null,state=0 where WebID="+model.getWebid();
+    			this.jdbcTemplate.execute(sql);
+    		}
+    	}else if(model.getState()==1){
+    		if(model.getOuttime()==null){
+    			model.setOuttime(new Date());
+    		}
+    		jlFrSQL.edit(model);
+    	}
+    	return result.toResult();
+	}
 }

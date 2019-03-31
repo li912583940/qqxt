@@ -59,3 +59,6 @@ export const findJbList = params => { return request.get('/jlJb/findList', { par
 
 // 获取缩位号码
 export const findSwList = params => { return request.get('/jlQs/findSwList', { params: params } ).then(res => res) }
+
+//
+export const RequestState = params => { return request.post('/jlFr/setState', params ).then(res => res) }

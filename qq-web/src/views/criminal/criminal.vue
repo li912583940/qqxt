@@ -154,6 +154,35 @@
       </div>
     </el-dialog>
 
+    <!-- 状态 开始-->
+		<el-dialog title="状态" :visible.sync="dialogStateVisible" width="600px">
+      <el-form  :model="stateForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
+        <el-form-item :label="$t('currency.frNo')">
+          <el-input v-model="stateForm.frNo" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('currency.frName')">
+          <el-input v-model="stateForm.frName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="罪犯状态">
+          <el-select class="filter-item" v-model="stateForm.state" placeholder="请选择">
+            <el-option v-for="item in states" :key="item.id" :label="item.name" :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="出狱时间">
+          <el-date-picker v-if="stateForm.state==1" v-model="stateForm.outtime" type="datetime" placeholder="请选取出狱时间" >
+          </el-date-picker>
+          <el-date-picker v-else v-model="stateForm.outtime" type="datetime" placeholder="请选取出狱时间" :disabled="true">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogStateVisible = false">取 消</el-button>
+        <el-button type="primary" @click="requestState">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 状态 结束 -->
+    
     <!-- 亲属弹框  -->
     <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1381px">
     	<div class="filter-container">
@@ -263,7 +292,7 @@
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList } from '@/api/criminal'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList, RequestState } from '@/api/criminal'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment';
@@ -319,7 +348,7 @@ export default {
       	},
       	{
       		id: 1,
-      		name: '已出狱'
+      		name: '出狱'
       	}
       ],
  
@@ -338,6 +367,17 @@ export default {
         jq: [{ required: true, message: '监区不能为空', trigger: 'change' }]
       },
       
+      /***********  状态 开始    ************/
+      dialogStateVisible: false,
+      stateForm: {
+      	webid: undefined,
+        frName: undefined,
+        frNo: undefined,
+        state: undefined,
+        outtime: undefined
+      },
+      /***********  状态 结束    ************/
+    
       // 亲属
       qs_frname: undefined, // 亲属弹框左上角显示犯人姓名
       dialogQsFormVisible: false,
@@ -774,6 +814,33 @@ export default {
 	      })
 			})
 		},
+		/*** 状态  开始  ***/
+		openState(row) {
+			this.dialogStateVisible = true
+			
+			this.stateForm.webid = row.webid
+      this.stateForm.frName = row.frName
+      this.stateForm.frNo = row.frNo
+      this.stateForm.state = row.state
+      this.stateForm.outtime = row.outtime
+		},
+		requestState() {
+			if(this.stateForm.outtime){
+        this.stateForm.outtime = this.dateFormats(this.stateForm.outtime);
+      }
+			RequestState(this.stateForm).then(res =>{
+				this.getList()
+				this.dialogStateVisible = false
+			}).catch(error => {
+	    })
+		},
+		/*** 状态  结束  ***/
+		
+		/***  特批  开始   ***/
+		openSpecially(row) {
+			
+		},
+		/***  特批  结束  ***/
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

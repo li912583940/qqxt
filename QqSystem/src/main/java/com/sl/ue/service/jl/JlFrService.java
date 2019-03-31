@@ -82,4 +82,12 @@ public interface JlFrService extends BaseService<JlFrVO>{
 	 * L_晓天  @2019年1月20日
 	 */
 	public boolean frExist(String frNo);
+	
+	/**
+	 * 说明 [设置出狱状态]
+	 * @param model
+	 * @return
+	 * L_晓天  @2019年3月31日
+	 */
+	public String setState(JlFrVO model);
 }
