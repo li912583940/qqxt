@@ -44,8 +44,8 @@
     </div>
 
 	<!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="180px" style='width: 400px; margin-left:25%;' >
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
+      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="监区编号" prop="jqNo">
           <el-input v-if="dialogStatus=='update'" v-model="dataForm.jqNo" :disabled="true"></el-input>
           <el-input v-if="dialogStatus=='create'" v-model="dataForm.jqNo"></el-input>
@@ -120,8 +120,8 @@
       </span>
 		</el-dialog>
 	  
-	  <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogWeekFormVisible">
-      <el-form :model="dataFormWeek"  label-position="right" label-width="180px" style='width: 400px; margin-left:10%;' >
+	  <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogWeekFormVisible" width="700px">
+      <el-form :model="dataFormWeek"  label-position="right" label-width="180px" style='width: 400px; margin-left:7%;' >
         <el-form-item label="监区编号" prop="jqNo">
           <el-input v-model="dataFormWeek.jqNo" :disabled="true"></el-input>
         </el-form-item>

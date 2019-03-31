@@ -1,3 +1,4 @@
+<!-- 实时监控 -->
 <template>
   <div class="app-container">
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间"  border fit highlight-current-row
@@ -80,8 +81,8 @@
       </el-pagination>
     </div>
 
-	  <el-dialog title="插话" :visible.sync="dialogCHVisible">
-      <el-form :rules="rulesCH" :model="dataFormCH" ref="dataFormCH" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
+	  <el-dialog title="插话" :visible.sync="dialogCHVisible"  width="600px">
+      <el-form :rules="rulesCH" :model="dataFormCH" ref="dataFormCH" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="姓名" >
           <el-input v-model="dataFormCH.frName" :disabled="true"></el-input>
         </el-form-item>
@@ -97,8 +98,8 @@
       </div>
     </el-dialog>
 	
-	  <el-dialog title="注释" :visible.sync="dialogZSVisible">
-      <el-form :model="dataFormZS" ref="dataFormZS" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
+	  <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="600px">
+      <el-form :model="dataFormZS" ref="dataFormZS" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="姓名" >
           <el-input v-model="dataFormZS.frName" :disabled="true"></el-input>
         </el-form-item>
@@ -308,6 +309,14 @@ export default {
 	      	this.dataFormCH.lineNo = undefined
 	    },
 		chahua(row){
+			if(!row.monitorCallid){
+				Message({
+	          message: '当前线路未处于通话状态，无法插话',
+	          type: 'error',
+	          duration: 5 * 1000
+	        });
+	        return false;
+			}
 			this.resetFormCH()
 			this.dialogCHVisible = true
 			this.dataFormCH.frName = row.monitorFr
@@ -347,7 +356,7 @@ export default {
 			if(!row.monitorCallid){
 				Message({
 	          message: '当前线路未处于通话状态，无法添加注释',
-	          type: 'success',
+	          type: 'error',
 	          duration: 5 * 1000
 	        });
 	        return false;

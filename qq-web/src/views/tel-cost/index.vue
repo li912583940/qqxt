@@ -110,7 +110,7 @@
 
     
     <!-- 话费明细 开始 -->
-    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="70%">
+    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="1450px">
     	<div class="filter-container">
     	  <el-date-picker
 	    		style="width: 200px"
@@ -133,7 +133,7 @@
 	      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleFrDownload">{{$t('criminal.export')}}</el-button>
     	</div>
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 100%;margin-left: 0px;">
+	      style="width: 1401px;margin-left: 0px;">
 	      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
 	        <template slot-scope="scope">
 	          <span>{{scope.row.jqName}}</span>

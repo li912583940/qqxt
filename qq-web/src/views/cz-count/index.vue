@@ -38,7 +38,7 @@
   	</div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1231px">
+      style="width: 1411px">
       <el-table-column width="160" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
@@ -111,7 +111,7 @@
 
     
    <!-- 打印小票 -->
-    <el-dialog title="" :visible.sync="dialogFormVisible">
+    <el-dialog title="" :visible.sync="dialogFormVisible" width="1000px">
       <div id="wrap" class="wrap">
       	<span v-if="printList">
 	      	<div style="text-align: center"><font size="5">出狱话费结算单</font></div>
