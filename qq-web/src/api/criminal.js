@@ -62,3 +62,15 @@ export const findSwList = params => { return request.get('/jlQs/findSwList', { p
 
 //
 export const RequestState = params => { return request.post('/jlFr/setState', params ).then(res => res) }
+
+
+export const findSpeciallyPojo = params => { return request.get('/jlQqTpdh/findPojo', { params: params } ).then(res => res) }
+
+export const findSpeciallyOne = params => { return request.get('/jlQqTpdh/findOne', { params: params } ).then(res => res) }
+
+export const RequestSpeciallyAdd = params => { return request.post('/jlQqTpdh/add', params ).then(res => res) }
+
+export const RequestSpeciallyEdit = params => { return request.post('/jlQqTpdh/edit', params ).then(res => res) }
+
+export const RequestSpeciallyDelete = params => { return request.post('/jlQqTpdh/delete', params ).then(res => res) }
+

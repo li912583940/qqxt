@@ -246,7 +246,7 @@
         <el-button type="primary" @click="dialogQsVisible = false">关闭</el-button>
       </span>
     </el-dialog>
-
+		
 		<!-- 亲属新增或编辑 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogQsFormVisible" width="600px">
       <el-form :rules="rulesQs" :model="dataQsForm" ref="dataQsForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
@@ -288,11 +288,130 @@
         <el-button v-else type="primary" @click="updateQsData">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 亲属弹框 结束 -->
+    
+    
+    <!-- 特批弹框 开始  -->
+    <el-dialog :title="specially_frname" :visible.sync="dialogSpeciallyVisible" width="1381px">
+    	<div class="filter-container">
+	      <el-button v-if="buttonRole.addSpeciallyPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleSpeciallyCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
+	    </div>
+      <el-table :key='speciallyTableKey' :data="speciallyList" v-loading="speciallyListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
+	      style="width: 1281px;margin-left: 10px;">
+	      <el-table-column width="110" align="center" label="特批ID">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpid}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="180" align="center" :label="$t('currency.frName')">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.frName}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="160" align="center" label="特批号码">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpTele}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="90" align="center" label="通话人姓名">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpxm}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="90" align="center" label="与通话人关系">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpgx}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="100" align="center" label="特批次数">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpcs}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="100" align="center" label="剩余次数">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.sycs}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="100" align="center" label="特批电话时长">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpsc}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="140" align="center" label="特批人编号">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tprNo}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="140" align="center" label="特批人姓名">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tprName}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column width="160" align="center" label="特批时间">
+	        <template slot-scope="scope">
+	          <span>{{scope.row.tpsj | dateFormat}}</span>
+	        </template>
+	      </el-table-column>
+	      <el-table-column v-if="buttonRole.editSpeciallyPermission==1 || buttonRole.deleteSpeciallyPermission==1" align="center" :label="$t('criminal.actions')" width="200"  fixed="right">
+	        <template slot-scope="scope">
+	          <el-button v-if="buttonRole.editSpeciallyPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleSpeciallyUpdate(scope.row)">编辑</el-button>
+	          <el-button v-if="buttonRole.deleteSpeciallyPermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleSpeciallyDelete(scope.row)">删除</el-button>
+	        </template>
+	      </el-table-column>
+	    </el-table>
+	    <!-- 分页 -->
+	    <div class="pagination-container">
+	      <el-pagination background @size-change="handleSpeciallySizeChange" @current-change="handleSpeciallyCurrentChange" :current-page="speciallyListQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="speciallyListQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="speciallyTotal">
+	      </el-pagination>
+	    </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogSpeciallyVisible = false">关闭</el-button>
+      </span>
+    </el-dialog>
+		
+		<!-- 特批新增或编辑 -->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSpeciallyFormVisible" width="600px">
+      <el-form :rules="rulesSpecially" :model="dataSpeciallyForm" ref="dataSpeciallyForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
+        <el-form-item :label="$t('currency.frNo')" prop="frNo">
+          <el-input v-model="dataSpeciallyForm.frNo" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('currency.frName')" prop="frName">
+          <el-input v-model="dataSpeciallyForm.frName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="特批电话号码" prop="tpTele">
+          <el-input v-model="dataSpeciallyForm.tpTele"></el-input>
+        </el-form-item>
+        <el-form-item label="通话人姓名" prop="tpxm">
+          <el-input v-model="dataSpeciallyForm.tpxm"></el-input>
+        </el-form-item>
+        <el-form-item label="与通话人的关系" prop="gx">
+          <el-select class="filter-item" v-model="dataSpeciallyForm.tpgx" placeholder="请选择">
+            <el-option v-for="item in gxs" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="特批次数" prop="tpcs">
+          <el-input v-model="dataSpeciallyForm.tpcs"></el-input>
+        </el-form-item>
+        <el-form-item label="特批时长(分钟)" prop="tpsc">
+          <el-input v-model="dataSpeciallyForm.tpsc"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSpeciallyFormVisible = false">取 消</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createSpeciallyData">确 定</el-button>
+        <el-button v-else type="primary" @click="updateSpeciallyData">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 特批弹框 结束 -->
   </div>
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList, RequestState } from '@/api/criminal'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel, findJbList, 
+	findQsPojo, findQsOne, RequestQsAdd, RequestQsEdit, RequestQsDelete, findGxList, findSwList, 
+	RequestState,
+findSpeciallyPojo, findSpeciallyOne, RequestSpeciallyAdd, RequestSpeciallyEdit, RequestSpeciallyDelete} from '@/api/criminal'
 import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment';
@@ -378,7 +497,7 @@ export default {
       },
       /***********  状态 结束    ************/
     
-      // 亲属
+      /*****  亲属 开始    ******/ 
       qs_frname: undefined, // 亲属弹框左上角显示犯人姓名
       dialogQsFormVisible: false,
       dialogQsVisible: false,
@@ -414,6 +533,43 @@ export default {
         qsSfz: [{ required: true, message: '亲属身份证不能为空', trigger: 'blur' }]
       },
       
+      /*****  亲属 结束    ******/ 
+      
+      /*****  特批 开始    ******/ 
+      specially_frname: undefined, // 特批弹框左上角显示犯人姓名
+      dialogSpeciallyFormVisible: false,
+      dialogSpeciallyVisible: false,
+      speciallyTableKey: 0,
+      speciallyList: null,
+      speciallyTotal: null,
+      speciallyListLoading: true,
+      speciallyListQuery: {
+        pageNum: 1,
+        pageSize: 10,
+        frNo: undefined
+      },
+      // 新增或编辑弹窗
+      dataSpeciallyForm: { 
+        tpid: undefined,
+        frNo: undefined,
+        frName: undefined,
+        tpTele: undefined,
+        tpxm: undefined,
+        tpgx: undefined,
+        tpcs: undefined,
+        tpsc: undefined
+      },
+      rulesSpecially:{
+        tpTele: [{ required: true, message: '特批电话号码不能为空', trigger: 'blur' }],
+        tpxm: [{ required: true, message: '通话人姓名不能为空', trigger: 'blur' }],
+        tpgx: [{ required: true, message: '与通话人的关系必选', trigger: 'blur' }],
+        tpcs: [{ required: true, message: '特批次数不能为空', trigger: 'blur' }],
+        tpsc: [{ required: true, message: '特批时长不能为空', trigger: 'blur' }]
+      },
+      
+      /*****  特批 结束    ******/ 
+      
+      
       //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
       	queryPermission: 1, 
@@ -423,17 +579,29 @@ export default {
       	exportPermission: 0,
       	importPermission: 0,
       	statePermission: 0,
-      	speciallyPermission: 0,
+      	
       	//亲属相关的
       	queryQsPermission: 0,
       	addQsPermission: 0,
       	editQsPermission: 0,
-      	deleteQsPermission: 0
+      	deleteQsPermission: 0,
+      	
+      	//特批
+      	speciallyPermission: 0,
+      	addSpeciallyPermission: 0,
+      	editSpeciallyPermission: 0,
+      	deleteSpeciallyPermission: 0,
       }
       
     }
   },
   filters: {
+  	dateFormat(val) {
+			if(!val){
+				return ''
+			}
+			return moment(val).format("YYYY-MM-DD HH:mm:ss");
+		},
     qqYeFormat(data){
 			if(data == undefined){
 				return '0';
@@ -814,6 +982,108 @@ export default {
 	      })
 			})
 		},
+		/**** 亲属结束  ****/
+		
+		/****** 特批方法开始 *****/ 
+    getSpeciallyList() { 
+    	this.speciallyListLoading = true
+      findSpeciallyPojo(this.speciallyListQuery).then((res) => {
+      	 this.speciallyList = res.pojo.list
+      	 this.speciallyTotal = res.pojo.count
+      	 this.speciallyListLoading = false
+      }).catch(error => {
+         this.speciallyListLoading = false
+      })
+    },
+		openSpecially(row) { //打开特批弹框
+			this.speciallyListQuery.frNo = row.frNo
+    	this.specially_frname = row.frName
+			this.dialogSpeciallyVisible = true
+			this.getSpeciallyList()
+		},
+		handleSpeciallySizeChange(val) {
+      this.speciallyListQuery.pageSize = val
+      this.getSpeciallyList()
+    },
+    handleSpeciallyCurrentChange(val) {
+      this.speciallyListQuery.pageNum = val
+      this.getSpeciallyList()
+    },
+    //重置表单
+		resetSpeciallyForm(formName) {
+			if(this.$refs[formName] !== undefined){
+				this.$refs[formName].resetFields();
+			}
+			this.dataSpeciallyForm.tpid= undefined
+	  },
+    handleSpeciallyCreate() {
+      this.dialogStatus = 'create'
+      this.resetSpeciallyForm('dataQsForm')
+      this.dialogSpeciallyFormVisible = true
+      
+      this.getGxList()
+    },
+    createSpeciallyData() {
+      this.$refs['dataSpeciallyForm'].validate((valid) => {
+        if (valid) {
+        	this.dataSpeciallyForm.frNo = this.speciallyListQuery.frNo
+          RequestSpeciallyAdd(this.dataSpeciallyForm).then(() => {
+            this.dialogSpeciallyFormVisible = false
+            this.getSpeciallyList()
+          }).catch(error => {
+		        this.dialogSpeciallyFormVisible = false
+		      })
+        }
+      })
+    },
+    handleSpeciallyUpdate(row) {
+    	let param = {
+    		id: row.tpid
+    	}
+    	findSpeciallyOne(param).then((res) =>{
+    		this.dataSpeciallyForm.tpid = res.data.tpid
+        this.dataSpeciallyForm.frNo = this.qsListQuery.frNo
+        this.dataSpeciallyForm.frName =  res.data.frName
+        this.dataSpeciallyForm.tpTele =  res.data.tpTele
+        this.dataSpeciallyForm.tpxm =  res.data.tpxm
+        this.dataSpeciallyForm.tpgx =  res.data.tpgx
+        this.dataSpeciallyForm.tpcs =  res.data.tpcs
+        this.dataSpeciallyForm.tpsc =  res.data.tpsc
+    	})
+      this.dialogStatus = 'update'
+      this.dialogSpeciallyFormVisible = true
+      
+      this.getGxList()
+    },
+    updateSpeciallyData() {
+      this.$refs['dataSpeciallyForm'].validate((valid) => {
+        if (valid) {
+          RequestSpeciallyEdit(this.dataSpeciallyForm).then(() => {
+            this.dialogSpeciallyFormVisible = false
+            this.getSpeciallyList()
+          }).catch(error => {
+		        this.dialogSpeciallyFormVisible = false
+		      })
+        }
+      })
+    },
+    //删除
+		handleSpeciallyDelete(row) {
+			this.$confirm('确认删除该记录吗?', '提示', {
+				type: 'warning'
+			}).then(() => {
+				this.speciallyListLoading = true;
+				let param = {
+	    		id: row.tpid
+	    	}
+				RequestSpeciallyDelete(param).then(() => {
+	    		this.getSpeciallyList()
+	    	}).catch(error => {
+	      })
+			})
+		},
+		/**** 特批结束  ****/
+		
 		/*** 状态  开始  ***/
 		openState(row) {
 			this.dialogStateVisible = true
@@ -836,11 +1106,6 @@ export default {
 		},
 		/*** 状态  结束  ***/
 		
-		/***  特批  开始   ***/
-		openSpecially(row) {
-			
-		},
-		/***  特批  结束  ***/
 		dateFormats: function (val) {
 			if(!val){
 				return undefined
