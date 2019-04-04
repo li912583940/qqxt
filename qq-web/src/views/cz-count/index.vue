@@ -111,7 +111,7 @@
 
     
    <!-- 打印小票 -->
-    <el-dialog title="" :visible.sync="dialogFormVisible" width="1000px">
+    <el-dialog title="" :visible.sync="dialogFormVisible" width="1000px" :modal-append-to-body="false">
       <div id="wrap" class="wrap">
       	<span v-if="printList">
 	      	<div style="text-align: center"><font size="5">出狱话费结算单</font></div>

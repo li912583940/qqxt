@@ -89,7 +89,7 @@
     </div>
 
     <!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.frName')" prop="frName">
           <el-input v-model="dataForm.frName" :disabled="true"></el-input>
@@ -133,16 +133,6 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="Reading statistics" :visible.sync="dialogPvVisible">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"> </el-table-column>
-        <el-table-column prop="pv" label="Pv"> </el-table-column>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">{{$t('criminal.confirm')}}</el-button>
-      </span>
-    </el-dialog>
-
 
   </div>
 </template>
@@ -152,7 +142,6 @@ import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, exportExcel,
 
 import moment from 'moment'
 import waves from '@/directive/waves' // 水波纹指令
-import { parseTime } from '@/utils'
 import { Message, MessageBox } from 'element-ui'
 
 export default {
@@ -209,13 +198,6 @@ export default {
         update: '编 辑',
         create: '新 增'
       },
-      dialogPvVisible: false,
-      pvData: [],
-      rules: {
-        qsName: [{ required: true, message: '亲属姓名不能为空', trigger: 'blur' }],
-        gx: [{ required: true, message: '亲属关系必选', trigger: 'blur' }]
-      },
-      
     }
   },
   filters: {

@@ -140,8 +140,8 @@
     </div>
     
     <!-- 注释 开始 -->
-    <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="50%">
-	      <el-form  :model="dataFormZS" ref="dataFormZS" label-position="right" label-width="120px" style='width: 400px; margin-left:25%;' >
+    <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="600px" :modal-append-to-body="false">
+	      <el-form  :model="dataFormZS" ref="dataFormZS" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
 	        <el-form-item label="呼叫ID" >
 	          <el-input v-model="dataFormZS.callId" :disabled="true"></el-input>
 	        </el-form-item>
@@ -160,7 +160,7 @@
 	  <!-- 注释 结束 -->
 	  
 	  <!-- 查看所有注释  开始  -->
-    <el-dialog title="查看所有注释" :visible.sync="dialogZsAllVisible" width="50%">
+    <el-dialog title="查看所有注释" :visible.sync="dialogZsAllVisible" width="800px" :modal-append-to-body="false">
       <el-table :key='zsAllTableKey' :data="zsAllList" v-loading="zsAllListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
 	      style="width: 721px">
 	      <el-table-column width="160" align="center" label="用户编号">
@@ -191,8 +191,8 @@
     <!-- 查看所有注释  结束  -->
     
     <!-- 播放录音 开始 -->
-    <el-dialog title="播放录音" :visible.sync="dialogTapeVisible" @close='closeTapeDialog'  width="40%">
-    	<div style="position: relative;margin-top: 10px; margin-bottom: 30px; margin-left: 25%;">
+    <el-dialog title="播放录音" :visible.sync="dialogTapeVisible" @close='closeTapeDialog'  width="600px" :modal-append-to-body="false">
+    	<div style="position: relative;margin-top: 10px; margin-bottom: 30px; margin-left: 10%;">
 				<audio id="audio1" :src="callRecfileUrl" controls="controls" controlsList="nodownload">
 				</audio>
       </div>

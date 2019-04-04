@@ -50,7 +50,7 @@
     </div>
 
 	<!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px" :modal-append-to-body="false">
       <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 520px; margin-left:10%;' >
         <el-form-item label="费率字冠" prop="flFlag">
           <el-input v-model="dataForm.flFlag" style="width:200px"></el-input>
@@ -94,7 +94,7 @@
     </el-dialog>
     
     <!-- 费率切换  开始 -->
-    <el-dialog title="费率切换" :visible.sync="dialogFormFlVisible" width="600px">
+    <el-dialog title="费率切换" :visible.sync="dialogFormFlVisible" width="600px" :modal-append-to-body="false">
       <el-form :model="dataFlForm" label-position="right" label-width="120px" style='width: 400px; margin-left:17%;' >
         <el-form-item label="对内对外费率" prop="paramData1">
           <el-radio-group v-model="dataFlForm.paramData1">

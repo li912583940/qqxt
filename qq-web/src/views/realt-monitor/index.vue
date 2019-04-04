@@ -81,7 +81,7 @@
       </el-pagination>
     </div>
 
-	  <el-dialog title="插话" :visible.sync="dialogCHVisible"  width="600px">
+	  <el-dialog title="插话" :visible.sync="dialogCHVisible"  width="600px" :modal-append-to-body="false">
       <el-form :rules="rulesCH" :model="dataFormCH" ref="dataFormCH" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="姓名" >
           <el-input v-model="dataFormCH.frName" :disabled="true"></el-input>
@@ -98,7 +98,7 @@
       </div>
     </el-dialog>
 	
-	  <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="600px">
+	  <el-dialog title="注释" :visible.sync="dialogZSVisible"  width="600px" :modal-append-to-body="false">
       <el-form :model="dataFormZS" ref="dataFormZS" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="姓名" >
           <el-input v-model="dataFormZS.frName" :disabled="true"></el-input>

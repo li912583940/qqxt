@@ -57,7 +57,7 @@
     </div>
 
 	<!-- 充值 开始 -->
-    <el-dialog title="充值" :visible.sync="dialogRechargeVisible" width="600px">
+    <el-dialog title="充值" :visible.sync="dialogRechargeVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rulesRecharge" :model="dataRechargeForm" ref="dataRechargeForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.jqName')">
         	<el-input v-model="dataRechargeForm.jqName" :disabled="true"></el-input>
@@ -84,7 +84,7 @@
     
     
     <!-- 充值明细 结束 -->
-    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="961px">
+    <el-dialog title="充值明细" :visible.sync="dialogDetailsVisible" width="961px" :modal-append-to-body="false">
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
 	      style="width: 861px;margin-left: 20px;">
 	      <el-table-column width="160" align="center" label="充值时间">
@@ -136,7 +136,7 @@
     <!-- 充值明细 结束 -->
     
     <!-- 修改充值 开始 -->
-    <el-dialog title="充值" :visible.sync="dialogDetailsUpdateVisible" width="600px">
+    <el-dialog title="充值" :visible.sync="dialogDetailsUpdateVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rulesDetailsUpdate" :model="dataDetailsUpdateForm" ref="dataDetailsUpdateForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.jqName')">
         	<el-input v-model="dataDetailsUpdateForm.jqName" :disabled="true"></el-input>

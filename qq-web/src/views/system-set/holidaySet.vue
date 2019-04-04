@@ -29,7 +29,7 @@
     </div>
 
 	<!-- 新增或编辑 -->
-    <el-dialog title="新 增" :visible.sync="dialogFormVisible" width="600px">
+    <el-dialog title="新 增" :visible.sync="dialogFormVisible" width="600px" :modal-append-to-body="false">
       <el-form label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="日期">
           <el-date-picker

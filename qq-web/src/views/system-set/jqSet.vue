@@ -44,7 +44,7 @@
     </div>
 
 	<!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="监区编号" prop="jqNo">
           <el-input v-if="dialogStatus=='update'" v-model="dataForm.jqNo" :disabled="true"></el-input>
@@ -71,7 +71,7 @@
     </el-dialog>
     
     <!-- 亲情星期设置开始   -->
-		<el-dialog title="亲情星期设置" :visible.sync="dialogWeekVisible"width="820px">
+		<el-dialog title="亲情星期设置" :visible.sync="dialogWeekVisible"width="820px" :modal-append-to-body="false">
 			<div class="filter-container">
 	      <el-button class="filter-item" style="margin-left: 10px;" @click="openWeekAdd" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
 	    </div>
@@ -120,7 +120,7 @@
       </span>
 		</el-dialog>
 	  
-	  <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogWeekFormVisible" width="700px">
+	  <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogWeekFormVisible" width="700px" :modal-append-to-body="false">
       <el-form :model="dataFormWeek"  label-position="right" label-width="180px" style='width: 400px; margin-left:7%;' >
         <el-form-item label="监区编号" prop="jqNo">
           <el-input v-model="dataFormWeek.jqNo" :disabled="true"></el-input>

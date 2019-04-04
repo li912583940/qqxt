@@ -110,7 +110,7 @@
 
     
     <!-- 话费明细 开始 -->
-    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="1450px">
+    <el-dialog title="话费明细" :visible.sync="dialogDetailsVisible" width="1450px" :modal-append-to-body="false">
     	<div class="filter-container">
     	  <el-date-picker
 	    		style="width: 200px"

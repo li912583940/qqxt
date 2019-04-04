@@ -110,7 +110,7 @@
     </div>
 
     <!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.frNo')" prop="frNo">
           <el-input v-if="dialogStatus=='create'" v-model="dataForm.frNo"></el-input>
@@ -155,7 +155,7 @@
     </el-dialog>
 
     <!-- 状态 开始-->
-		<el-dialog title="状态" :visible.sync="dialogStateVisible" width="600px">
+		<el-dialog title="状态" :visible.sync="dialogStateVisible" width="600px" :modal-append-to-body="false">
       <el-form  :model="stateForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.frNo')">
           <el-input v-model="stateForm.frNo" :disabled="true"></el-input>
@@ -184,7 +184,7 @@
     <!-- 状态 结束 -->
     
     <!-- 亲属弹框  -->
-    <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1381px">
+    <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1381px" :modal-append-to-body="false">
     	<div class="filter-container">
 	      <el-button v-if="buttonRole.addQsPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleQsCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
 	    </div>
@@ -248,7 +248,7 @@
     </el-dialog>
 		
 		<!-- 亲属新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogQsFormVisible" width="600px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogQsFormVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rulesQs" :model="dataQsForm" ref="dataQsForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item label="证件号码" prop="qsSfz">
           <el-input v-model="dataQsForm.qsSfz"></el-input>
@@ -292,23 +292,23 @@
     
     
     <!-- 特批弹框 开始  -->
-    <el-dialog :title="specially_frname" :visible.sync="dialogSpeciallyVisible" width="1381px">
+    <el-dialog :title="specially_frname" :visible.sync="dialogSpeciallyVisible" width="1381px" :modal-append-to-body="false">
     	<div class="filter-container">
 	      <el-button v-if="buttonRole.addSpeciallyPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleSpeciallyCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
 	    </div>
       <el-table :key='speciallyTableKey' :data="speciallyList" v-loading="speciallyListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 1281px;margin-left: 10px;">
+	      style="width: 1161px;margin-left: 10px;">
 	      <el-table-column width="110" align="center" label="特批ID">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.tpid}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="180" align="center" :label="$t('currency.frName')">
+	      <el-table-column width="110" align="center" :label="$t('currency.frName')">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.frName}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="160" align="center" label="特批号码">
+	      <el-table-column width="110" align="center" label="特批号码">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.tpTele}}</span>
 	        </template>
@@ -371,7 +371,7 @@
     </el-dialog>
 		
 		<!-- 特批新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSpeciallyFormVisible" width="600px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSpeciallyFormVisible" width="600px" :modal-append-to-body="false">
       <el-form :rules="rulesSpecially" :model="dataSpeciallyForm" ref="dataSpeciallyForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
         <el-form-item :label="$t('currency.frNo')" prop="frNo">
           <el-input v-model="dataSpeciallyForm.frNo" :disabled="true"></el-input>
@@ -385,7 +385,7 @@
         <el-form-item label="通话人姓名" prop="tpxm">
           <el-input v-model="dataSpeciallyForm.tpxm"></el-input>
         </el-form-item>
-        <el-form-item label="与通话人的关系" prop="gx">
+        <el-form-item label="与通话人的关系" prop="tpgx">
           <el-select class="filter-item" v-model="dataSpeciallyForm.tpgx" placeholder="请选择">
             <el-option v-for="item in gxs" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
@@ -546,7 +546,8 @@ export default {
       speciallyListQuery: {
         pageNum: 1,
         pageSize: 10,
-        frNo: undefined
+        frNo: undefined,
+        frName: undefined
       },
       // 新增或编辑弹窗
       dataSpeciallyForm: { 
@@ -669,12 +670,17 @@ export default {
     		this.buttonRole.exportPermission= 1
     		this.buttonRole.importPermission= 1
     		this.buttonRole.statePermission= 1
-      	this.buttonRole.speciallyPermission= 1
       	
     		this.buttonRole.queryQsPermission= 1
     		this.buttonRole.addQsPermission= 1
     		this.buttonRole.editQsPermission= 1
     		this.buttonRole.deleteQsPermission= 1
+    		
+    		//特批
+    		this.buttonRole.speciallyPermission= 1
+    		this.buttonRole.addSpeciallyPermission= 1
+      	this.buttonRole.editSpeciallyPermission= 1
+      	this.buttonRole.deleteSpeciallyPermission= 1
     	}else{
     		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
     		let criminal = buttonRoles.criminal
@@ -692,8 +698,6 @@ export default {
     					this.buttonRole.importPermission= 1
     				}else if(value=='statePermission'){
     					this.buttonRole.statePermission= 1
-    				}else if(value=='speciallyPermission'){
-    					this.buttonRole.speciallyPermission= 1
     				}
     				else if(value=='queryQsPermission'){
     					this.buttonRole.queryQsPermission= 1
@@ -706,6 +710,19 @@ export default {
     				}else if(value=='deleteQsPermission'){
     					this.buttonRole.deleteQsPermission= 1
     					this.buttonRole.queryQsPermission= 1
+    				}
+    				else if(value=='speciallyPermission'){
+    					this.buttonRole.speciallyPermission= 1
+    					this.buttonRole.speciallyPermission= 1
+    				}else if(value=='addSpeciallyPermission'){
+    					this.buttonRole.addSpeciallyPermission= 1
+    					this.buttonRole.speciallyPermission= 1
+    				}else if(value=='editSpeciallyPermission'){
+    					this.buttonRole.editSpeciallyPermission= 1
+    					this.buttonRole.speciallyPermission= 1
+    				}else if(value=='deleteSpeciallyPermission'){
+    					this.buttonRole.deleteSpeciallyPermission= 1
+    					this.buttonRole.speciallyPermission= 1
     				}
     			}
     		}
@@ -997,6 +1014,7 @@ export default {
     },
 		openSpecially(row) { //打开特批弹框
 			this.speciallyListQuery.frNo = row.frNo
+			this.speciallyListQuery.frName = row.frName
     	this.specially_frname = row.frName
 			this.dialogSpeciallyVisible = true
 			this.getSpeciallyList()
@@ -1018,8 +1036,11 @@ export default {
 	  },
     handleSpeciallyCreate() {
       this.dialogStatus = 'create'
-      this.resetSpeciallyForm('dataQsForm')
+      this.resetSpeciallyForm('dataSpeciallyForm')
       this.dialogSpeciallyFormVisible = true
+      
+      this.dataSpeciallyForm.frNo = this.speciallyListQuery.frNo
+      this.dataSpeciallyForm.frName =  this.speciallyListQuery.frName
       
       this.getGxList()
     },
@@ -1037,13 +1058,15 @@ export default {
       })
     },
     handleSpeciallyUpdate(row) {
+    	this.resetSpeciallyForm('dataSpeciallyForm')
+    	
     	let param = {
     		id: row.tpid
     	}
     	findSpeciallyOne(param).then((res) =>{
     		this.dataSpeciallyForm.tpid = res.data.tpid
-        this.dataSpeciallyForm.frNo = this.qsListQuery.frNo
-        this.dataSpeciallyForm.frName =  res.data.frName
+        this.dataSpeciallyForm.frNo = this.speciallyListQuery.frNo
+        this.dataSpeciallyForm.frName =  this.speciallyListQuery.frName
         this.dataSpeciallyForm.tpTele =  res.data.tpTele
         this.dataSpeciallyForm.tpxm =  res.data.tpxm
         this.dataSpeciallyForm.tpgx =  res.data.tpgx
@@ -1059,8 +1082,8 @@ export default {
       this.$refs['dataSpeciallyForm'].validate((valid) => {
         if (valid) {
           RequestSpeciallyEdit(this.dataSpeciallyForm).then(() => {
-            this.dialogSpeciallyFormVisible = false
             this.getSpeciallyList()
+            this.dialogSpeciallyFormVisible = false
           }).catch(error => {
 		        this.dialogSpeciallyFormVisible = false
 		      })

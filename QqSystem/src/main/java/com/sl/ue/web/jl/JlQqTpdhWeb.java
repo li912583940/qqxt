@@ -1,5 +1,6 @@
 package com.sl.ue.web.jl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sl.ue.entity.jl.vo.JlQqTpdhVO;
+import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.jl.JlQqTpdhService;
 import com.sl.ue.util.http.Result;
+import com.sl.ue.util.http.token.TokenUser;
 
 @RestController
 @RequestMapping("/jlQqTpdh")
@@ -48,6 +51,12 @@ public class JlQqTpdhWeb extends Result{
 
     @RequestMapping("/add")
     public String add(JlQqTpdhVO model){
+    	model.setSycs(model.getTpcs());
+    	SysUserVO sysUser = TokenUser.getUser();
+    	model.setTprNo(sysUser.getUserNo());
+    	model.setTprName(sysUser.getUserName());
+    	model.setTpsj(new Date());
+    	model.setSpState(1);
         jlQqTpdhSQL.add(model);
         return this.toResult();
     }
