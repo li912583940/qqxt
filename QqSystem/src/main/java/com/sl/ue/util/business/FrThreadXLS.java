@@ -17,10 +17,12 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.sl.ue.entity.jl.vo.JlFrVO;
 import com.sl.ue.entity.jl.vo.JlJbVO;
 import com.sl.ue.entity.jl.vo.JlJqVO;
+import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.entity.sys.vo.SysServerVO;
 import com.sl.ue.service.jl.JlFrService;
 import com.sl.ue.service.jl.JlJbService;
 import com.sl.ue.service.jl.JlJqService;
+import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.service.sys.SysServerService;
 import com.sl.ue.util.component.SpringTool;
 
@@ -46,10 +48,10 @@ public class FrThreadXLS implements Runnable {
 	public void run() {
 		JlFrService jlFrSQL = (JlFrService) SpringTool.getBean("jlFrSQL");
 		/** servername 开始 */
-		SysServerService sysServerSQL = (SysServerService) SpringTool.getBean("sysServerSQL");
-		List<SysServerVO> sysServerList = sysServerSQL.findList(new SysServerVO());
+		SysQqServerService sysQqServerSQL = (SysQqServerService) SpringTool.getBean("sysQqServerSQL");
+		List<SysQqServerVO> sysQqServerList = sysQqServerSQL.findList(new SysQqServerVO(),null,null,"ASC");
 		String serverName = "Server1";
-		if(sysServerList.size()>0)serverName = sysServerList.get(0).getServerName();
+		if(sysQqServerList.size()>0)serverName = sysQqServerList.get(0).getServerName();
 		/** servername 结束 */
 		
 		/** 监区 开始 */

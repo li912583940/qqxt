@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.sl.ue.entity.jl.vo.JlFrVO;
 import com.sl.ue.entity.sys.vo.SysLogVO;
+import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.entity.sys.vo.SysServerVO;
 import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.jl.JlFrService;
 import com.sl.ue.service.sys.SysLogService;
+import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.service.sys.SysServerService;
 import com.sl.ue.util.DateUtil;
 import com.sl.ue.util.anno.IgnoreSecurity;
@@ -32,7 +34,7 @@ public class JlFrWeb extends Result{
     @Autowired
 	private SysLogService sysLogSQL;
     @Autowired
-    private SysServerService sysServerSQL;
+    private SysQqServerService sysQqServerSQL;
     
     @RequestMapping("/findList")
     public String findList(JlFrVO model,Integer pageSize, Integer pageNum){
@@ -81,8 +83,8 @@ public class JlFrWeb extends Result{
 		sysLog.setLogTime(DateUtil.getDefaultNow());
 		sysLogSQL.add(sysLog);
 		
-		List<SysServerVO> sysServerList = sysServerSQL.findList(new SysServerVO());
-		String jy = sysServerList.size()>0?sysServerList.get(0).getServerName():"Server1";
+		List<SysQqServerVO> sysQqServerList = sysQqServerSQL.findList(new SysQqServerVO(),null,null,"ASC");
+		String jy = sysQqServerList.size()>0?sysQqServerList.get(0).getServerName():"Server1";
 		model.setJy(jy);
 		jlFrSQL.add(model);
         return this.toResult();
