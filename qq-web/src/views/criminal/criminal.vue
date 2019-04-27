@@ -13,6 +13,10 @@
         <el-option v-for="item in jbNos" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.qqJb" placeholder="选择亲情级别">
+        <el-option v-for="item in qqJbs" :key="item.id" :label="item.name" :value="item.id">
+        </el-option>
+      </el-select>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入IC卡号" v-model="listQuery.frCard" clearable>
       </el-input>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.state" placeholder="选择服刑状态">
@@ -37,7 +41,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1511px">
+      style="width: 1531px">
       <el-table-column width="100" align="center" :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
@@ -53,24 +57,25 @@
           <span>{{scope.row.jqName}}</span>
         </template>
       </el-table-column>
+      <el-table-column width="100" align="center" label="亲情级别">
+        <template slot-scope="scope">
+          <span v-if="scope.row.qqJb==1">正常</span>
+          <span v-if="scope.row.qqJb==0" style="color: red;">禁止</span>
+        </template>
+      </el-table-column>
       <el-table-column width="160" align="center" :label="$t('currency.frCard')">
         <template slot-scope="scope">
           <span>{{scope.row.frCard}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="90" align="center" label="余额">
+      <el-table-column width="90" align="center" label="余额(元)">
         <template slot-scope="scope">
           <span>{{scope.row.qqYe | qqYeFormat}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="拨打次数">
+      <el-table-column width="140" align="center" label="拨打次数/剩余次数">
         <template slot-scope="scope">
-          <span>{{scope.row.qqUse}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="110" align="center" label="剩余次数">
-        <template slot-scope="scope">
-          <span>{{scope.row.qqLeft}}</span>
+          <span>{{scope.row.qqUse}}/{{scope.row.qqLeft}}</span>
         </template>
       </el-table-column>
       <el-table-column width="160" align="center" label="电话卡号/密码">
@@ -142,8 +147,8 @@
         </el-form-item>
         <el-form-item label="亲情级别" >
         	<el-radio-group v-model="dataForm.qqJb">
+        		<el-radio :label="1">正常</el-radio>
 				    <el-radio :label="0">禁止</el-radio>
-				    <el-radio :label="1">正常</el-radio>
 				  </el-radio-group>
         </el-form-item>
       </el-form>
@@ -184,12 +189,12 @@
     <!-- 状态 结束 -->
     
     <!-- 亲属弹框  -->
-    <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1381px" :modal-append-to-body="false">
+    <el-dialog :title="qs_frname" :visible.sync="dialogQsVisible" width="1221px" :modal-append-to-body="false">
     	<div class="filter-container">
 	      <el-button v-if="buttonRole.addQsPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleQsCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
 	    </div>
       <el-table :key='qsTableKey' :data="qsList" v-loading="qsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 1281px;margin-left: 10px;">
+	      style="width: 1121px;margin-left: 10px;">
 	      <el-table-column width="110" align="center" label="亲属姓名">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.qsName}}</span>
@@ -198,11 +203,6 @@
 	      <el-table-column width="180" align="center" label="亲属身份证">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.qsSfz}}</span>
-	        </template>
-	      </el-table-column>
-	      <el-table-column width="160" align="center" label="IC卡号">
-	        <template slot-scope="scope">
-	          <span>{{scope.row.qsCard}}</span>
 	        </template>
 	      </el-table-column>
 	      <el-table-column width="90" align="center" label="关系">
@@ -261,9 +261,6 @@
             <el-option v-for="item in gxs" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="IC卡号" prop="qsCard">
-          <el-input v-model="dataQsForm.qsCard"></el-input>
-        </el-form-item>
         <el-form-item label="地址" prop="dz">
           <el-input v-model="dataQsForm.dz"></el-input>
         </el-form-item>
@@ -277,7 +274,7 @@
           <el-input v-model="dataQsForm.tele"></el-input>
         </el-form-item>
         <el-form-item label="缩位号码" prop="sw">
-          <el-select class="filter-item" v-model="dataQsForm.sw" placeholder="请选择">
+          <el-select clearable class="filter-item" v-model="dataQsForm.sw" placeholder="请选择">
             <el-option v-for="item in sws" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -438,6 +435,7 @@ export default {
         frName: undefined,
         jq: undefined,
         jbNo: undefined,
+        qqJb: undefined,
         frCard: undefined,
         state: undefined,
         qqZh: undefined,
@@ -459,6 +457,16 @@ export default {
       ],
       jbNos: [ //犯人级别下拉框
       
+      ],
+      qqJbs:[
+      	{
+      		id: 1,
+      		name: '正常'
+      	},
+      	{
+      		id: 0,
+      		name: '禁止'
+      	}
       ],
       states: [
       	{
@@ -517,7 +525,6 @@ export default {
         qsSfz: undefined,
         qsName: undefined,
         gx: undefined,
-        qsCard: undefined,
         dz: undefined,
         xb: '男',
         tele: undefined,
@@ -530,7 +537,8 @@ export default {
       rulesQs:{
         qsName: [{ required: true, message: '亲属姓名不能为空', trigger: 'blur' }],
         gx: [{ required: true, message: '亲属关系必选', trigger: 'blur' }],
-        qsSfz: [{ required: true, message: '亲属身份证不能为空', trigger: 'blur' }]
+        tele: [{ required: true, message: '电话号码不能为空', trigger: 'blur' }]
+        
       },
       
       /*****  亲属 结束    ******/ 

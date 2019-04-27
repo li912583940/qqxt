@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,8 +56,8 @@ public class JlQsWeb extends Result{
     private JlFrService jlFrSQL;
     @Autowired
 	private SysLogService sysLogSQL;
-
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     
     @RequestMapping("/findList")
     public String findList(JlQsVO model,Integer pageSize, Integer pageNum){
@@ -121,7 +122,7 @@ public class JlQsWeb extends Result{
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
 		sysLogSQL.add(sysLog);
-    	
+		
         jlQsSQL.add(model);
         return this.toResult();
     }
@@ -150,6 +151,11 @@ public class JlQsWeb extends Result{
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
 		sysLogSQL.add(sysLog);
+		
+		if(model.getSw()==null){
+			String sql = "update JL_QS set sw=NULL where WebID="+model.getWebid();
+			jdbcTemplate.execute(sql);
+		}
 		
         jlQsSQL.edit(model);
         return this.toResult();

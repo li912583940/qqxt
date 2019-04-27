@@ -6,7 +6,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +23,7 @@ import com.sl.ue.service.sys.SysLogService;
 import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.service.sys.SysServerService;
 import com.sl.ue.util.DateUtil;
+import com.sl.ue.util.StringUtil;
 import com.sl.ue.util.anno.IgnoreSecurity;
 import com.sl.ue.util.http.Result;
 import com.sl.ue.util.http.token.TokenUser;
@@ -35,6 +38,8 @@ public class JlFrWeb extends Result{
 	private SysLogService sysLogSQL;
     @Autowired
     private SysQqServerService sysQqServerSQL;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     
     @RequestMapping("/findList")
     public String findList(JlFrVO model,Integer pageSize, Integer pageNum){
@@ -86,6 +91,12 @@ public class JlFrWeb extends Result{
 		List<SysQqServerVO> sysQqServerList = sysQqServerSQL.findList(new SysQqServerVO(),null,null,"ASC");
 		String jy = sysQqServerList.size()>0?sysQqServerList.get(0).getServerName():"Server1";
 		model.setJy(jy);
+		
+		if(StringUtils.isNotBlank(model.getFrCard())){
+			String sql = "UPDATE JL_FR SET FR_Card='' WHERE FR_Card='"+model.getFrCard()+"'";
+			jdbcTemplate.execute(sql);
+		}
+		
 		jlFrSQL.add(model);
         return this.toResult();
     }
@@ -102,6 +113,11 @@ public class JlFrWeb extends Result{
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
 		sysLogSQL.add(sysLog);
+		
+		if(StringUtils.isNotBlank(model.getFrCard())){
+			String sql = "UPDATE JL_FR SET FR_Card='' WHERE FR_Card='"+model.getFrCard()+"'";
+			jdbcTemplate.execute(sql);
+		}
 		
         jlFrSQL.edit(model);
         return this.toResult();

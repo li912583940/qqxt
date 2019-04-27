@@ -23,7 +23,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1671px">
+      style="width: 1511px">
       <el-table-column width="100" align="center"  :label="$t('currency.frNo')">
         <template slot-scope="scope">
           <span>{{scope.row.frNo}}</span>
@@ -42,11 +42,6 @@
       <el-table-column width="100" align="center" label="亲属姓名">
         <template slot-scope="scope">
           <span>{{scope.row.qsName}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="160" align="center" label="IC卡号">
-        <template slot-scope="scope">
-          <span>{{scope.row.qsCard}}</span>
         </template>
       </el-table-column>
       <el-table-column width="100" align="center" label="关系">
@@ -105,9 +100,6 @@
             <el-option v-for="item in gxs" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="IC卡号" prop="qsCard">
-          <el-input v-model="dataForm.qsCard"></el-input>
-        </el-form-item>
         <el-form-item label="地址" prop="dz">
           <el-input v-model="dataForm.dz"></el-input>
         </el-form-item>
@@ -121,7 +113,7 @@
           <el-input v-model="dataForm.tele"></el-input>
         </el-form-item>
         <el-form-item label="缩位号码" prop="sw">
-          <el-select class="filter-item" v-model="dataForm.sw" placeholder="请选择">
+          <el-select clearable class="filter-item" v-model="dataForm.sw" placeholder="请选择">
             <el-option v-for="item in sws" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -182,7 +174,6 @@ export default {
         qsSfz: undefined,
         qsName: undefined,
         gx: undefined,
-        qsCard: undefined,
         dz: undefined,
         xb: undefined,
         tele: undefined,
@@ -192,6 +183,11 @@ export default {
       	
       ],
       sws: [], // 缩位号码
+      rules:{
+        qsName: [{ required: true, message: '亲属姓名不能为空', trigger: 'blur' }],
+        gx: [{ required: true, message: '亲属关系必选', trigger: 'blur' }],
+        tele: [{ required: true, message: '电话号码不能为空', trigger: 'blur' }]
+      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -358,7 +354,6 @@ export default {
         this.dataForm.qsSfz = res.data.qsSfz,
         this.dataForm.qsName = res.data.qsName,
         this.dataForm.gx = res.data.gx,
-        this.dataForm.qsCard = res.data.qsCard,
         this.dataForm.dz = res.data.dz,
         this.dataForm.xb = res.data.xb,
         this.dataForm.tele = res.data.tele,
