@@ -7,11 +7,23 @@ public class JlYjVO extends JlYj{
     /** 序列化 */
     private static final long serialVersionUID = 1L;
 
+    private String jqName;
 
 
+    public String getJqName() {
+  		return jqName;
+  	}
+
+  	public void setJqName(String jqName) {
+  		this.jqName = jqName;
+  	}
+  	
     /*---------------------------  处理关联表  -----------------------------*/
 
-    private String leftJoinField; // 关联表字段
+    
+  
+
+	private String leftJoinField; // 关联表字段
 
     private String leftJoinTable; // 关联表
 

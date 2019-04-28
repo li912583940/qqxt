@@ -126,14 +126,12 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 			// 设置标题
 			List<String> title = new ArrayList<String>();
 			title.add("罪犯编号");
-			title.add("姓名");
+			title.add("罪犯姓名");
+			title.add("罪犯卡号");
 			title.add("监区");
-			title.add("级别");
-			title.add("当月会见次数");
-			title.add("当月剩余次数");
-			title.add("入监时间");
-			title.add("重点罪犯");
-			title.add("会见级别");
+			title.add("分管等级");
+			title.add("电话卡号");
+			title.add("电话密码");
 			// 标题 start
 			HSSFRow row1 = sheet.createRow(0);
 			for(int i=0; i<title.size(); i++){
@@ -155,31 +153,19 @@ public class JlFrServiceImpl extends BaseSqlImpl<JlFrVO> implements JlFrService{
 				cell1.setCellValue(jlFr.getFrName()!=null?jlFr.getFrName():"");
 				
 				HSSFCell cell2 = row2.createCell(2);
-				cell2.setCellValue(jlFr.getJqName()!=null?jlFr.getJqName():"");
+				cell2.setCellValue(StringUtils.isNotBlank(jlFr.getFrCard())?jlFr.getFrCard():"");
 				
 				HSSFCell cell3 = row2.createCell(3);
-				cell3.setCellValue(jlFr.getJbName()!=null?jlFr.getJbName():"");
+				cell3.setCellValue(StringUtils.isNotBlank(jlFr.getJqName())?jlFr.getJqName():"");
 				
 				HSSFCell cell4 = row2.createCell(4);
-				cell4.setCellValue(jlFr.getHjUse()!=null?jlFr.getHjUse():0);
+				cell4.setCellValue(StringUtils.isNotBlank(jlFr.getJbName())?jlFr.getJbName():"");
 				
 				HSSFCell cell5 = row2.createCell(5);
-				cell5.setCellValue(jlFr.getHjLeft()!=null?jlFr.getHjLeft():0);
+				cell5.setCellValue(StringUtils.isNotBlank(jlFr.getQqZh())?jlFr.getQqZh():"");
 				
 				HSSFCell cell6 = row2.createCell(6);
-				cell6.setCellValue(jlFr.getInfoRjsj()!=null?jlFr.getInfoRjsj():"");
-				
-				HSSFCell cell7 = row2.createCell(7);
-				cell7.setCellValue(jlFr.getInfoZdzf()!=null?jlFr.getInfoZdzf():"");
-				
-				HSSFCell cell8 = row2.createCell(8);
-				if(jlFr.getHjJb()!=null && jlFr.getHjJb()==1){
-					cell8.setCellValue("正常");
-				}else if(jlFr.getHjJb()!=null && jlFr.getHjJb()==-1){
-					cell8.setCellValue("禁止");
-				}else{
-					cell8.setCellValue("未定义");
-				}
+				cell6.setCellValue(StringUtils.isNotBlank(jlFr.getQqMm())?jlFr.getQqMm():"");
 				
 			}
 			

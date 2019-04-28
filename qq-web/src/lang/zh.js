@@ -8,7 +8,7 @@ export default {
     criminal: '罪犯',
     criminalLevel: '罪犯级别',
     relatives: '亲属',
-    yjMessage: '干警信息',
+    yjMessage: '警察信息',
     realtMonitor: '实时监控',
     callRecord: '通话录音',
     chargeMessage: '话费充值',

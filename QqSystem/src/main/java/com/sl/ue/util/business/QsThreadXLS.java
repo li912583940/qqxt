@@ -13,6 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.sl.ue.entity.jl.vo.JlQsVO;
 import com.sl.ue.service.jl.JlQsService;
+import com.sl.ue.util.ExcelUtil;
 import com.sl.ue.util.component.SpringTool;
 
 /**
@@ -55,11 +56,11 @@ public class QsThreadXLS implements Runnable {
 				if(row == null){
 					break;
 				}
-				// 0罪犯编号，1证件类型，2证件号码，3关系人姓名，4性别，5称谓，6电话，7家庭住址
+				// 0罪犯编号， 1罪犯姓名，2家属姓名， 3证件号码，4性别，5关系，6家庭住址，7电话
 				JlQsVO jlQs = new JlQsVO();
-				String frNo = row.getCell(0).getStringCellValue();   //0罪犯编号
-				String qsSfz = row.getCell(2).getStringCellValue();  //2证件号码
-				String qsName = row.getCell(3).getStringCellValue(); //3关系人姓名
+				String frNo = ExcelUtil.getCellValue(row.getCell(0));   //0罪犯编号
+				String qsName = ExcelUtil.getCellValue(row.getCell(2)); //2家属姓名
+				String qsSfz = ExcelUtil.getCellValue(row.getCell(3));  //3证件号码
 				jlQs.setFrNo(frNo!=null?frNo.trim():null);
 				if(StringUtils.isNotBlank(qsSfz)){
 					jlQs.setQsSfz(qsSfz.trim());
@@ -69,15 +70,10 @@ public class QsThreadXLS implements Runnable {
 					List<JlQsVO> list = jlQsSQL.findList(jlQs);
 					if(list.size()>0){
 					}else{
-						Integer qsZjlb = 1;
-						if(StringUtils.isNotBlank(row.getCell(1).getStringCellValue())){ //1证件类型
-							qsZjlb = Integer.parseInt(row.getCell(1).getStringCellValue());
-						}
-						jlQs.setQsZjlb(qsZjlb);
-						jlQs.setXb(row.getCell(4).getStringCellValue()); 	//4性别
-						jlQs.setGx(row.getCell(5).getStringCellValue()); 	//5称谓
-						jlQs.setTele(row.getCell(6).getStringCellValue()); 	//6电话
-						jlQs.setDz(row.getCell(7).getStringCellValue());	//7家庭住址
+						jlQs.setXb(ExcelUtil.getCellValue(row.getCell(4))); 	//4性别
+						jlQs.setGx(ExcelUtil.getCellValue(row.getCell(5))); 	//5称谓
+						jlQs.setDz(ExcelUtil.getCellValue(row.getCell(6)));		//6家庭住址
+						jlQs.setTele(ExcelUtil.getCellValue(row.getCell(7))); 	//7电话
 						jlQsSQL.add(jlQs);
 					}
 				}else{

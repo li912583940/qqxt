@@ -118,15 +118,15 @@ public class JlQsServiceImpl extends BaseSqlImpl<JlQsVO> implements JlQsService{
 			cellStyle.setDataFormat(book.createDataFormat().getFormat("yyyy-MM-dd"));
 			// 设置标题
 			List<String> title = new ArrayList<String>();
-			title.add("罪犯编号");
-			title.add("罪犯姓名");
-			title.add("证件类型");
-			title.add("证件号码");
-			title.add("家属姓名");
-			title.add("性别");
-			title.add("家属称谓");
-			title.add("电话");
-			title.add("家庭住址");
+			title.add("罪犯编号");  //0
+			title.add("罪犯姓名");  //1
+			title.add("家属姓名");  //2
+			title.add("证件号码");  //3
+			title.add("性别");  //4
+			title.add("关系");  //5
+			title.add("家庭住址");  //6
+			title.add("电话");  //7
+			
 			// 标题 start
 			HSSFRow row1 = sheet.createRow(0);
 			for(int i=0; i<title.size(); i++){
@@ -142,39 +142,29 @@ public class JlQsServiceImpl extends BaseSqlImpl<JlQsVO> implements JlQsService{
 				HSSFRow row2 = sheet.createRow(i+1);
 				
 				HSSFCell cell0 = row2.createCell(0);
-				cell0.setCellValue(jlQs.getFrNo());
+				cell0.setCellValue(StringUtils.isNotBlank(jlQs.getFrNo())?jlQs.getFrNo():"");
 					
 				HSSFCell cell1 = row2.createCell(1);
-				cell1.setCellValue(jlQs.getFrName()!=null?jlQs.getFrName():"");
+				cell1.setCellValue(StringUtils.isNotBlank(jlQs.getFrName())?jlQs.getFrName():"");
 				
 				HSSFCell cell2 = row2.createCell(2);
-				if(jlQs.getQsZjlb()==2){
-					cell2.setCellValue("警官证");
-				}else if(jlQs.getQsZjlb()==3){
-					cell2.setCellValue("工作证");
-				}else if(jlQs.getQsZjlb()==4){
-					cell2.setCellValue("其他");
-				}else{
-					cell2.setCellValue("身份证");
-				}
+				cell2.setCellValue(StringUtils.isNotBlank(jlQs.getQsName())?jlQs.getQsName():"");
 				
 				HSSFCell cell3 = row2.createCell(3);
-				cell3.setCellValue(jlQs.getQsSfz()!=null?jlQs.getQsSfz():"");
+				cell3.setCellValue(StringUtils.isNotBlank(jlQs.getQsSfz())?jlQs.getQsSfz():"");
 				
 				HSSFCell cell4 = row2.createCell(4);
-				cell4.setCellValue(jlQs.getQsName()!=null?jlQs.getQsName():"");
+				cell4.setCellValue(StringUtils.isNotBlank(jlQs.getXb())?jlQs.getXb():"");
 				
 				HSSFCell cell5 = row2.createCell(5);
-				cell5.setCellValue(jlQs.getXb()!=null?jlQs.getXb():"");
+				cell5.setCellValue(StringUtils.isNotBlank(jlQs.getGx())?jlQs.getGx():"");
 				
 				HSSFCell cell6 = row2.createCell(6);
-				cell6.setCellValue(jlQs.getGx()!=null?jlQs.getGx():"");
+				cell6.setCellValue(StringUtils.isNotBlank(jlQs.getDz())?jlQs.getDz():"");
 				
 				HSSFCell cell7 = row2.createCell(7);
-				cell7.setCellValue(jlQs.getTele()!=null?jlQs.getTele():"");
+				cell7.setCellValue(StringUtils.isNotBlank(jlQs.getTele())?jlQs.getTele():"");
 				
-				HSSFCell cell8 = row2.createCell(8);
-				cell8.setCellValue(jlQs.getDz()!=null?jlQs.getDz():"");
 			}
 			
 			// 处理不同浏览器中文名称编码

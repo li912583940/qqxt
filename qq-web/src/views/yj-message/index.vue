@@ -3,36 +3,61 @@
   	<div class="filter-container">
     	<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="警察编号" v-model="listQuery.yjNo" clearable>
       </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="警察警号" v-model="listQuery.yjNum" clearable>
+      </el-input>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="警察姓名" v-model="listQuery.yjName" clearable>
       </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="警察IC卡号" v-model="listQuery.yjCard" clearable>
+      </el-input>
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.jq" placeholder="监区">
+        <el-option v-for="item in jqs" :key="item.id" :label="item.name" :value="item.id">
+        </el-option>
+      </el-select>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.deptName" placeholder="部门">
         <el-option v-for="item in deptNames" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="授权账号" v-model="listQuery.teleuser" clearable>
+      </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
-      <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">{{$t('criminal.add')}}</el-button>
+      <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
     </div>
     
-    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1001px">
-      <el-table-column width="200" align="center" label="警察编号" >
+    <el-table :key='tableKey' :data="list"   border fit highlight-current-row
+      style="width: 1361px">
+      <el-table-column width="160" align="center" label="警察编号" >
         <template slot-scope="scope">
           <span>{{scope.row.yjNo}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="警察姓名">
+      <el-table-column width="160" align="center" label="警察警号" >
+        <template slot-scope="scope">
+          <span>{{scope.row.yjNum}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="160" align="center" label="警察姓名">
         <template slot-scope="scope">
           <span>{{scope.row.yjName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="警察IC卡号">
+      <el-table-column width="160" align="center" label="警察IC卡号">
         <template slot-scope="scope">
           <span>{{scope.row.yjCard}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="部门">
+      <el-table-column width="160" align="center" label="监区">
+        <template slot-scope="scope">
+          <span>{{scope.row.jqName}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="160" align="center" label="部门">
         <template slot-scope="scope">
           <span>{{scope.row.deptName}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="200" align="center" label="授权账号/密码">
+        <template slot-scope="scope">
+          <span>{{scope.row.teleuser}}/{{scope.row.telepwd}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.editPermission==1 || buttonRole.deletePermission==1" align="center" :label="$t('criminal.actions')" width="200" >
@@ -50,11 +75,14 @@
     </div>
 
 	<!-- 新增或编辑 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible"  width="600px" :modal-append-to-body="false">
-      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px; margin-left:10%;' >
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px" :modal-append-to-body="false">
+      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 400px;margin-left: 10%;' >
         <el-form-item label="警察编号" prop="yjNo">
         	<el-input v-if="dialogStatus=='update'" v-model="dataForm.yjNo" :disabled="true"></el-input>
           <el-input v-if="dialogStatus=='create'" v-model="dataForm.yjNo"></el-input>
+        </el-form-item>
+        <el-form-item label="警察警号" prop="yjNum">
+          <el-input v-model="dataForm.yjNum"></el-input>
         </el-form-item>
         <el-form-item label="警察姓名" prop="yjName">
           <el-input v-model="dataForm.yjName"></el-input>
@@ -62,11 +90,23 @@
         <el-form-item label="警察IC卡号" prop="yjCard">
           <el-input v-model="dataForm.yjCard"></el-input>
         </el-form-item>
+        <el-form-item label="监区" prop="jq">
+          <el-select class="filter-item" v-model="dataForm.jq" placeholder="请选择">
+            <el-option v-for="item in  jqs" :key="item.id" :label="item.name" :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="部门" prop="deptName">
           <el-select class="filter-item" v-model="dataForm.deptName" placeholder="请选择">
             <el-option v-for="item in  deptNames" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="授权账号" prop="teleuser">
+          <el-input v-model="dataForm.teleuser"></el-input>
+        </el-form-item>
+        <el-form-item label="授权密码" prop="telepwd">
+          <el-input v-model="dataForm.telepwd"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -81,6 +121,7 @@
 
 <script>
 import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, findDeptNameList} from '@/api/yjMessage'
+import { findList as findJqList} from '@/api/jqSet'
 
 import moment from 'moment'
 import waves from '@/directive/waves' // 水波纹指令
@@ -96,11 +137,14 @@ export default {
       tableKey: 0,
       list: null,
       total: null,
-      listLoading: true,
       listQuery: {
       	yjNo: undefined,
+      	yjNum: undefined,
       	yjName: undefined,
+      	yjCard: undefined,
+      	jq: undefined,
       	deptName: undefined,
+      	teleuser: undefined,
         pageNum: 1,
         pageSize: 20
       },
@@ -108,10 +152,15 @@ export default {
       dataForm: { 
         webid: undefined,
         yjNo: undefined,
+        yjNum: undefined,
         yjName: undefined,
         yjCard: undefined,
-        deptName: undefined
+        jq: undefined,
+        deptName: undefined,
+        teleuser: undefined,
+        telepwd: undefined
       },
+      jqs: [],
       deptNames : [ 
       
       ],
@@ -123,7 +172,8 @@ export default {
       },
        rules: {
         yjNo: [{ required: true, message: '警察编号不能为空', trigger: 'blur' }],
-        yjName: [{ required: true, message: '警察姓名不能为空', trigger: 'blur' }]
+        yjName: [{ required: true, message: '警察姓名不能为空', trigger: 'blur' }],
+        jq: [{ required: true, message: '必须选择监区', trigger: 'blur' }]
       },
       
       //按钮权限   1：有权限， 0：无权限
@@ -137,12 +187,13 @@ export default {
     }
   },
   filters: {
-    dateFormat(data) {
+    dateFormat(row, column) {
 			//时间格式化  
-	    if (data == undefined) {  
+	    let date = row[column.property];  
+	    if (date == undefined) {  
 	      return "";  
 	    }  
-	    return moment(data).format("YYYY-MM-DD HH:mm:ss");  
+	    return moment(date).format("YYYY-MM-DD HH:mm:ss");  
 		}
   },
   created() {
@@ -151,18 +202,14 @@ export default {
   },
   mounted() {
     this.setButtonRole()
+    this.getJqList()
   },
   methods: {
     getList() {
-    	this.listLoading = true
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
-      	 this.listLoading = false
-      }).catch(error => {
-          this.listLoading = false
       })
-      
     },
     handleFilter() {
       this.listQuery.pageNum = 1
@@ -225,6 +272,9 @@ export default {
       this.dialogStatus = 'create'
       this.resetForm('dataForm')
       this.dialogFormVisible = true
+//    this.$nextTick(() => {
+//      this.$refs['dataForm'].clearValidate()
+//    })
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -243,11 +293,15 @@ export default {
     		id: row.webid
     	}
     	findOne(param).then((res) =>{
-    		this.dataForm.webid = res.data.webid,
-        this.dataForm.yjNo =  res.data.yjNo,
-        this.dataForm.yjName = res.data.yjName,
-        this.dataForm.yjCard = res.data.yjCard,
+    		this.dataForm.webid = res.data.webid
+        this.dataForm.yjNo =  res.data.yjNo
+        this.dataForm.yjNum = res.data.yjNum
+        this.dataForm.yjName = res.data.yjName
+        this.dataForm.yjCard = res.data.yjCard
+        this.dataForm.jq = res.data.jq
         this.dataForm.deptName = res.data.deptName
+        this.dataForm.teleuser = res.data.teleuser
+        this.dataForm.telepwd = res.data.telepwd
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true
@@ -268,7 +322,7 @@ export default {
       })
     },
     //删除
-	  handleDelete(row) {
+		handleDelete(row) {
 			this.$confirm('确认删除该记录吗?', '提示', {
 				type: 'warning'
 			}).then(() => {
@@ -282,7 +336,20 @@ export default {
 		        this.dialogFormVisible = false
 		      })
 			})
-	  },
+		},
+    getJqList() { //监区下拉框
+    	if(this.jqs.length === 0) {
+    		findJqList({}).then((res) => {
+	    		let list = res.list
+	    		for(let x of list){
+					  let value = {}
+					  value.id = x.jqNo
+					  value.name = x.jqName
+					  this.jqs.push(value)
+					}
+	    	})
+    	}
+    },
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

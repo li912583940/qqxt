@@ -23,9 +23,9 @@ public class JlYj implements java.io.Serializable {
 	@DbField("JQ")
 	private String jq;
 	@DbField("TeleUser")
-	private String teleUser;
+	private String teleuser;
 	@DbField("TelePwd")
-	private String telePwd;
+	private String telepwd;
 	@DbField("YJ_Num")
 	private String yjNum;
 	@DbField("Dept_Name")
@@ -83,20 +83,20 @@ public class JlYj implements java.io.Serializable {
 		this.jq = jq;
 	}
 
-	public String getTeleUser() {
-		return this.teleUser;
+	public String getTeleuser() {
+		return teleuser;
 	}
 
-	public void setTeleUser(String teleUser) {
-		this.teleUser = teleUser;
+	public void setTeleuser(String teleuser) {
+		this.teleuser = teleuser;
 	}
 
-	public String getTelePwd() {
-		return this.telePwd;
+	public String getTelepwd() {
+		return telepwd;
 	}
 
-	public void setTelePwd(String telePwd) {
-		this.telePwd = telePwd;
+	public void setTelepwd(String telepwd) {
+		this.telepwd = telepwd;
 	}
 
 	public String getYjNum() {

@@ -95,7 +95,7 @@ export const asyncRouterMap = [
     ]
   },
 
-  { // 干警信息
+  { // 警察信息
     path: '/yjMessage',
     component: Layout,
     meta: {
