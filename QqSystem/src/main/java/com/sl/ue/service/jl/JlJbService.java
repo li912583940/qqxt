@@ -22,4 +22,13 @@ public interface JlJbService extends BaseService<JlJbVO>{
 	 * L_晓天  @2019年3月22日
 	 */
 	public String qzResetQqCount();
+	
+	/**
+	 * 说明 [按监区批量设置电话次数]
+	 * @param count
+	 * @param jqs
+	 * @return
+	 * L_晓天  @2019年5月3日
+	 */
+	public String addCountByJb(Integer count, String jbs);
 }

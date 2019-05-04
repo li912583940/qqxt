@@ -115,4 +115,19 @@ public class JlJbServiceImpl extends BaseSqlImpl<JlJbVO> implements JlJbService{
 		sysLogSQL.add(sysLog);
 		return result.toResult();
 	}
+	
+	public String addCountByJb(Integer count, String jbs){
+		Result result = new Result();
+		if(count<-1){
+			result.error(Result.error_102, "电话次数只能设置大于-1的值");
+			return result.toResult();
+		}
+		if(StringUtils.isBlank(jbs)){
+			result.error(Result.error_102, "请至少选择一个级别");
+			return result.toResult();
+		}
+		String sql = "update JL_JB set QQ_Count="+count+" where webid in ("+jbs+")";
+		this.jdbcTemplate.execute(sql);
+		return result.toResult();
+	}
 }

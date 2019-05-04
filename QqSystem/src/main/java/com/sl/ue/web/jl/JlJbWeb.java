@@ -96,4 +96,11 @@ public class JlJbWeb extends Result{
     public String qzResetQqCount(){
     	return jlJbSQL.qzResetQqCount();
     }
+    
+    @RequestMapping("/addCountByJb")
+    public String addCountByJb(Integer count, String jbs){
+    	return jlJbSQL.addCountByJb(count, jbs);
+    }
+    
+    
 }

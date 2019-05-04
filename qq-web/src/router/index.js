@@ -218,9 +218,9 @@ export const asyncRouterMap = [
       roles:'systemSet'
     },
     children: [
-      { path: 'sysUser', component: () => import('@/views/system-set/sysUser'), name: 'sysUser', meta: { title: 'sysUser', icon: 'user', roles:'sysUser' }}, //系统用户管理
-      { path: 'sysRoles', component: () => import('@/views/system-set/sysRoles'), name: 'sysRoles', meta: { title: 'sysRoles', icon: 'user', roles:'sysRoles'}}, //系统权限配置
-      { path: 'criminalLevel', component: () => import('@/views/system-set/criminalLevel'), name: 'criminalLevel', meta: { title: 'criminalLevel', icon: 'tree', roles:'criminalLevel' }}, //服刑人员级别
+      { path: 'sysUser', component: () => import('@/views/system-set/sysUser'), name: 'sysUser', meta: { title: 'sysUser', icon: 'user', roles:'sysUser' }}, //用户管理
+      { path: 'sysRoles', component: () => import('@/views/system-set/sysRoles'), name: 'sysRoles', meta: { title: 'sysRoles', icon: 'user', roles:'sysRoles'}}, //权限配置
+      { path: 'criminalLevel', component: () => import('@/views/system-set/criminalLevel'), name: 'criminalLevel', meta: { title: 'criminalLevel', icon: 'tree', roles:'criminalLevel' }}, //罪犯级别
       { path: 'jqSet', component: () => import('@/views/system-set/jqSet'), name: 'jqSet', meta: { title: 'jqSet', icon: 'tab', roles:'jqSet' }}, //监区设置
       //{ path: 'spSet', component: () => import('@/views/system-set/spSet'), name: 'spSet', meta: { title: 'spSet', icon: 'tab', roles:'spSet' }}, //审批设置
       { path: 'lineSet', component: () => import('@/views/system-set/lineSet'), name: 'lineSet', meta: { title: 'lineSet', icon: 'tab', roles:'lineSet' }}, // 线路设置

@@ -6,7 +6,7 @@
 <template>
   <div class="app-container">
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 901px">
+      style="width: 1461px">
       <el-table-column width="100" align="center" label="线路逻辑号">
         <template slot-scope="scope">
           <span>{{scope.row.lineNo}}</span>
@@ -38,6 +38,21 @@
           <span>{{scope.row.localTele}}</span>
         </template>
       </el-table-column>
+      <el-table-column width="160" align="center" label="中继号码">
+        <template slot-scope="scope">
+          <span>{{scope.row.outCallid}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="200" align="center" label="序列号">
+        <template slot-scope="scope">
+          <span>{{scope.row.inBoard}}/{{scope.row.outBoard}}/{{scope.row.monBoard}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="200" align="center" label="端口">
+        <template slot-scope="scope">
+          <span>{{scope.row.inLine}}/{{scope.row.outLine}}/{{scope.row.monLine}}</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="160">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">配置</el-button>
@@ -58,10 +73,11 @@
           <el-input v-model="dataForm.lineNo" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="服务器名称" prop="jy"> 
-          <el-select class="filter-item" v-model="dataForm.jy" placeholder="请选择">
+          <el-input v-model="dataForm.jy" :disabled="true"></el-input>
+          <!--<el-select class="filter-item" v-model="dataForm.jy" placeholder="请选择">
             <el-option v-for="item in jys" :key="item.id" :label="item.name" :value="item.id">
             </el-option>
-          </el-select>
+          </el-select>-->
         </el-form-item>
         <el-form-item label="线路监区" prop="jq">
           <el-select class="filter-item" v-model="dataForm.jq" placeholder="请选择">
@@ -77,9 +93,12 @@
         </el-form-item>
         <el-form-item label="线路状态">
           <el-radio-group v-model="dataForm.state">
+          	<el-radio :label="1">开启</el-radio>
 		    <el-radio :label="0">关闭</el-radio>
-		    <el-radio :label="1">开启</el-radio>
 		  </el-radio-group>
+        </el-form-item>
+        <el-form-item label="中继号码">
+          <el-input v-model="dataForm.outCallid"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,7 +146,8 @@ export default {
         jq: undefined,
         dkq: undefined,
         localTele: undefined,
-        state: 1
+        state: 1,
+        outCallid: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -206,6 +226,7 @@ export default {
 	        this.dataForm.dkq = res.data.dkq
 	        this.dataForm.localTele = res.data.localTele
 	        this.dataForm.state = res.data.state
+	        this.dataForm.outCallid = res.data.outCallid
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true

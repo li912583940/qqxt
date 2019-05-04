@@ -26,9 +26,9 @@ public class JlJq implements java.io.Serializable {
 	@DbField("Pwd")
 	private String pwd;
 	@DbField("UseTimeLen")
-	private Integer useTimeLen;
+	private Integer usetimelen;
 	@DbField("LastTime")
-	private Date lastTime;
+	private Date lasttime;
 	@DbField("floor")
 	private String floor; //楼层
 
@@ -82,20 +82,20 @@ public class JlJq implements java.io.Serializable {
 		this.pwd = pwd;
 	}
 
-	public Integer getUseTimeLen() {
-		return this.useTimeLen;
+	public Integer getUsetimelen() {
+		return usetimelen;
 	}
 
-	public void setUseTimeLen(Integer useTimeLen) {
-		this.useTimeLen = useTimeLen;
+	public void setUsetimelen(Integer usetimelen) {
+		this.usetimelen = usetimelen;
 	}
 
-	public Date getLastTime() {
-		return this.lastTime;
+	public Date getLasttime() {
+		return lasttime;
 	}
 
-	public void setLastTime(Date lastTime) {
-		this.lastTime = lastTime;
+	public void setLasttime(Date lasttime) {
+		this.lasttime = lasttime;
 	}
 
 	public String getFloor() {

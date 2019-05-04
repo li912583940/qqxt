@@ -11,7 +11,7 @@
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
-      style="width: 671px">
+      style="width: 871px">
       <el-table-column width="100" align="center" :label="$t('currency.jqNo')">
         <template slot-scope="scope">
           <span>{{scope.row.jqNo}}</span>
@@ -28,11 +28,16 @@
           <span v-if="scope.row.isTs==1" style="color: red;">是</span>
         </template>
       </el-table-column>
+      <el-table-column width="200" align="center" label="管理员解锁有效时长(秒)">
+        <template slot-scope="scope">
+          <span>{{scope.row.usetimelen}}</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" :label="$t('criminal.actions')" width="320" fixed="right">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">亲情星期设置</el-button>
+          <el-button size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">拨打时段设置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,14 +58,14 @@
         <el-form-item label="监区名称" prop="jqName">
           <el-input v-model="dataForm.jqName"></el-input>
         </el-form-item>
-        <el-form-item label="楼层" prop="floor">
-          <el-input v-model="dataForm.floor"></el-input>
-        </el-form-item>
         <el-form-item label="特殊监区">
           <el-radio-group v-model="dataForm.isTs">
-		    <el-radio :label="0">否</el-radio>
-		    <el-radio :label="1">是</el-radio>
-		  </el-radio-group>
+				    <el-radio :label="0">否</el-radio>
+				    <el-radio :label="1">是</el-radio>
+				  </el-radio-group>
+        </el-form-item>
+        <el-form-item label="管理员解锁有效时长(秒)" prop="usetimelen">
+          <el-input v-model="dataForm.usetimelen"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -188,7 +193,7 @@ export default {
         jqNo: undefined,
         jqName: undefined,
         isTs: 0,
-        floor: undefined
+        usetimelen: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -304,7 +309,7 @@ export default {
 	        this.dataForm.jqNo =  res.data.jqNo
 	        this.dataForm.jqName = res.data.jqName
 	        this.dataForm.isTs = res.data.isTs
-	        this.dataForm.floor = res.data.floor
+	        this.dataForm.usetimelen = res.data.usetimelen
     	})
 	    this.dialogStatus = 'update'
 	    this.dialogFormVisible = true

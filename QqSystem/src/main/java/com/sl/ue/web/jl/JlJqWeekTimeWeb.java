@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -22,8 +25,33 @@ public class JlJqWeekTimeWeb extends Result{
     private JlJqWeekTimeService jlJqWeekTimeSQL;
     @Autowired
     private SysQqServerService sysQqServerSQL;
+    @Autowired
+	protected JdbcTemplate jdbcTemplate;
+    
     @RequestMapping("/findList")
     public String findList(JlJqWeekTimeVO model,Integer pageSize, Integer pageNum){
+    	if(StringUtils.isBlank(model.getJqNo())){
+    		this.error(error_102);
+    		return this.toResult();
+    	}
+    	StringBuffer leftJoinField = new StringBuffer();
+		leftJoinField.append(",b.JQ_Name AS jqName");
+		//model.setLeftJoinField(leftJoinField.toString());
+		
+		StringBuffer leftJoinTable = new StringBuffer();
+		leftJoinTable.append(" LEFT JOIN JL_JQ b ON a.JQ_No=b.JQ_No");
+		//model.setLeftJoinTable(leftJoinTable.toString());
+		
+		String sql = "select a.*"+leftJoinField.toString()+" from JL_JQ_WEEK_TIME a "+leftJoinTable.toString()+" where 1=1 AND a.JQ_No='"+model.getJqNo()+"' ORDER BY a.JQ_Week ASC";
+		RowMapper<JlJqWeekTimeVO> rowMapper = BeanPropertyRowMapper.newInstance(JlJqWeekTimeVO.class);
+		List<JlJqWeekTimeVO> list = jdbcTemplate.query(sql, rowMapper);
+		//List<JlJqWeekTimeVO> list = jlJqWeekTimeSQL.findList(model, pageSize, pageNum, "ASC");
+        this.putData(list);
+        return this.toResult();
+    }
+
+    @RequestMapping("/findPojo")
+    public String findPojo(JlJqWeekTimeVO model, Integer pageSize, Integer pageNum){
     	if(StringUtils.isBlank(model.getJqNo())){
     		this.error(error_102);
     		return this.toResult();
@@ -35,13 +63,6 @@ public class JlJqWeekTimeWeb extends Result{
 		StringBuffer leftJoinTable = new StringBuffer();
 		leftJoinTable.append(" LEFT JOIN JL_JQ b ON a.JQ_No=b.JQ_No");
 		model.setLeftJoinTable(leftJoinTable.toString());
-        List<JlJqWeekTimeVO> list = jlJqWeekTimeSQL.findList(model, pageSize, pageNum, "ASC");
-        this.putData(list);
-        return this.toResult();
-    }
-
-    @RequestMapping("/findPojo")
-    public String findPojo(JlJqWeekTimeVO model, Integer pageSize, Integer pageNum){
         Map<String, Object> map = jlJqWeekTimeSQL.findPojo(model, pageSize, pageNum);
         this.putPojo(map);
         return this.toResult();
@@ -63,16 +84,16 @@ public class JlJqWeekTimeWeb extends Result{
 
     @RequestMapping("/add")
     public String add(JlJqWeekTimeVO model){
-    	if(model.getJqWeek()!=null){
-    		JlJqWeekTimeVO query = new JlJqWeekTimeVO();
-    		query.setJqNo(model.getJqNo());
-    		query.setJqWeek(model.getJqWeek());
-    		Integer count = jlJqWeekTimeSQL.count(query);
-    		if(count>0){
-    			this.error(error_103, "星期已存在，请选择别的星期");
-    			return this.toResult();
-    		}
-    	}
+//    	if(model.getJqWeek()!=null){
+//    		JlJqWeekTimeVO query = new JlJqWeekTimeVO();
+//    		query.setJqNo(model.getJqNo());
+//    		query.setJqWeek(model.getJqWeek());
+//    		Integer count = jlJqWeekTimeSQL.count(query);
+//    		if(count>0){
+//    			this.error(error_103, "星期已存在，请选择别的星期");
+//    			return this.toResult();
+//    		}
+//    	}
     	List<SysQqServerVO> list = sysQqServerSQL.findList(new SysQqServerVO());
     	if(list.size()>0){
     		model.setJy(list.get(0).getServerName());
@@ -85,19 +106,19 @@ public class JlJqWeekTimeWeb extends Result{
 
     @RequestMapping("/edit")
     public String edit(JlJqWeekTimeVO model){
-    	if(model.getTimeIndex()!=null){
-    		JlJqWeekTimeVO old = jlJqWeekTimeSQL.findOne(model.getTimeIndex());
-    		if(old.getJqWeek().intValue() != model.getJqWeek().intValue()){
-    			JlJqWeekTimeVO query = new JlJqWeekTimeVO();
-        		query.setJqNo(model.getJqNo());
-        		query.setJqWeek(model.getJqWeek());
-        		Integer count = jlJqWeekTimeSQL.count(query);
-        		if(count>0){
-        			this.error(error_103, "星期已存在，请选择别的星期");
-        			return this.toResult();
-        		}
-    		}
-    	}
+//    	if(model.getTimeIndex()!=null){
+//    		JlJqWeekTimeVO old = jlJqWeekTimeSQL.findOne(model.getTimeIndex());
+//    		if(old.getJqWeek().intValue() != model.getJqWeek().intValue()){
+//    			JlJqWeekTimeVO query = new JlJqWeekTimeVO();
+//        		query.setJqNo(model.getJqNo());
+//        		query.setJqWeek(model.getJqWeek());
+//        		Integer count = jlJqWeekTimeSQL.count(query);
+//        		if(count>0){
+//        			this.error(error_103, "星期已存在，请选择别的星期");
+//        			return this.toResult();
+//        		}
+//    		}
+//    	}
         jlJqWeekTimeSQL.edit(model);
         return this.toResult();
     }

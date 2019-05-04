@@ -133,7 +133,7 @@
 	      <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleFrDownload">{{$t('criminal.export')}}</el-button>
     	</div>
         <el-table :key='detailsTableKey' :data="detailsList" v-loading="detailsListLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-	      style="width: 1401px;margin-left: 0px;">
+	      style="width: 1441px;margin-left: 0px;">
 	      <el-table-column width="100" align="center" :label="$t('currency.jqName')" >
 	        <template slot-scope="scope">
 	          <span>{{scope.row.jqName}}</span>
@@ -174,22 +174,22 @@
 	          <span>{{scope.row.callTimeLen}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="主叫号码">
+	      <el-table-column width="130" align="center" label="主叫号码">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.localTele}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="被叫号码">
+	      <el-table-column width="130" align="center" label="被叫号码">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.tele}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="内部话费">
+	      <el-table-column width="110" align="center" label="内部话费(元)">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.callCountIn | qqYeFormat}}</span>
 	        </template>
 	      </el-table-column>
-	      <el-table-column width="110" align="center" label="外部话费">
+	      <el-table-column width="110" align="center" label="外部话费(元)">
 	        <template slot-scope="scope">
 	          <span>{{scope.row.callCountOut | qqYeFormat}}</span>
 	        </template>

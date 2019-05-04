@@ -25,11 +25,13 @@ import org.springframework.stereotype.Service;
 
 import com.sl.ue.entity.jl.vo.JlQqInfoVO;
 import com.sl.ue.entity.jl.vo.JlQqRecVO;
+import com.sl.ue.entity.sys.vo.SysQqLineVO;
 import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.base.impl.BaseSqlImpl;
 import com.sl.ue.service.jl.JlQqInfoService;
 import com.sl.ue.service.jl.JlQqRecService;
+import com.sl.ue.service.sys.SysQqLineService;
 import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.util.Config;
 import com.sl.ue.util.Constants;
@@ -45,6 +47,8 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 	private SysQqServerService sysQqServerSQL;
 	@Autowired
 	private JlQqInfoService jlQqInfoSQL;
+	@Autowired
+	private SysQqLineService sysQqLineSQL;
 	@Override
 	public Map<String, Object> findPojoLeft(JlQqRecVO model, Integer pageSize, Integer pageNum) {
 		StringBuffer leftJoinWhere = new StringBuffer();
@@ -122,14 +126,17 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     		leftJoinWhere.append(" AND a.Call_Time_Start<='"+ model.getCallTimeEnd() + "' ");
     	}
     	if(StringUtils.isNotBlank(model.getJqNo())){
-    		leftJoinWhere.append(",a.JQ_No='"+model.getJqNo()+"'");
+    		leftJoinWhere.append(" AND a.JQ_No='"+model.getJqNo()+"'");
     	}
     	if(StringUtils.isNotBlank(model.getFrNo())){
-    		leftJoinWhere.append(",a.FR_No='"+model.getFrNo()+"'");
+    		String str = model.getFrNo();
+    		leftJoinWhere.append(" AND a.FR_No LIKE '%"+str+"%'");
+    		model.setFrNo(null);
     	}
     	if(StringUtils.isNotBlank(model.getFrName())){
     		String str = model.getFrName();
     		leftJoinWhere.append(" AND (a.FR_Name LIKE '%"+str+"%' OR dbo.f_get_fryp(a.FR_Name,'"+str+"') =1 )");
+    		model.setFrName(null);
     	}
     	if(model.getJfFlag()!=null){
     		if(model.getJfFlag()==0){
@@ -949,5 +956,37 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 			}
 		}
     
+    }
+    
+    public String getFileUrl(Long id){
+    	Result result =new Result();
+    	JlQqRecVO model = this.findOne(id);
+    	if(model == null){
+    		return result.toResult();
+    	}
+    	String callRecPath = Config.getPropertiesValue("callRecfile");
+    	
+    	String qqServerPath = ""; //录音文件网络地址
+    	List<SysQqServerVO> list = sysQqServerSQL.findList(new SysQqServerVO());
+    	for(SysQqServerVO qqServer : list){
+    		if(qqServer.getServerName().equals(model.getJy())){
+    			qqServerPath = qqServer.getRecurl();
+    		}
+    	}
+    	
+    	if(StringUtils.isNotBlank(model.getCallRecfile())){
+			//先查看文件是否存在， 不存在就直接提示了
+			File file = new File(model.getCallRecfile());
+			if(file.exists()){
+				String end =model.getCallRecfile().replace("\\", "/");
+				end = end.substring(end.indexOf("/")+1);
+				end = end.substring(end.indexOf("/"));
+				String url = qqServerPath + callRecPath + end;
+				result.putJson("callUrl",url);
+				result.putJson("callLen",model.getCallTimeLen() );
+			}
+		}
+    	
+		return result.toResult();
     }
 }

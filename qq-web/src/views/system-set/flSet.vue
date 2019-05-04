@@ -51,7 +51,7 @@
 
 	<!-- 新增或编辑 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px" :modal-append-to-body="false">
-      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 520px; margin-left:10%;' >
+      <el-form :rules="rules" :model="dataForm" ref="dataForm" label-position="right" label-width="120px" style='width: 560px; margin-left:10%;' >
         <el-form-item label="费率字冠" prop="flFlag">
           <el-input v-model="dataForm.flFlag" style="width:200px"></el-input>
         </el-form-item>
@@ -329,7 +329,7 @@ export default {
 		}).then(() => {
 			this.listLoading = true;
 			let param = {
-    			id: row.id
+    			id: row.webid
     		}
 			RequestDelete(param).then(() => {
     		this.getList()

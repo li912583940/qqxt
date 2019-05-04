@@ -89,4 +89,11 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 	 */
 	public void exportExcelByRemind(String callTimeStart, String callTimeEnd, HttpServletRequest request, HttpServletResponse response);
 
+	/**
+	 * 说明 []
+	 * @param id
+	 * @return
+	 * L_晓天  @2019年5月2日
+	 */
+	public String getFileUrl(Long id);
 }

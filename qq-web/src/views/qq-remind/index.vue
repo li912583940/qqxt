@@ -4,24 +4,6 @@
 <template>
   <div class="app-container">
   	<div class="filter-container">
-  	  <el-date-picker
-    		style="width: 200px"
-    		class="filter-item"
-	      v-model="callTimeStart"
-	      align="right"
-	      type="date"
-	      placeholder="选择开始日期"
-	      :picker-options="pickerOptionsStart">
-	  </el-date-picker>
-	  <el-date-picker
-	    	style="width: 200px"
-	    	class="filter-item"
-	      v-model="callTimeEnd"
-	      align="right"
-	      type="date"
-	      placeholder="选择结束日期">
-	  </el-date-picker>
-      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
       <el-button v-if="buttonRole.exportPermission==1" class="filter-item" style="margin-left: 10px;" type="primary" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>
   	</div>
     
@@ -69,58 +51,10 @@ export default {
       list: null,
       total: null,
       listLoading: true,
-      callTimeStart: undefined,
-      callTimeEnd: undefined,
       listQuery: {
-      	callTimeStart: undefined,
-      	callTimeEnd: undefined,
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
-      
-      pickerOptionsStart: {
-	      shortcuts: [{
-	        text: '今天',
-	        onClick(picker) {
-	          picker.$emit('pick', new Date());
-	        }
-	      }, {
-	        text: '昨天',
-	        onClick(picker) {
-	          const date = new Date();
-	          date.setTime(date.getTime() - 3600 * 1000 * 24);
-	          picker.$emit('pick', date);
-	        }
-	      }, {
-	        text: '最近一周',
-	        onClick(picker) {
-	          const date = new Date();
-	          date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-	          picker.$emit('pick', date);
-	        }
-	      }, {
-	        text: '最近一个月',
-	        onClick(picker) {
-	          const date = new Date();
-	          date.setTime(date.getTime() - 3600 * 1000 * 24 * 30);
-	          picker.$emit('pick', date);
-	        }
-	      }, {
-	        text: '最近三个月',
-	        onClick(picker) {
-	          const date = new Date();
-	          date.setTime(date.getTime() - 3600 * 1000 * 24 * 90);
-	          picker.$emit('pick', date);
-	        }
-	      }, {
-	        text: '最近一年',
-	        onClick(picker) {
-	          const date = new Date();
-	          date.setTime(date.getTime() - 3600 * 1000 * 24 * 365);
-	          picker.$emit('pick', date);
-	        }
-	      }]
-	  },
       
       //按钮权限   1：有权限， 0：无权限
       buttonRole: { 
@@ -148,16 +82,6 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      if(!this.callTimeStart){
-      	this.listQuery.callTimeStart = undefined
-      }else{
-      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";
-      }
-      if(!this.callTimeEnd){
-      	this.listQuery.callTimeEnd = undefined
-      }else{
-      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
-      }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list
       	 this.total = res.pojo.count
@@ -202,16 +126,6 @@ export default {
 		      type: 'success',
 		      duration: 5 * 1000
 	    });
-        if(!this.callTimeStart){
-	      	this.listQuery.callTimeStart = undefined
-	    }else{
-	      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";
-	    }
-	    if(!this.callTimeEnd){
-	      	this.listQuery.callTimeEnd = undefined
-	    }else{
-	      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
-	    }
 		exportExcel(this.listQuery).then(res => {
 	        var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
 	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
@@ -227,9 +141,9 @@ export default {
 		     	window.URL.revokeObjectURL(href) // 释放掉blob对象
     		}
 	     	
-			}).catch(error => {
+		}).catch(error => {
          console.log(error)
-      })
+        })
 
     },
 	dateFormats: function (val) {

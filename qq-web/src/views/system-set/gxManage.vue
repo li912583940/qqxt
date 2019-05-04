@@ -77,7 +77,7 @@ export default {
         update: '编 辑',
         create: '新 增'
       },
-       rules: {
+      rules: {
         qsGx: [{ required: true, message: '亲属关系不能为空', trigger: 'blur' }]
       }
     }

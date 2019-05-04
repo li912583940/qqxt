@@ -22,12 +22,13 @@ public class SysLogServiceImpl extends BaseSqlImpl<SysLogVO> implements SysLogSe
     		leftJoinWhere.append(" AND a.LOG_TIME<='"+ model.getCallTimeEnd() + "' ");
     		model.setCallTimeEnd(null);
     	}
-    	if(StringUtils.isNotBlank(model.getUserNo())){
-    		leftJoinWhere.append(" AND a.USER_NO LIKE '%"+model.getUserNo()+"%' ");
-    		model.setUserNo(null);
-    	}
+//    	if(StringUtils.isNotBlank(model.getUserNo())){
+//    		leftJoinWhere.append(" AND a.USER_NO LIKE '%"+model.getUserNo()+"%' ");
+//    		model.setUserNo(null);
+//    	}
     	if(StringUtils.isNotBlank(model.getUserName())){
-    		leftJoinWhere.append(" AND a.USER_NAME LIKE '%"+model.getUserName()+"%' ");
+    		String str = model.getUserName();
+    		leftJoinWhere.append(" AND (a.USER_NAME LIKE '%"+str+"%' OR dbo.f_get_fryp(a.USER_NAME,'"+str+"') =1 )");
     		model.setUserName(null);
     	}
     	if(StringUtils.isNotBlank(model.getUserIp())){

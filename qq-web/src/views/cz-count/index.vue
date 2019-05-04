@@ -66,12 +66,12 @@
       </el-table-column>
       <el-table-column width="110" align="center" label="充值人编号">
         <template slot-scope="scope">
-          <span>{{scope.row.czUserNo}}</span>
+          <span>{{scope.row.czrNo}}</span>
         </template>
       </el-table-column>
       <el-table-column width="110" align="center" label="充值人名称">
         <template slot-scope="scope">
-          <span>{{scope.row.czUserName}}</span>
+          <span>{{scope.row.czrName}}</span>
         </template>
       </el-table-column>
       <el-table-column width="160" align="center" label="修改时间">
@@ -81,12 +81,12 @@
       </el-table-column>
       <el-table-column width="110" align="center" label="修改人编号">
         <template slot-scope="scope">
-          <span>{{scope.row.scUserNo}}</span>
+          <span>{{scope.row.scrNo}}</span>
         </template>
       </el-table-column>
       <el-table-column width="110" align="center" label="修改人名称">
         <template slot-scope="scope">
-          <span>{{scope.row.scUserName}}</span>
+          <span>{{scope.row.scrName}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.printPermission==1" align="center" :label="$t('criminal.actions')" width="120" fixed="right">
@@ -95,8 +95,8 @@
         </template>
       </el-table-column>
     </el-table>
-    <span style="margin-top: 15px;"></span>
-	<div class="filter-container">
+    <div style="margin-top: 10px;"></div>
+	<div class="filter-container" >
     	<span v-if="czCountSum !=null" >
     		<span style="margin-left: 20px;">充值总额为：{{czCountSum.countIn/1000}}（元）</span>
 	    	<span style="margin-left: 20px;">退费总额为：{{czCountSum.thcountOutZe/1000}}（元）</span>
@@ -294,15 +294,15 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      if(!this.callTimeStart1){
+      if(!this.callTimeStart){
       	this.listQuery.callTimeStart = undefined
       }else{
-      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart1)+" 00:00:00";
+      	this.listQuery.callTimeStart = this.dateFormatYMD(this.callTimeStart)+" 00:00:00";
       }
-      if(!this.callTimeEnd1){
+      if(!this.callTimeEnd){
       	this.listQuery.callTimeEnd = undefined
       }else{
-      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd1)+" 23:59:59";
+      	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
       }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list

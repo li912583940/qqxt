@@ -39,7 +39,7 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">电话批次</div>
+          <div class="card-panel-text">拨打次数</div>
           <count-to :start-val="0" :end-val="qqCount" :duration="3600" class="card-panel-num"/>
         </div>
       </div>

@@ -28,14 +28,14 @@
         </el-input>
 	    <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="用户姓名" v-model="listQuery.userName" clearable>
 	    </el-input>
-	    <!--<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="来源IP" v-model="listQuery.userIp" clearable>
-	    </el-input>-->
+	    <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="来源IP" v-model="listQuery.userIp" clearable>
+	    </el-input>
 	    <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
 	    <!--<el-button class="filter-item" type="primary" :loading="downloadLoading" v-waves icon="el-icon-download" @click="handleDownload">{{$t('criminal.export')}}</el-button>-->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1281px">
+      style="width: 1421px">
       <el-table-column width="160" align="center"  label="时间">
         <template slot-scope="scope">
           <span>{{scope.row.logTime}}</span>
@@ -71,11 +71,11 @@
           <span>{{scope.row.userName}}</span>
         </template>
       </el-table-column>
-      <!--<el-table-column width="140" align="center" label="来源IP">
+      <el-table-column width="140" align="center" label="来源IP">
         <template slot-scope="scope">
           <span>{{scope.row.userIp}}</span>
         </template>
-      </el-table-column>-->
+      </el-table-column>
     </el-table>
 
 		<!-- 分页 -->
@@ -123,17 +123,81 @@ export default {
       downloadLoading: false,
       models: [
       	{
-        	id: '用户登录',
-        	name: '用户登录'
-        },
-      	{
       		id: '罪犯管理',
       		name: '罪犯管理'
       	},
       	{
       		id: '亲属管理',
       		name: '亲属管理'
-      	}
+      	},
+      	{
+        	id: '警察信息',
+        	name: '警察信息'
+        },
+        {
+        	id: '实时监控',
+        	name: '实时监控'
+        },
+        {
+        	id: '通话录音',
+        	name: '通话录音'
+        },
+        {
+        	id: '话费充值',
+        	name: '话费充值'
+        },
+        {
+        	id: '话务统计',
+        	name: '话务统计'
+        },
+        {
+        	id: '亲情提醒',
+        	name: '亲情提醒'
+        },
+        {
+        	id: '充值统计',
+        	name: '充值统计'
+        },
+        {
+        	id: '用户管理',
+        	name: '用户管理'
+        },
+        {
+        	id: '权限配置',
+        	name: '权限配置'
+        },
+        {
+        	id: '罪犯级别',
+        	name: '罪犯级别'
+        },
+        {
+        	id: '监区设置',
+        	name: '监区设置'
+        },
+        {
+        	id: '线路设置',
+        	name: '线路设置'
+        },
+        {
+        	id: '亲情节假日',
+        	name: '亲情节假日'
+        },
+        {
+        	id: '亲属关系',
+        	name: '亲属关系'
+        },
+        {
+        	id: '部门管理',
+        	name: '部门管理'
+        },
+        {
+        	id: '费率设置',
+        	name: '费率设置'
+        },
+        {
+        	id: '系统参数',
+        	name: '系统参数'
+        }
       ],
       types: [
 		{
@@ -214,21 +278,6 @@ export default {
       	this.listQuery.callTimeEnd = undefined
       }else{
       	this.listQuery.callTimeEnd = this.dateFormatYMD(this.callTimeEnd)+" 23:59:59";
-      }
-      if(!this.listQuery.model){
-      	this.listQuery.model = undefined
-      }
-      if(!this.listQuery.type){
-      	this.listQuery.type = undefined
-      }
-      if(!this.listQuery.userNo){
-      	this.listQuery.userNo = undefined
-      }
-      if(!this.listQuery.userName){
-      	this.listQuery.userName = undefined
-      }
-      if(!this.listQuery.userIp){
-      	this.listQuery.userIp = undefined
       }
       findPojo(this.listQuery).then((res) => {
       	 this.list = res.pojo.list

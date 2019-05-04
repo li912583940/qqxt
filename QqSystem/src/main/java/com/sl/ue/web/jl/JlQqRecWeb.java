@@ -103,4 +103,10 @@ public class JlQqRecWeb extends Result{
 	public String getWeekCount(){
 		return jlQqRecSQL.getWeekCount();
 	}
+	
+	@RequestMapping("/getFileUrl")
+	//@IgnoreSecurity
+	public String getFileUrl(Long id){
+		return jlQqRecSQL.getFileUrl(id);
+	}
 }

@@ -213,6 +213,8 @@ import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 import { Message, MessageBox } from 'element-ui'
+import Vue from 'vue'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'callRecord',
@@ -523,8 +525,21 @@ export default {
     
     /** 录音操作 开始 */
     palyTape(row) {
+    	this.audioStartTime = 0
+    	this.audioCallLen= 0
+    	this.webid = undefined
+    	
     	this.callRecfileUrl = row.callRecfileUrl
-    	this.dialogTapeVisible = true
+    	if(this.ie==1){
+    	var httpPath = process.env.BASE_API
+    	var tokenValue = getToken()
+    		window.open("/static/html/audio.html?id="+row.webid+"&httpPath="+httpPath+"&token="+tokenValue,"","width=360,height=116,left=900,top=620,dependent=yes,scroll:no,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no")
+    	}else{
+    		this.dialogTapeVisible = true
+    		this.audioStartTime=(new Date()).getTime()
+    		this.audioCallLen=row.callTimeLen
+    		this.webid = row.webid
+    	}
     },
     downVideo(pathUrl){
     	if(pathUrl=='' ){

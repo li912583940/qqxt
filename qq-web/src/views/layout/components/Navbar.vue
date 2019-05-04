@@ -72,7 +72,7 @@
     </el-dialog>
     
     <div v-for="(item, index) in sysQqServerList">
-			<object :id="item.serverName" :name="item.serverName" codebase="../../ocx/TeleQqOcx.ocx#version=1,0,0,1" classid="clsid:561E476B-6C4F-4FCC-A8CE-A85C7F781620" 
+			<object :id="item.serverName" :name="item.serverName" codebase="../../../ocx/TeleQqOcx.ocx#version=1,0,0,1" classid="clsid:561E476B-6C4F-4FCC-A8CE-A85C7F781620" 
 		 		width="0" height="0">
 			</object>
 	  </div>
@@ -132,7 +132,7 @@ export default {
     }
   },
   mounted() {
-  	this.getHjServerList()
+  	this.getQqServerList()
   },
   destroyed() {
 
@@ -199,10 +199,12 @@ export default {
 				
 			})
     },
-    getHjServerList() { // 获取服务器用于注册控件
-			GetQqServerList({}).then(res => {
-				this.sysQqServerList = res.list
-			})
+    getQqServerList() { // 获取服务器用于注册控件
+    	if(navigator.appVersion.indexOf("MSIE") != -1 || (navigator.appVersion.toLowerCase().indexOf("trident") > -1 && navigator.appVersion.indexOf("rv") > -1) ){ // IE浏览器
+				GetQqServerList({}).then(res => {
+					this.sysQqServerList = res.list
+				})
+			}
 		},
   }
 }

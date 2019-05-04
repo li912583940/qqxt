@@ -74,7 +74,7 @@ export default {
       // 新增或编辑弹窗
       holidayValue: [],
       dialogFormVisible: false,
-
+	  
     }
   },
   filters: {
@@ -108,6 +108,14 @@ export default {
       this.dialogFormVisible = true
     },
     createData() {
+      if(this.holidayValue.length==0){
+      	Message({
+	        message: '请选择日期',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false;
+      }
       let holidays = this.holidayValue.join()
       let param = {
       	holidays: holidays

@@ -107,7 +107,7 @@ public class JlQsWeb extends Result{
     }
 
     @RequestMapping("/add")
-    public String add(JlQsVO model){
+    public String add(JlQsVO model, HttpServletRequest request){
     	if(jlQsSQL.qsExist(model.getFrNo(), model.getQsSfz())){
 			this.error(error_103, "当前亲属证件号码已绑定此罪犯");
 			return this.toResult();
@@ -121,6 +121,7 @@ public class JlQsWeb extends Result{
 		sysLog.setUserNo(user.getUserNo());
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
 		sysLogSQL.add(sysLog);
 		
         jlQsSQL.add(model);
@@ -128,7 +129,7 @@ public class JlQsWeb extends Result{
     }
 
     @RequestMapping("/edit")
-    public String edit(JlQsVO model){
+    public String edit(JlQsVO model, HttpServletRequest request){
     	JlQsVO oldJlQs = new JlQsVO();
     	if(StringUtils.isNotBlank(model.getQsSfz())){
     		oldJlQs = jlQsSQL.findOne(model.getWebid()); //之前的家属
@@ -150,6 +151,7 @@ public class JlQsWeb extends Result{
 		sysLog.setUserNo(user.getUserNo());
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
 		sysLogSQL.add(sysLog);
 		
 		if(model.getSw()==null){
@@ -162,7 +164,7 @@ public class JlQsWeb extends Result{
     }
 
     @RequestMapping("/delete")
-    public String del(Integer id){
+    public String del(Integer id, HttpServletRequest request){
     	JlQsVO model = jlQsSQL.findOne(id);
     	SysUserVO user = TokenUser.getUser();
 		SysLogVO sysLog = new SysLogVO();
@@ -173,6 +175,7 @@ public class JlQsWeb extends Result{
 		sysLog.setUserNo(user.getUserNo());
 		sysLog.setUserName(user.getUserName());
 		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
 		sysLogSQL.add(sysLog);
 		
         jlQsSQL.deleteKey(id);
@@ -182,12 +185,34 @@ public class JlQsWeb extends Result{
     @RequestMapping("/exportExcel")
     public void exportExcel(JlQsVO model,
     		HttpServletRequest request, HttpServletResponse response) {
+    	SysUserVO user = TokenUser.getUser();
+		SysLogVO sysLog = new SysLogVO();
+		sysLog.setType("正常");
+		sysLog.setOp("导出亲属信息");
+		sysLog.setInfo("导出亲属信息");
+		sysLog.setModel("亲属管理");
+		sysLog.setUserNo(user.getUserNo());
+		sysLog.setUserName(user.getUserName());
+		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
+		sysLogSQL.add(sysLog);
     	jlQsSQL.exportExcel(model, request, response);
     }
     
     @RequestMapping(value="/importExcel",method={RequestMethod.GET,RequestMethod.POST})
     @IgnoreSecurity
     public String importExcel(HttpServletRequest request, HttpServletResponse response){
+    	SysUserVO user = TokenUser.getUser();
+		SysLogVO sysLog = new SysLogVO();
+		sysLog.setType("正常");
+		sysLog.setOp("导入亲属信息");
+		sysLog.setInfo("导入亲属信息");
+		sysLog.setModel("亲属管理");
+		sysLog.setUserNo(user.getUserNo());
+		sysLog.setUserName(user.getUserName());
+		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
+		sysLogSQL.add(sysLog);
     	return jlQsSQL.importExcel(request, response);
     }
     

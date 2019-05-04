@@ -59,7 +59,7 @@ export default {
 //    this.setOptions(this.chartData)
 			this.chart.setOption({
 				title : {
-	        text: '一周内电话次数变化',
+	        text: '一周内拨打次数变化',
 	        subtext: '只能查看权限内数据'
     		},
         xAxis: {

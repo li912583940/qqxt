@@ -15,9 +15,9 @@
       </el-table-column>
       <el-table-column width="100" align="center" label="状态">
         <template slot-scope="scope">
-          <span v-if="scope.row.monitorState =='通话'">通话</span>
+          <span v-if="scope.row.monitorState =='通话'" style="color: red;">通话</span>
           <span v-if="scope.row.monitorState =='空闲'">空闲</span>
-          <span v-if="scope.row.monitorState =='应答'">应答</span>
+          <span v-if="scope.row.monitorState =='应答'" style="color:#409EFF;">应答</span>
         </template>
       </el-table-column>
       <el-table-column width="110" align="center" label="电话号码">
@@ -60,17 +60,13 @@
           <span>{{scope.row.monitorTime}}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.jiantingPermission==1 || buttonRole.qieduanPermission==1 || buttonRole.chahuaPermission==1" align="center" :label="$t('criminal.actions')" width="300" fixed="right">
+      <el-table-column v-if="buttonRole.jiantingPermission==1 || buttonRole.qieduanPermission==1 || buttonRole.chahuaPermission==1 || buttonRole.zhushiPermission==1" align="center" :label="$t('criminal.actions')" width="420" fixed="right">
         <template slot-scope="scope">
-          <el-button v-if="jtState==1 && buttonRole.jiantingPermission==1" type="primary" size="mini" icon="el-icon-service" @click="jianting(scope.row)">监听</el-button>
-          <el-button v-if="jtState==2 && buttonRole.jiantingPermission==1" size="mini" type="info" icon="el-icon-phone" @click="jiantingStop(scope.row)">停止监听</el-button>
-          <el-button v-if="jtState==2 && buttonRole.qieduanPermission==1" size="mini" type="danger" icon="el-icon-phone" @click="qieduan(scope.row)">切断</el-button>
-          <el-button v-if="buttonRole.chahuaPermission==1" type="primary" size="mini" icon="el-icon-phone-outline" @click="chahua(scope.row)">插话</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column v-if=" buttonRole.zhushiPermission==1" align="center" label="功能" width="120" fixed="right">
-        <template slot-scope="scope">
-          <el-button v-if="buttonRole.zhushiPermission==1" size="mini" type="info" icon="el-icon-document" @click="zhushi(scope.row)">注释</el-button>
+          <el-button v-if="jtState!=scope.row.lineNo && buttonRole.jiantingPermission==1" type="primary" size="mini" icon="el-icon-service" @click="jianting(scope.row)">监听</el-button>
+          <el-button v-if="jtState==scope.row.lineNo && buttonRole.jiantingPermission==1" size="mini" type="info" icon="el-icon-phone" @click="jiantingStop(scope.row)">停止监听</el-button>
+          <el-button v-if="jtState==scope.row.lineNo && buttonRole.qieduanPermission==1" size="mini" type="danger" icon="el-icon-phone" @click="qieduan(scope.row)">切断</el-button>
+          <el-button v-if="jtState==scope.row.lineNo && buttonRole.chahuaPermission==1" type="primary" size="mini" icon="el-icon-phone-outline" @click="chahua(scope.row)">插话</el-button>
+          <el-button v-if="jtState==scope.row.lineNo && buttonRole.zhushiPermission==1" size="mini" type="info" icon="el-icon-document" @click="zhushi(scope.row)">注释</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -118,7 +114,7 @@
 
 <script>
 	
-import { findPojo, GetMonitorVocList, AddMonitorFlag, GetZs} from '@/api/realtMonitor'
+import { findPojo, GetMonitorVocList, AddMonitorFlag, GetZs, GetQqServerList} from '@/api/realtMonitor'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -141,7 +137,9 @@ export default {
         pageSize: 20
       },
       
-      jtState: 1, //监听状态
+      jtState: null, //监听状态
+      
+      qqServerList: null,
       
       /** 插话 开始 */
       // 插话
@@ -190,6 +188,8 @@ export default {
   	this.setButtonRole()
   	
   	this.getMonitorVocList()
+  	
+  	this.openServerOcx()
   	
   	if(this.timer){
   		this.clearInterval(this.timer)
@@ -247,9 +247,12 @@ export default {
     },
     /** 监听 开始 */
     jianting(row){
+    	if(this.jtState!=null){
+    		document.getElementById(row.jy).ListenStop(this.jtState);
+    	}
     	if(row.monitorState=='通话'){
     		document.getElementById(row.jy).ListenTele(row.lineNo);
-    		this.jtState = 2
+    		this.jtState = row.lineNo
     	}else{
     		Message({
 	        message: '当前线路不在通话状态',
@@ -258,12 +261,13 @@ export default {
 	      });
     	}
     },
+    
     /** 监听 结束 */
    
     /** 停止监听 开始 */
     jiantingStop(row){
     	document.getElementById(row.jy).ListenStop(row.lineNo);
-    	this.jtState = 1
+    	this.jtState = null
     	Message({
         message: '停止监听',
 	      type: 'success',
@@ -278,6 +282,7 @@ export default {
 				type: 'warning'
 			}).then(() => {
 				document.getElementById(row.jy).StopTele(row.lineNo);
+				this.jtState = null
 		    Message({
 	        message: '已成功切断当前通话',
 		      type: 'success',
@@ -380,6 +385,25 @@ export default {
 		},
 		/** 注释 结束 */
 	
+		openServerOcx() { // 获取服务器用于控件连接
+			if(navigator.appVersion.indexOf("MSIE") != -1 || (navigator.appVersion.toLowerCase().indexOf("trident") > -1 && navigator.appVersion.indexOf("rv") > -1) ){ // IE浏览器
+				GetQqServerList({}).then(res => {
+					this.qqServerList = res.list
+					for(let x of this.qqServerList){
+						document.getElementById(x.serverName).ConnectSvr(x.ip, x.port);//修改
+					}
+				})
+			}
+			
+		},
+		closeServerOcx(){ //关闭服务器控件连接
+			if(this.qqServerList){
+				for(let x of this.qqServerList){
+						document.getElementById(x.serverName).DisconnectSvr();//修改
+					}
+			}
+		},
+		
 		dateFormats: function (val) {
 			if(!val){
 				return undefined
