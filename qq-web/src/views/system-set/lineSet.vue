@@ -53,9 +53,9 @@
           <span>{{scope.row.inLine}}/{{scope.row.outLine}}/{{scope.row.monLine}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('criminal.actions')" width="160">
+      <el-table-column v-if="buttonRole.confPermission==1" align="center" :label="$t('criminal.actions')" width="160">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">配置</el-button>
+          <el-button v-if="buttonRole.confPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -154,7 +154,13 @@ export default {
       textMap: {
         update: '配 置',
         create: '新 增'
-      }
+      },
+      
+      //按钮权限   1：有权限， 0：无权限
+      buttonRole: { 
+      	queryPermission: 1, 
+      	confPermission: 0
+      },
    
     }
   },
@@ -165,6 +171,8 @@ export default {
     this.getList()
   },
   mounted() {
+  	this.setButtonRole()
+  	
     this.getJyList()
     this.getJqList()
   },
@@ -187,6 +195,24 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    
+    setButtonRole() { //设置按钮的权限
+    	let roles = sessionStorage.getItem("roles")
+    	if(roles.includes('admin')){
+    		this.buttonRole.confPermission= 1
+    	}else{
+    		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
+    		let lineSet = buttonRoles.lineSet
+    		if(lineSet.length>0){
+    			for(let value of lineSet){
+    				if(value=='confPermission'){
+    					this.buttonRole.confPermission= 1
+    				}
+    			}
+    		}
+    	}
+    },
+    
     //重置表单
 	resetForm(formName) {
 		if(this.$refs[formName] !== undefined){

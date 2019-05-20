@@ -60,7 +60,7 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1631px">
+      style="width: 1601px">
       <el-table-column width="160" align="center" label="通话开始时间">
         <template slot-scope="scope">
           <span>{{scope.row.callTimeStart}}</span>
@@ -76,7 +76,7 @@
           <span>{{scope.row.callTimeLen}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="电话号码">
+      <el-table-column width="130" align="center" label="电话号码">
         <template slot-scope="scope">
           <span>{{scope.row.tele}}</span>
         </template>
@@ -90,6 +90,11 @@
       <el-table-column width="90" align="center" :label="$t('currency.jqName')">
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="110" align="center" :label="$t('currency.frNo')">
+        <template slot-scope="scope">
+          <span>{{scope.row.frNo}}</span>
         </template>
       </el-table-column>
       <el-table-column width="110" align="center" :label="$t('currency.frName')">
@@ -113,22 +118,29 @@
           <span>{{scope.row.yjName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="110" align="center" label="本机号码">
+      <el-table-column width="130" align="center" label="本机号码">
         <template slot-scope="scope">
           <span>{{scope.row.localTele}}</span>
         </template>
       </el-table-column>
-
-      <el-table-column v-if="buttonRole.playAudioPermission==1 || buttonRole.downAudioPermission==1" width="200" align="center" label="录音操作" fixed="right">
+      <el-table-column v-if="buttonRole.playAudioPermission==1 || buttonRole.downAudioPermission==1" width="100" align="center" label="录音操作" fixed="right">
         <template slot-scope="scope">
-        	<el-button v-if="buttonRole.playAudioPermission==1" type="primary" size="mini" @click="palyTape(scope.row)">播放录音</el-button>
-        	<el-button v-if="buttonRole.downAudioPermission==1" type="primary" size="mini" @click="downVideo(scope.row.callRecfileUrl)">下载录音</el-button>
+        	<div>
+        		<el-button v-if="buttonRole.playAudioPermission==1" type="primary" size="mini" @click="palyTape(scope.row)">播放录音</el-button>
+        	</div>
+        	<div style="margin-top: 2px;">
+        		<el-button v-if="buttonRole.downAudioPermission==1" type="primary" size="mini" @click="downAudio(scope.row)">下载录音</el-button>
+        	</div>
         </template>
       </el-table-column>
-      <el-table-column v-if="buttonRole.notesPermission==1 || buttonRole.seeNotesPermission==1" width="160" align="center" label="摘要操作" fixed="right">
+      <el-table-column v-if="buttonRole.notesPermission==1 || buttonRole.seeNotesPermission==1" width="80" align="center" label="摘要操作" fixed="right">
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.notesPermission==1" type="primary" size="mini" @click="zhushi(scope.row)">注释</el-button>
-          <el-button v-if="buttonRole.seeNotesPermission==1" type="primary" size="mini" @click="zhushiAll(scope.row)">查看</el-button>
+        	<div>
+          		<el-button v-if="buttonRole.notesPermission==1" type="primary" size="mini" @click="zhushi(scope.row)">注释</el-button>
+            </div>
+            <div style="margin-top: 2px;">
+            	<el-button v-if="buttonRole.seeNotesPermission==1" type="primary" size="mini" @click="zhushiAll(scope.row)">查看</el-button>
+        	</div>
         </template>
       </el-table-column>
     </el-table>
@@ -207,7 +219,7 @@
 
 <script>
 import { findPojo, findOne, findJqList, GetZs, AddRecordFlag, GetZsAllPojo, 
-	 exportExcel } from '@/api/callRecord'
+	 exportExcel, DownAudio } from '@/api/callRecord'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
@@ -391,10 +403,9 @@ export default {
       	downAudioPermission: 0, //下载录音
       	notesPermission: 0, //注释
       	seeNotesPermission: 0, //查看所有注释
-      	
-  
       },
       
+      ie:1,
     }
   },
   filters: {
@@ -411,6 +422,8 @@ export default {
     this.noSearch()
     
     this.getJqList()
+    
+    this.isIe()
   },
   mounted() {
     this.setButtonRole()
@@ -523,12 +536,16 @@ export default {
     },
     /** 查看所有注释 结束 */
     
+    isIe(){
+    	if(navigator.appVersion.indexOf("MSIE") != -1 || (navigator.appVersion.toLowerCase().indexOf("trident") > -1 && navigator.appVersion.indexOf("rv") > -1) ){ // IE浏览器
+    		this.ie=1
+    	}else{
+    		this.ie=0
+    	}
+    },
+    
     /** 录音操作 开始 */
     palyTape(row) {
-    	this.audioStartTime = 0
-    	this.audioCallLen= 0
-    	this.webid = undefined
-    	
     	this.callRecfileUrl = row.callRecfileUrl
     	if(this.ie==1){
     	var httpPath = process.env.BASE_API
@@ -536,36 +553,53 @@ export default {
     		window.open("/static/html/audio.html?id="+row.webid+"&httpPath="+httpPath+"&token="+tokenValue,"","width=360,height=116,left=900,top=620,dependent=yes,scroll:no,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no")
     	}else{
     		this.dialogTapeVisible = true
-    		this.audioStartTime=(new Date()).getTime()
-    		this.audioCallLen=row.callTimeLen
-    		this.webid = row.webid
     	}
     },
-    downVideo(pathUrl){
-    	if(pathUrl=='' ){
-				Message({
-		        message: '录音文件已被删除，无法下载。',
-			      type: 'error',
-			      duration: 5 * 1000
-		      });
-			}else{
-				//  录音
-				let fileName = pathUrl.substring(pathUrl.lastIndexOf("/")+1)
-		    	const downloadElement = document.createElement('a')
-		    	downloadElement.href = pathUrl
-		    	downloadElement.download=fileName
-		    	document.body.appendChild(downloadElement)
-		    	downloadElement.click()
-		    	document.body.removeChild(downloadElement)
-			}
+    downAudio(row){
+    	Message({
+	        message: '文件正在下载，请稍后。',
+		    type: 'success',
+		    duration: 5 * 1000
+	    });
+    	let param={
+    		webid: row.webid
+    	}
+    	let fileName = row.frName+"-"+row.frNo+"音频.wav";
+    	DownAudio(param).then(res =>{
+    		var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
+	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
+        	window.navigator.msSaveOrOpenBlob(blob, fileName);
+    		}else{ //非IE浏览器
+	     		var downloadElement = document.createElement('a')
+		     	var href = window.URL.createObjectURL(blob)
+		     	downloadElement.href = href
+		     	downloadElement.download = fileName
+		     	document.body.appendChild(downloadElement)
+		     	downloadElement.click()
+	     		document.body.removeChild(downloadElement) // 下载完成移除元素
+		     	window.URL.revokeObjectURL(href) // 释放掉blob对象
+	     	}
+    	}).catch(error => {
+	        console.log(error)
+	    })
     },
     
     closeTapeDialog(){
-    	var audio1 = document.getElementById("audio1")
-    	if(audio1.play){
-    		audio1.currentTime = 0;
-        audio1.pause();
+    	var x = document.getElementById("audio1")
+    	if(this.ie==1){
+    		if(x.play){
+    			x.pause()
+    		}
+    		Vue.nextTick(() => {
+		      document.getElementById("audioPlay").innerHTML= ''
+		    });
+    	}else{
+    		if(x.play){
+	    		x.currentTime = 0;
+	        	x.pause();
+	    	}
     	}
+    	
     },
     /** 录音操作 结束 */
     
@@ -585,12 +619,12 @@ export default {
       }
 
       Message({
-        message: '已准备导出会见记录文件，请稍等几秒。',
+        message: '已准备导出通话记录文件，请稍等几秒。',
 	      type: 'success',
 	      duration: 5 * 1000
       });
       
-			exportExcel(this.listQuery).then(res => {
+		exportExcel(this.listQuery).then(res => {
 	      var blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' })
 	     	if (window.navigator && window.navigator.msSaveOrOpenBlob) { // IE浏览器
         	window.navigator.msSaveOrOpenBlob(blob, '通话记录.xls');

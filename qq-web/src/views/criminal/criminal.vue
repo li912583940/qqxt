@@ -401,6 +401,9 @@
       </div>
     </el-dialog>
     <!-- 特批弹框 结束 -->
+    
+    <button hidden="hidden" id="shibie1" @click="shibie()"></button>
+    <input type="hidden" id="frCard1" name="frCard1" value="" />
   </div>
 </template>
 
@@ -440,6 +443,7 @@ export default {
         state: undefined,
         qqZh: undefined,
       },
+      scriptAddFr: null,
       
       // 新增或编辑弹窗
       dataForm: { 
@@ -627,6 +631,11 @@ export default {
   },
   mounted() {
      this.setButtonRole()
+     
+     this.openPort()
+  },
+  destroyed(){
+  	this.colsePort()
   },
   methods: {
   	noSearch() {
@@ -643,6 +652,53 @@ export default {
           this.listLoading = false
       })
     },
+    openPort(){ // 打开读卡器驱动
+    	console.log('打开port')
+    	if(navigator.appVersion.indexOf("MSIE") != -1 || (navigator.appVersion.toLowerCase().indexOf("trident") > -1 && navigator.appVersion.indexOf("rv") > -1) ){ // IE浏览器
+				//	reID.ReadCardID(4, "baud=9600 parity=N data=8 stop=1");
+				var isSuc=false;
+				for(var i=1;i<10;i++){
+					 isSuc=document.getElementById("WM1711").OpenPort1(i,"115200");
+					 if(isSuc==true){
+					 	break;
+					 }
+				}
+				this.cardEvent()
+    	}
+		},
+		colsePort(){ // 关闭读卡器驱动
+			if(navigator.appVersion.indexOf("MSIE") != -1 || (navigator.appVersion.toLowerCase().indexOf("trident") > -1 && navigator.appVersion.indexOf("rv") > -1)){ // IE浏览器
+				if(this.scriptAddFr){ // 删除节点
+					document.body.removeChild(this.scriptAddFr);
+				}
+				document.getElementById("WM1711").FunCloseCard();
+    	}
+		},
+		cardEvent() {// 设置读卡器监听事件 
+			let handler =	document.createElement("script")
+			handler.setAttribute("for", "WM1711");
+			handler.setAttribute("event","cardEvent();")
+			handler.appendChild(document.createTextNode("{"))
+			handler.appendChild(document.createTextNode("if(State == 1){"))
+			handler.appendChild(document.createTextNode("document.getElementById('frCard1').value=document.getElementById(\"WM1711\").FunGetEveData();"))
+			handler.appendChild(document.createTextNode("document.getElementById('shibie1').click();"))
+			handler.appendChild(document.createTextNode("}"))
+			handler.appendChild(document.createTextNode("}"))
+			document.body.appendChild(handler)
+			
+			this.scriptAddFr = handler
+  	},
+  	shibie(){ // 识别身份证信息并查询
+    	var idcard=document.getElementById("frCard1").value;
+		  idcard1=idcard.substring(6,8);
+	 		idcard2=idcard.substring(8,10);
+	 		idcard3=idcard.substring(10,12);
+	 		idcard4=idcard.substring(12,14);
+	 		idcard=idcard1+idcard2+idcard3+idcard4;
+			var ten=parseInt(idcard,16);
+			this.dataForm.frCard=ten;
+  	},
+  	
     getJqList() { //监区下拉框
     	if(this.jqs.length === 0) {
     		findJqList({}).then((res) => {

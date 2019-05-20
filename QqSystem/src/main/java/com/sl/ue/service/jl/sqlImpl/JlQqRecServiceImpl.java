@@ -1,8 +1,15 @@
 package com.sl.ue.service.jl.sqlImpl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,16 +32,19 @@ import org.springframework.stereotype.Service;
 
 import com.sl.ue.entity.jl.vo.JlQqInfoVO;
 import com.sl.ue.entity.jl.vo.JlQqRecVO;
+import com.sl.ue.entity.sys.vo.SysLogVO;
 import com.sl.ue.entity.sys.vo.SysQqLineVO;
 import com.sl.ue.entity.sys.vo.SysQqServerVO;
 import com.sl.ue.entity.sys.vo.SysUserVO;
 import com.sl.ue.service.base.impl.BaseSqlImpl;
 import com.sl.ue.service.jl.JlQqInfoService;
 import com.sl.ue.service.jl.JlQqRecService;
+import com.sl.ue.service.sys.SysLogService;
 import com.sl.ue.service.sys.SysQqLineService;
 import com.sl.ue.service.sys.SysQqServerService;
 import com.sl.ue.util.Config;
 import com.sl.ue.util.Constants;
+import com.sl.ue.util.DateUtil;
 import com.sl.ue.util.http.Result;
 import com.sl.ue.util.http.WebContextUtil;
 import com.sl.ue.util.http.token.JqRoleManager;
@@ -49,6 +59,8 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
 	private JlQqInfoService jlQqInfoSQL;
 	@Autowired
 	private SysQqLineService sysQqLineSQL;
+	@Autowired
+	private SysLogService sysLogSQL;
 	@Override
 	public Map<String, Object> findPojoLeft(JlQqRecVO model, Integer pageSize, Integer pageNum) {
 		StringBuffer leftJoinWhere = new StringBuffer();
@@ -85,7 +97,7 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     	
     	String callRecPath = Config.getPropertiesValue("callRecfile");
     	for(JlQqRecVO qqRec : list){
-    		qqRec.setCallRecfile("");
+    		qqRec.setCallRecfileUrl("");
     		
     		// 录音文件路径处理
     		for(SysQqServerVO qqServer: sysQqServerList){
@@ -975,18 +987,129 @@ public class JlQqRecServiceImpl extends BaseSqlImpl<JlQqRecVO> implements JlQqRe
     	}
     	
     	if(StringUtils.isNotBlank(model.getCallRecfile())){
-			//先查看文件是否存在， 不存在就直接提示了
-			File file = new File(model.getCallRecfile());
-			if(file.exists()){
-				String end =model.getCallRecfile().replace("\\", "/");
-				end = end.substring(end.indexOf("/")+1);
-				end = end.substring(end.indexOf("/"));
-				String url = qqServerPath + callRecPath + end;
-				result.putJson("callUrl",url);
-				result.putJson("callLen",model.getCallTimeLen() );
-			}
+    		String end =model.getCallRecfile().replace("\\", "/");
+			end = end.substring(end.indexOf("/")+1);
+			end = end.substring(end.indexOf("/"));
+			String url = qqServerPath + callRecPath + end;
+			result.putJson("callUrl",url);
+			System.out.println(url);
 		}
     	
 		return result.toResult();
+    }
+    
+    public void downAudio(Long webid, HttpServletRequest request, HttpServletResponse response){
+    	Result result = new Result();
+    	JlQqRecVO jlQqRec = this.findOne(webid);
+    	if(jlQqRec==null){
+    		result.error(Result.error_103,"数据库查询不到此记录");
+    		return;
+    	}
+    	SysUserVO user = TokenUser.getUser();
+    	SysLogVO sysLog = new SysLogVO();
+    	sysLog.setType("严重");
+		sysLog.setOp("下载录音");
+		sysLog.setInfo("下载罪犯编号: "+jlQqRec.getFrNo()+"，罪犯姓名: "+jlQqRec.getFrName()+"；时间: "+jlQqRec.getCallTimeStart()+" 的录音");
+		sysLog.setModel("通话录音");
+		sysLog.setUserNo(user.getUserNo());
+		sysLog.setUserName(user.getUserName());
+		sysLog.setLogTime(DateUtil.getDefaultNow());
+		sysLog.setUserIp(request.getRemoteAddr());
+		sysLogSQL.add(sysLog);
+		
+		
+		InputStream inputStream = null;
+    	if(StringUtils.isNotBlank(jlQqRec.getCallRecfile())){
+    		if("Server1".equals(jlQqRec.getJy())){
+    			File file = new File(jlQqRec.getCallRecfile());
+        		if(!file.exists()){
+        			return;
+        		}
+        		try {
+					inputStream = new FileInputStream(file);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+    		}else{
+    			String fileUrl="";
+	    		List<SysQqServerVO> list = sysQqServerSQL.findList(new SysQqServerVO());
+	    		for(SysQqServerVO qqServer : list){
+	    			if(qqServer.getServerName().equals(jlQqRec.getJy())){
+	    				String end =jlQqRec.getCallRecfile().replace("\\", "/");
+	        			end = end.substring(end.indexOf("/")+1);
+	        			end = end.substring(end.indexOf("/"));
+	        			fileUrl = qqServer.getRecurl()+"/file"+end;
+	    			}
+	    		}
+	    		int HttpResult; // 服务器返回的状态
+	            try
+	            {
+	                URL url =new URL(fileUrl); // 创建URL
+	                URLConnection urlconn = url.openConnection(); // 试图连接并取得返回状态码
+	                urlconn.connect();
+	                HttpURLConnection httpconn =(HttpURLConnection)urlconn;
+	                HttpResult = httpconn.getResponseCode();
+	                if(HttpResult != HttpURLConnection.HTTP_OK) {
+	                    System.out.print("无法连接到");
+	                } else {
+	                    inputStream = urlconn.getInputStream();
+	                }
+	            }
+	            catch (Exception e) {
+	                e.printStackTrace();
+	            }
+    			
+    		}
+    	}
+    	
+    	
+    	OutputStream out = null;
+		BufferedInputStream in =null;
+		try {
+			String fileName ="录音.mp3";
+			// 处理不同浏览器中文名称编码
+			String userAgent=request.getHeader("USER-AGENT");
+			if(userAgent.indexOf("Chrome")!=-1 || userAgent.indexOf("Safari")!=-1 || userAgent.indexOf("Firefox")!=-1){
+				fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+			}else{
+				fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+				//fileName = URLEncoder.encode(fileName,"UTF8");
+			}
+			response.setHeader("Content-Disposition", "attachment;filename="+fileName);
+			response.setHeader("Cache-Control","no-cache");//设置头
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("application/octet-stream");
+			out = response.getOutputStream();
+			//in = new BufferedInputStream(new FileInputStream(file));
+			in = new BufferedInputStream(inputStream);
+			int l = 1024*1024;//1M 默认，可在配置文件中设置此值大小
+			//int byteCount = 0;
+			byte[] buffer = new byte[l];
+			int bytesRead = -1;//文件大小
+			while ((bytesRead = in.read(buffer)) != -1) {
+				out.write(buffer, 0, bytesRead);
+				//byteCount += bytesRead;
+			}
+			out.flush();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				if(in!=null){
+					in.close();
+				}
+			}
+			catch (IOException ex) {
+			}
+			try {
+				if(out!=null){
+					out.close();
+				}
+			}
+			catch (IOException ex) {
+			}
+		}
     }
 }

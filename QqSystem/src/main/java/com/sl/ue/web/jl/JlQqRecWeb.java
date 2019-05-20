@@ -109,4 +109,15 @@ public class JlQqRecWeb extends Result{
 	public String getFileUrl(Long id){
 		return jlQqRecSQL.getFileUrl(id);
 	}
+	
+	/**
+	 * 说明 [下载录音]
+	 * @param request
+	 * @param response
+	 * L_晓天  @2019年4月9日
+	 */
+	@RequestMapping("/downAudio")
+	public void downAudio(Long webid, HttpServletRequest request, HttpServletResponse response){
+		jlQqRecSQL.downAudio(webid, request, response);
+	}
 }

@@ -91,8 +91,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: 'admin'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -229,7 +229,7 @@ $bg:#FFFAFA;
 /*$dark_gray:#889aa4;*/
 $dark_gray:#1E1E1E;
 $light_gray:#1E1E1E;
-$bgImg:url(/static/image/bj_kuaiyu.jpg);
+$bgImg:url(/static/image/北京声联信通科技有限公司.jpg);
 
 
 .login-container {

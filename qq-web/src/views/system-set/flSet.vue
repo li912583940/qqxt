@@ -4,8 +4,8 @@
 <template>
   <div class="app-container">
   	<div class="filter-container">
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="openFlUsable" type="info" icon="el-icon-setting">费率切换</el-button>
+      <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">{{$t('criminal.add')}}</el-button>
+      <el-button v-if="buttonRole.switchPermission==1" class="filter-item" style="margin-left: 10px;" @click="openFlUsable" type="info" icon="el-icon-setting">费率切换</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
@@ -35,10 +35,10 @@
           <span>{{scope.row.flCountOut | qqYeFormat}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('criminal.actions')" width="200">
+      <el-table-column v-if="buttonRole.editPermission==1 || buttonRole.deletePermission==1" align="center" :label="$t('criminal.actions')" width="200">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button  size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-if="buttonRole.editPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-if="buttonRole.deletePermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -164,6 +164,16 @@ export default {
       	paramData1: '0',
       },
       /**** 费率切换  结束 ****/
+     
+     //按钮权限   1：有权限， 0：无权限
+      buttonRole: { 
+      	queryPermission: 1, 
+      	addPermission: 0,
+      	editPermission: 0,
+      	deletePermission: 0,
+      	switchPermission: 0   // 费率切换
+      },
+      
     }
   },
   filters: {
@@ -185,6 +195,8 @@ export default {
     this.getList()
   },
   mounted() {
+  	this.setButtonRole()
+  	
     this.getSysParam()
   },
   methods: {
@@ -206,6 +218,32 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    setButtonRole() { //设置按钮的权限
+    	let roles = sessionStorage.getItem("roles")
+    	if(roles.includes('admin')){
+    		this.buttonRole.addPermission= 1
+    		this.buttonRole.editPermission= 1
+    		this.buttonRole.deletePermission= 1
+    		this.buttonRole.switchPermission= 1
+    	}else{
+    		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
+    		let flSet = buttonRoles.flSet
+    		if(flSet.length>0){
+    			for(let value of flSet){
+    				if(value=='addPermission'){
+    					this.buttonRole.addPermission= 1
+    				}else if(value=='editPermission'){
+    					this.buttonRole.editPermission= 1
+    				}else if(value=='deletePermission'){
+    					this.buttonRole.deletePermission= 1
+    				}else if(value=='switchPermission'){
+    					this.buttonRole.switchPermission= 1
+    				}
+    			}
+    		}
+    	}
+    },
+    
     getSysParam(){
     	findSysParam({}).then(res =>{
     		this.sysParam = res.data

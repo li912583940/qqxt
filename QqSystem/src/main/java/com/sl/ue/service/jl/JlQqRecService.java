@@ -96,4 +96,6 @@ public interface JlQqRecService extends BaseService<JlQqRecVO>{
 	 * L_晓天  @2019年5月2日
 	 */
 	public String getFileUrl(Long id);
+	
+	public void downAudio(Long webid, HttpServletRequest request, HttpServletResponse response);
 }

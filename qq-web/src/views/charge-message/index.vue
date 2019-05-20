@@ -12,11 +12,15 @@
       </el-input>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入罪犯姓名" v-model="listQuery.frName" clearable>
       </el-input>
+      <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.state" placeholder="选择服刑状态">
+        <el-option v-for="item in states" :key="item.id" :label="item.name" :value="item.id">
+        </el-option>
+      </el-select>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">{{$t('criminal.search')}}</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="给我一点时间" border fit highlight-current-row
-      style="width: 1101px">
+      style="width: 1201px">
       <el-table-column width="200" align="center" :label="$t('currency.jqName')" >
         <template slot-scope="scope">
           <span>{{scope.row.jqName}}</span>
@@ -32,15 +36,22 @@
           <span>{{scope.row.frName}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200" align="center" label="话费余额">
+      <el-table-column width="200" align="center" label="话费余额(元)">
         <template slot-scope="scope">
           <span>{{scope.row.qqYe | qqYeFormat}}</span>
         </template>
       </el-table-column>
+      <el-table-column width="100" align="center" label="服刑状态">
+        <template slot-scope="scope">
+          <span v-if="scope.row.state==0">服刑中</span>
+          <span v-if="scope.row.state==1" style="color: red;">出狱</span>
+        </template>
+      </el-table-column>
       <el-table-column v-if="buttonRole.rechargePermission==1 || buttonRole.refundPermission==1" align="center" :label="$t('criminal.actions')" width="180" >
         <template slot-scope="scope">
-          <el-button v-if="buttonRole.rechargePermission==1" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
-          <el-button v-if="buttonRole.refundPermission==1" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
+          
+          <el-button v-if="buttonRole.rechargePermission==1 && scope.row.state==0" type="primary" size="mini" @click="openRecharge(scope.row)">充值</el-button>
+          <el-button v-if="buttonRole.refundPermission==1 && scope.row.state==0" size="mini" type="danger" @click="requestRefund(scope.row)">出狱退费</el-button>
         </template>
       </el-table-column>
       <el-table-column v-if="buttonRole.detailsPermission==1" align="center" label="摘要" width="120" >
@@ -183,10 +194,21 @@ export default {
       	jq: undefined,
       	frNo: undefined,
       	frName: undefined,
+      	state: undefined,
         pageNum: 1,
         pageSize: 10
       },
       jqs: [],// 监区下拉选框
+      states: [
+      	{
+      		id: 0,
+      		name: '服刑中'
+      	},
+      	{
+      		id: 1,
+      		name: '出狱'
+      	}
+      ],
       
       // 充值 开始
       frname: undefined,
@@ -355,6 +377,14 @@ export default {
 	  this.dataRechargeForm.czje= row.czje
     },
     requestRecharge() {
+      if(this.dataRechargeForm.czje>1000){
+      	Message({
+	        message: '充值金额不能大于1000',
+		    type: 'error',
+		    duration: 5 * 1000
+	    });
+	    return false;
+      }
       this.$refs['dataRechargeForm'].validate((valid) => {
         if (valid) {
         	let param ={
@@ -438,6 +468,14 @@ export default {
     	this.dialogDetailsUpdateVisible=true
     },
     requestDetailsUpdate(){
+    	if(this.dataDetailsUpdateForm.czje>1000){
+    		Message({
+		        message: '修改金额不能大于1000',
+			    type: 'error',
+			    duration: 5 * 1000
+		    });
+		    return false;
+    	}
     	let param ={
     		czId:this.dataDetailsUpdateForm.czId,
     		czje:this.dataDetailsUpdateForm.czje*1000

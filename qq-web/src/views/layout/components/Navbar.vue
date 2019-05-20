@@ -34,6 +34,11 @@
               {{ $t('navbar.dashboard') }}
             </el-dropdown-item>
           </router-link>
+          <a target="_blank" @click="openDriver">
+            <el-dropdown-item>
+              	下载驱动
+            </el-dropdown-item>
+          </a>
           <a target="_blank" @click="openEditUser">
             <el-dropdown-item>
               	修改密码
@@ -51,6 +56,32 @@
       </el-dropdown>
     </div>
     
+    <!--下载驱动 -->
+    <el-dialog title="下载驱动" :visible.sync="dialogDriverVisible" width="800px" :modal-append-to-body="false">
+      <table  class="gridtable">
+      	<tr height="20px">
+      		<th width="15%">序号</th>
+      		<th width="15%">操作系统</th>
+      		<th width="50%">驱动名称</th>
+      		<th width="20%">操作</th>
+      	</tr>
+	  	 	<tr>
+	  	 		<td>1</td>
+	  	 		<td>全部</td>
+	  	 		<td>网页所需控件</td>
+	  	 		<td><a href="/static/Drivers/AllOcx.rar"><el-button type="primary"  size="mini" v-waves icon="el-icon-download">下载</el-button></a></td>
+	  	 	</tr>
+	  	 	<tr>
+	  	 		<td>2</td>
+	  	 		<td>全部</td>
+	  	 		<td>IC读卡器驱动</td>
+	  	 		<td><a href="/static/Drivers/CH341SER.rar"><el-button type="primary"  size="mini" v-waves icon="el-icon-download">下载</el-button></a></td>
+	  	 	</tr>
+	  	</table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogDriverVisible = false">关 闭</el-button>
+      </div>
+    </el-dialog>
     
     <!-- 新增或编辑 -->
     <el-dialog title="修改密码" :visible.sync="dialogFormVisible" :modal-append-to-body="false">
@@ -76,6 +107,12 @@
 		 		width="0" height="0">
 			</object>
 	  </div>
+	  
+	  <div v-if="dkq==1">
+	  	<object id="WM1711" name="WM1711" codebase="../../../ocx/WM171.ocx" classid="clsid:B56F7942-B054-416C-9BF8-C7339EB593D1" style="display: none"></object>
+    	<object id="MSCOMM32" name="MSCOMM32" codebase="../../../ocx/MSCOMM32.OCX" classid="clsid:648A5600-2C6E-101B-82B6-000000000014" style="display: none"></object>
+	  </div>
+	  
   </div>
 </template>
 
@@ -114,8 +151,13 @@ export default {
   data() {
     return {
       imagephoto: '/static/image/user.jpg',
+      
+      dialogDriverVisible : false, //下载驱动
+      
     	// 注册控件
       sysQqServerList: null,
+      //注册读卡器控件
+      dkq: 0,
       
     	dialogFormVisible: false,
     	dataForm: { 
@@ -146,7 +188,11 @@ export default {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
     },
-
+		
+		openDriver(){ // 下载驱动
+    	this.dialogDriverVisible=true
+    },
+    
     //重置表单
 		resetForm() {
 			this.dataForm.webid= undefined
@@ -204,6 +250,7 @@ export default {
 				GetQqServerList({}).then(res => {
 					this.sysQqServerList = res.list
 				})
+				this.dkq=1
 			}
 		},
   }
@@ -268,5 +315,31 @@ export default {
       }
     }
   }
+}
+
+table.gridtable {
+font-family: verdana,arial,sans-serif;
+font-size:15px;
+color:#333333;
+border-width: 1px;
+border-color: #76a5af;
+width: 700px;
+border-collapse: collapse;
+margin-left: 30px;
+}
+table.gridtable th {
+border-width: 1px;
+padding: 1px;
+border-style: solid;
+border-color: #76a5af;
+background-color: #dedede;
+}
+table.gridtable td {
+border-width: 1px;
+padding: 1px;
+border-style: solid;
+border-color: #76a5af;
+background-color: #ffffff;
+text-align:center;
 }
 </style>

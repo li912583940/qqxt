@@ -1,7 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-    	<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入姓名" v-model="listQuery.userName" clearable>
+    	<el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入登录账号" v-model="listQuery.userNo" clearable>
+      </el-input>
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="输入姓名" v-model="listQuery.userName" clearable>
       </el-input>
       <el-select clearable style="width: 200px" class="filter-item" v-model="listQuery.deptId" placeholder="选择部门">
         <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id">
@@ -63,6 +65,9 @@
             <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="重置密码" v-if="isAdmin==1">
+          <el-button type="info" @click="resetPassword">重置</el-button>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -93,11 +98,11 @@
 </template>
 
 <script>
-import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, FindUserDepartList, FindRoleList, GetCheckedRole, AddUserRole, GetDeptList } from '@/api/sysUser'
+import { findPojo, findOne, RequestAdd, RequestEdit, RequestDelete, FindUserDepartList, FindRoleList, GetCheckedRole, AddUserRole, GetDeptList, ResetPassword } from '@/api/sysUser'
 
 import moment from 'moment';
 import waves from '@/directive/waves' // 水波纹指令
-
+import { Message, MessageBox } from 'element-ui'
 
 export default {
   name: 'relatives',
@@ -114,6 +119,7 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 20,
+        userNo: undefined,
         userName: undefined,
         deptId: undefined
       },
@@ -149,6 +155,15 @@ export default {
 		  roleValue: [],
 		  /**------------添加角色结束-2-----------*/
    		
+   		//按钮权限   1：有权限， 0：无权限
+      buttonRole: { 
+      	queryPermission: 1, 
+      	addPermission: 0,
+      	editPermission: 0,
+      	deletePermission: 0,
+      	addRolesPermission: 0
+      },
+      isAdmin: 0,
     }
   },
   filters: {
@@ -157,6 +172,10 @@ export default {
   created() {
     this.getList()
     this.getDeptList()
+  },
+  mounted() {
+  	this.setButtonRole()
+    
   },
   methods: {
   	/**------------用户增删改查开始-1-----------*/
@@ -257,6 +276,20 @@ export default {
         }
       })
     },
+    resetPassword() { //重置密码
+    	let param={
+    		id: this.dataForm.webid
+    	}
+    	ResetPassword(param).then(res=>{
+    		Message({
+	        message: '密码重置成功。新的密码为123456，下次登录时请使用新密码。',
+		      type: 'success',
+		      duration: 5 * 1000
+	      });
+    	}).catch(error=>{
+    		
+    	})
+    },
     //删除
 		handleDelete(row) {
 			this.$confirm('确认删除该记录吗?', '提示', {
@@ -331,6 +364,33 @@ export default {
 	  
 	  /**------------添加角色结束-2-----------*/
 	 
+	  setButtonRole() { //设置按钮的权限
+    	let roles = sessionStorage.getItem("roles")
+    	if(roles.includes('admin')){
+    		this.isAdmin = 1
+    		this.buttonRole.addPermission= 1
+    		this.buttonRole.editPermission= 1
+    		this.buttonRole.deletePermission= 1
+    		this.buttonRole.addRolesPermission=1
+    	}else{
+    		let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
+    		let sysUser = buttonRoles.sysUser
+    		if(sysUser.length>0){
+    			for(let value of sysUser){
+    				if(value=='addPermission'){
+    					this.buttonRole.addPermission= 1
+    				}else if(value=='editPermission'){
+    					this.buttonRole.editPermission= 1
+    				}else if(value=='deletePermission'){
+    					this.buttonRole.deletePermission= 1
+    				}else if(value=='addRolesPermission'){
+    					this.buttonRole.addRolesPermission= 1
+    				}
+    			}
+    		}
+    	}
+    },
+    
 		dateFormats: function (val) {
 			if(!val){
 				return undefined

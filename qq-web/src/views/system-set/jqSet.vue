@@ -7,7 +7,7 @@
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="监区名称" v-model="listQuery.jqName" clearable>
       </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">添加</el-button>
+      <el-button v-if="buttonRole.addPermission==1" class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-circle-plus-outline">添加</el-button>
     </div>
     
     <el-table :key='tableKey' :data="list"   border fit highlight-current-row
@@ -33,11 +33,11 @@
           <span>{{scope.row.usetimelen}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('criminal.actions')" width="320" fixed="right">
+      <el-table-column v-if="buttonRole.editPermission==1 || buttonRole.deletePermission==1 || buttonRole.holidayPermission==1" align="center" :label="$t('criminal.actions')" width="320" fixed="right">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
-          <el-button size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">拨打时段设置</el-button>
+          <el-button v-if="buttonRole.editPermission==1" type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
+          <el-button v-if="buttonRole.deletePermission==1" size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button v-if="buttonRole.holidayPermission==1" size="mini" type="info" icon="el-icon-setting" @click="openWeek(scope.row)">拨打时段设置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -237,6 +237,16 @@ export default {
       ],
       /**---------------------亲情星期设置   结束--------------------------*/
 
+			//按钮权限   1：有权限， 0：无权限
+			isAdmin: 0,
+      buttonRole: { 
+      	queryPermission: 1, 
+      	addPermission: 0,
+      	editPermission: 0,
+      	deletePermission: 0,
+      	holidayPermission: 0,
+      },
+      
     }
   },
   filters: {
@@ -250,6 +260,9 @@ export default {
   },
   created() {
     this.getList()
+  },
+  mounted() {
+    this.setButtonRole()
   },
   methods: {
     getList() {
@@ -273,6 +286,33 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    setButtonRole() { //设置按钮的权限
+			let roles = sessionStorage.getItem("roles")
+			if(roles.includes('admin')){
+				this.isAdmin=1
+				this.buttonRole.addPermission= 1
+				this.buttonRole.editPermission= 1
+				this.buttonRole.deletePermission= 1
+				this.buttonRole.holidayPermission= 1
+			}else{
+				let buttonRoles = JSON.parse(sessionStorage.getItem("buttonRoles"))
+				let jqSet = buttonRoles.jqSet
+				if(jqSet.length>0){
+					for(let value of jqSet){
+						if(value=='addPermission'){
+							this.buttonRole.addPermission= 1
+						}else if(value=='editPermission'){
+							this.buttonRole.editPermission= 1
+						}else if(value=='deletePermission'){
+							this.buttonRole.deletePermission= 1
+						}else if(value=='holidayPermission'){
+							this.buttonRole.holidayPermission= 1
+						}
+					}
+				}
+			}
+		},
+	
     //重置表单
 	  resetForm(formName) {
 		if(this.$refs[formName] !== undefined){
